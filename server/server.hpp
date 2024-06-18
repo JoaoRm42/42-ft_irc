@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:28 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/18 14:03:39 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/18 17:19:15 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,9 @@ class Server {
 		int epollFunction();
 		uint16_t get_port_as_uint16();
 		int bind_user(int serverSocket, const struct sockaddr_in& serverAddr);
+		int listen_user(int serverSocket);
+		struct sockaddr_in serveraddr();
+		int create_epoll();
 };
 
 #endif
