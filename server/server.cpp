@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:20 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/17 15:39:11 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/18 12:57:22 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,4 +30,11 @@ Server& Server::operator=(const Server &obj) {
 Server::~Server() {}
 
 std::string Server::get_password() { return ( this->_password ); }
-std::string Server::get_port() { return ( this->_port); }
+std::string Server::get_port() { return ( this->_port ); }
+
+int Server::create_user() {
+    int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (serverSocket == -1)
+        return (-1);
+    return (serverSocket);
+}
