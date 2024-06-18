@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:20 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/18 14:39:46 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/18 15:16:54 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,8 +142,10 @@ int Server::epollFunction() {
                     epoll_ctl(epoll_fd, EPOLL_CTL_DEL, clientSocket, &event);
                     close(clientSocket);
                 } else {
-                    // Echo received data back to client
-                    // send(clientSocket, buffer, bytesRead, 0);
+                    for (std::vector<int>::iterator it = clientSockets.begin(); it != clientSockets.end(); ++it) {
+                        if (*it != clientSocket)
+                            send(*it, buffer, bytesRead, 0);
+                    }
                     write(1, &buffer, bytesRead);
                 }
             }
