@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:12:43 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/18 12:57:29 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/18 14:08:03 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,7 @@ int main(int ac, char **av) {
         Server teste(av);
         std::vector<Client_info> client;
         teste.print_cool_intro();
-        while (1)
-            if (std::cin.eof())
-                break;
+        teste.epollFunction();
     }
     else
         std::cout << "Wrong usage!\nTry: ./ircserv <port> <password>" << std::endl;
