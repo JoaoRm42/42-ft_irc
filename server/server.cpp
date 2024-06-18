@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:20 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/18 14:08:16 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/18 14:39:46 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,8 @@ int Server::epollFunction() {
                     close(clientSocket);
                 } else {
                     // Echo received data back to client
-                    send(clientSocket, buffer, bytesRead, 0);
+                    // send(clientSocket, buffer, bytesRead, 0);
+                    write(1, &buffer, bytesRead);
                 }
             }
         }
