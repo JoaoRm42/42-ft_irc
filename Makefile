@@ -3,17 +3,17 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: marvin <marvin@student.42.fr>              +#+  +:+       +#+         #
+#    By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/17 11:06:08 by marvin            #+#    #+#              #
-#    Updated: 2024/06/17 11:06:08 by marvin           ###   ########.fr        #
+#    Updated: 2024/06/18 11:25:01 by joaoped2         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = ircserv
 CXX = c++
 CXXFLAGS = -std=c++98 -Wall -Wextra -Werror -g
-SRCS = main.cpp server/server.cpp
+SRCS = main.cpp server/server.cpp server/getHostname.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(NAME)

@@ -6,19 +6,36 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:12:43 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/17 15:50:43 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/18 14:08:03 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libs.hpp"
 
-void print_cool_intro() {
+// 94 Lengh
+
+void print_line(const std::string& label, const std::string& value) {
+    int valuelen = value.length();
+    int total = (94 - 39 -  valuelen + 1);
+    std::cout << "│" << std::setw(39) << label << ": " << value << std::setw(total) << "│" << std::endl;
+}
+
+void Server::print_cool_intro() {
+    system("clear");
+    std::string string = display_hostname();
+    std::string ip = getIP();
+    std::string port = get_port();
+    std::string pass = get_password();
     std::cout << "┌──────────────────────────────────────────────────────────────────────────────────────────────┐\n";
-    std::cout << "|  __________  __________  __________  __________  __________  __________  _________________   │\n";
-    std::cout << "| ||F        |||T        |||_        |||I        |||R        |||C        |||                |  │\n";
-    std::cout << "| ||_________|||_________|||_________|||_________|||_________|||_________|||________________|  │\n";
-    std::cout << "| |/_________/|/_________/|/_________/|/_________/|/_________/|/_________/|/________________/  │\n";
-    std::cout << "|                                                                                              │\n";
+    std::cout << "│  __________  __________  __________  __________  __________  __________  _________________   │\n";
+    std::cout << "│ ||F        |||T        |||_        |||I        |||R        |||C        |||                |  │\n";
+    std::cout << "│ ||_________|||_________|||_________|||_________|||_________|||_________|||________________|  │\n";
+    std::cout << "│ |/_________/|/_________/|/_________/|/_________/|/_________/|/_________/|/________________/  │\n";
+    std::cout << "│                                                                                              │\n";
+    print_line("HOST", string);
+    print_line("IPV4", ip);
+    print_line("PORT", port);
+    print_line("PASS", pass);
     std::cout << "└──────────────────────────────────────────────────────────────────────────────────────────────┘\n\n";
 }
 
@@ -28,33 +45,8 @@ int main(int ac, char **av) {
     {
         Server teste(av);
         std::vector<Client_info> client;
-        std::string option;
-        print_cool_intro();
-        int i = 0;
-        while (1)
-        {
-            std::cin >> option;
-            if (std::cin.eof())
-                break;
-            else if (option == "ADD") {
-                std::stringstream ss;
-                ss << "Client" << i;
-                Client_info tmp;
-                tmp.name = ss.str();
-                tmp.admin = false;
-                tmp.nick = "Cli";
-                tmp.socket_fd = i;
-                client.push_back(tmp);
-                i++;
-            }
-            else if (option == "SHOW") {
-                const Client_info& lastClient = client.back();
-                std::cout << lastClient.name << std::endl;
-                std::cout << lastClient.admin << std::endl;
-                std::cout << lastClient.nick << std::endl;
-                std::cout << lastClient.socket_fd << std::endl;
-            }
-       }
+        teste.print_cool_intro();
+        teste.epollFunction();
     }
     else
         std::cout << "Wrong usage!\nTry: ./ircserv <port> <password>" << std::endl;

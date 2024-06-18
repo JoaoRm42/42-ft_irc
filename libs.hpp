@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:26:24 by joaoped2          #+#    #+#             */
-/*   Updated: 2024/06/17 15:50:18 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/18 13:46:10 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,13 @@
 # include <netdb.h>
 # include <vector>
 # include <sstream>
-
+# include <netdb.h>
+# include <cstring>
+# include <arpa/inet.h>
+# include <cstdlib>
+# include <iomanip>
+# include <map>
+# include <stdint.h>
 
 //Server Libs
 # include "server/server.hpp"
