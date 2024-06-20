@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:20 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/20 15:24:40 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/20 16:25:34 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -274,7 +274,12 @@ void Server::add_user_to_channel(const std::string& channel_name, clientInfo& us
         new_channel.name = channel_name;
         it = channels.insert(std::make_pair(channel_name, new_channel)).first;
         std::string msg = ":" + user.nick + "!d@localhost JOIN " + channel_name + "\r\n";
+        // std::string list_users = ":" + user.nick + "=" + channel_name + user.nick + "\r\n";
+        // sendMessage(client->getFd(), RPL_NAMREPLY(hostname, client->getNickname(), "=", channel, "@" + client->getNickname()));
+        // ---->  https://modern.ircdocs.horse/
+        std::cout << msg << std::endl;
         send(user.socket_fd, msg.c_str(), msg.size(), MSG_DONTWAIT);
+        // send(user.socket_fd, list_users.c_str(), list_users.size(), MSG_DONTWAIT);
         std::cout << "Channel " << channel_name << " created." << std::endl;
     }
 
