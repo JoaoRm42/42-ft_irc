@@ -6,11 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:28 by marvin            #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2024/06/18 17:19:15 by joaoped2         ###   ########.fr       */
-=======
 /*   Updated: 2024/06/19 15:31:38 by joaoped2         ###   ########.fr       */
->>>>>>> main
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,19 +40,12 @@ class Server {
 		int create_user();
 		int epollFunction();
 		uint16_t get_port_as_uint16();
-<<<<<<< HEAD
-		int bind_user(int serverSocket, const struct sockaddr_in& serverAddr);
-		int listen_user(int serverSocket);
-		struct sockaddr_in serveraddr();
-		int create_epoll();
-=======
 		int bind_user(int sockfd, const struct sockaddr_in& server_addr);
 		void handle_new_connection(int epoll_fd, int sockfd);
 		void handle_client_data(int epoll_fd, int clientSocket);
 		int check_single(Client_info& client_info, const std::string& result);
 		int check_message(Client_info& client_info, char* buffer);
 		int listen_user(int sockfd);
->>>>>>> main
 };
 
 #endif
