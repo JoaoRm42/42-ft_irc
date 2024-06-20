@@ -6,14 +6,14 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:20 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/19 16:39:59 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/20 15:24:40 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 
-Server::Server() : _port("6667"), _password("password"), _client_info() {}
-Server::Server(char **av) : _client_info() {
+Server::Server() : _port("6667"), _password("password"), _clientInfo() {}
+Server::Server(char **av) : _clientInfo() {
     this->_port = av[1];
     this->_password = av[2];
 }
@@ -29,92 +29,41 @@ Server& Server::operator=(const Server &obj) {
 
 Server::~Server() {}
 
-std::string Server::get_password() { return ( this->_password ); }
-std::string Server::get_port() { return ( this->_port ); }
+std::string Server::getPassword() { return ( this->_password ); }
+std::string Server::getPort() { return ( this->_port ); }
 
-uint16_t Server::get_port_as_uint16() {
-    // Convert string port to uint16_t
+
+uint16_t Server::getPortAsUint16() {
     char* endptr;
     unsigned long port_ul = strtoul(this->_port.c_str(), &endptr, 10);
     if (*endptr != '\0') {
-        // Error handling: Invalid port number string
         std::cerr << "Invalid port number format" << std::endl;
-        // Return default port or handle error appropriately
-        return 0; // Example default port
+        return 0;
     }
     return static_cast<uint16_t>(port_ul);
 }
 
-int Server::create_user() {
+int Server::createUser() {
     return socket(AF_INET, SOCK_STREAM, 0);
 }
 
-int Server::bind_user(int sockfd, const struct sockaddr_in& server_addr) {
+int Server::bindUser(int sockfd, const struct sockaddr_in& server_addr) {
     if (bind(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
         std::cerr << "Failed to bind socket" << std::endl;
-        return (1);
+        return 1;
     }
-    return (0);
+    return 0;
 }
 
-int Server::listen_user(int sockfd) {
+int Server::listenUser(int sockfd) {
     if (listen(sockfd, SOMAXCONN) < 0) {
         std::cerr << "Failed to listen on socket" << std::endl;
-        return (1);
+        return 1;
     }
-    return (0);
+    return 0;
 }
 
-std::vector<std::string> split(const std::string& s, char delimiter) {
-    std::vector<std::string> tokens;
-    std::string token;
-    std::istringstream tokenStream(s);
-
-    while (std::getline(tokenStream, token, delimiter)) {
-        tokens.push_back(token);
-    }
-
-    return tokens;
-}
-
-int Server::check_single(Client_info& client_info, const std::string& result) {
-    std::vector<std::string> line = split(result, ' ');
-    std::string tmp, tmp2;
-    for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) {
-        if (*it == "PASS" && ++it != line.end()) {
-            tmp = *it;
-            tmp2 = get_password();
-            if (tmp.length() - 1 != tmp2.length())
-                return (1);
-            client_info.pass = *it;
-            // std::cout << "Stored Pass: " << client_info.pass << std::endl;
-        } else if (*it == "NICK" && ++it != line.end()) {
-            client_info.nick = *it;
-            // std::cout << "Stored Nick: " << client_info.nick << std::endl;
-        } else if (*it == "USER" && ++it != line.end()) {
-            client_info.user = *it;
-            // std::cout << "Stored User: " << client_info.user << std::endl;
-        } else if (*it == "QUIT")
-            return (2);
-    }
-    return (0);
-}
-
-int Server::check_message(Client_info& client_info, char* buffer) {
-    std::vector<std::string> tokens = split(buffer, '\n');
-    int res;
-    for (std::vector<std::string>::iterator it = tokens.begin(); it != tokens.end(); ++it) {
-        std::string result = *it;
-        res = check_single(client_info, result);
-        if (res == 1)
-            return (1);
-        else if (res == 2)
-            return (2);
-    }
-    return (0);
-}
-
-void Server::handle_new_connection(int epoll_fd, int sockfd) {
+void Server::handleNewConnection(int epoll_fd, int sockfd) {
     struct sockaddr_in clientAddr;
     socklen_t clientAddrLen = sizeof(clientAddr);
     int clientSocket = accept(sockfd, (struct sockaddr*)&clientAddr, &clientAddrLen);
@@ -124,19 +73,26 @@ void Server::handle_new_connection(int epoll_fd, int sockfd) {
     }
 
     char buffer[1024];
-    recv(clientSocket, buffer, sizeof(buffer), 0);
+    int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
+    if (bytesRead < 0) {
+        std::cerr << "Failed to receive data from client" << std::endl;
+        close(clientSocket);
+        return;
+    }
+    buffer[bytesRead] = '\0';
 
-    Client_info client_info;
-    client_info.socket_fd = clientSocket;
-    int res;
-    res = check_message(client_info, buffer) == 1;
+    clientInfo clientInfo;
+    clientInfo.socket_fd = clientSocket;
+    int res = check_message(clientInfo, buffer);
     if (res == 1) {
         std::cout << "Wrong Password!" << std::endl;
-        return ;
+        close(clientSocket);
+        return;
+    } else if (res == 2) {
+        close(clientSocket);
+        return;
     }
-    else if (res == 2)
-        return ;
-    _client_info.push_back(client_info);
+    _clientInfo.push_back(clientInfo);
 
     std::cout << "New connection from " << inet_ntoa(clientAddr.sin_addr) << ":" << ntohs(clientAddr.sin_port) << std::endl;
 
@@ -150,9 +106,9 @@ void Server::handle_new_connection(int epoll_fd, int sockfd) {
     }
 }
 
-void Server::handle_client_data(int epoll_fd, int clientSocket) {
+void Server::handleClientData(int epoll_fd, int clientSocket) {
     char buffer[1024];
-    int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
+    int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0); // Ensure space for null-terminator
     if (bytesRead <= 0) {
         if (bytesRead == 0) {
             std::cout << "Connection closed by client" << std::endl;
@@ -164,21 +120,35 @@ void Server::handle_client_data(int epoll_fd, int clientSocket) {
     } else {
         buffer[bytesRead] = '\0'; // Null-terminate the received data
 
-        // Find the client_info associated with this socket
-        for (std::vector<Client_info>::iterator it = _client_info.begin(); it != _client_info.end(); ++it) {
+        // Find the clientInfo associated with this socket
+        for (std::vector<clientInfo>::iterator it = _clientInfo.begin(); it != _clientInfo.end(); ++it) {
             if (it->socket_fd == clientSocket) {
                 std::stringstream ss;
-                ss << it->socket_fd << ": " << std::string(buffer);
+                ss << it->nick << ": " << std::string(buffer);
                 std::string message = ss.str();
 
+                // Process commands
+                std::vector<std::string> tokens = split(buffer, ' ');
+                // Inside handleClientData function
+                if (!tokens.empty()) {
+                    if (tokens[0] == "JOIN" && tokens.size() > 1) {
+                        std::string channel_name = tokens[1];
+                        add_user_to_channel(channel_name, *it); // Add the user to the channel
+                        // Optionally notify the user about successful join
+                        std::string join_message = "You have joined channel " + channel_name;
+                        send(clientSocket, join_message.c_str(), join_message.size(), 0);
+                    }
+                    // Handle other commands...
+                }
 
-                //^^ Check if you can pass the nick name ^^//
-                for (std::vector<Client_info>::iterator cit = _client_info.begin(); cit != _client_info.end(); ++cit) {
+
+                // Broadcast the message to other clients
+                /* for (std::vector<clientInfo>::iterator cit = _clientInfo.begin(); cit != _clientInfo.end(); ++cit) {
                     if (cit->socket_fd != clientSocket) {
                         send(cit->socket_fd, message.c_str(), message.size(), 0);
                     }
-                }
-                write(1, message.c_str(), message.size());
+                } */
+                // write(1, message.c_str(), message.size());
                 break;
             }
         }
@@ -186,16 +156,19 @@ void Server::handle_client_data(int epoll_fd, int clientSocket) {
 }
 
 int Server::epollFunction() {
-    int sockfd = create_user();
+    int sockfd = createUser();
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(get_port_as_uint16());
+    server_addr.sin_port = htons(getPortAsUint16());
     server_addr.sin_addr.s_addr = INADDR_ANY;
 
-    if (bind_user(sockfd, server_addr))
-        return (1);
-    if (listen_user(sockfd))
-        return (1);
+    int opt = 1;
+	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) != 0)
+        return 1;
+    if (bindUser(sockfd, server_addr))
+        return 1;
+    if (listenUser(sockfd))
+        return 1;
 
     int epoll_fd = epoll_create1(0);
     if (epoll_fd == -1) {
@@ -211,7 +184,7 @@ int Server::epollFunction() {
         return 1;
     }
 
-    std::cout << "Server started. Listening on port " << get_port() << "..." << std::endl;
+    std::cout << "Server started. Listening on port " << getPort() << "..." << std::endl;
 
     epoll_event events[MAX_EVENTS];
 
@@ -219,9 +192,9 @@ int Server::epollFunction() {
         int numEvents = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
         for (int i = 0; i < numEvents; ++i) {
             if (events[i].data.fd == sockfd) {
-                handle_new_connection(epoll_fd, sockfd);
+                handleNewConnection(epoll_fd, sockfd);
             } else {
-                handle_client_data(epoll_fd, events[i].data.fd);
+                handleClientData(epoll_fd, events[i].data.fd);
             }
         }
     }
@@ -229,3 +202,118 @@ int Server::epollFunction() {
     close(sockfd);
     return 0;
 }
+
+std::vector<std::string> Server::split(const std::string &str, char delimiter) {
+    // std::cout << std::endl << "split" << std::endl << std::endl;
+    std::vector<std::string> tokens;
+    std::stringstream ss(str);
+    std::string token;
+    while (std::getline(ss, token, delimiter)) {
+        // std::cout << "token->$" << token << "$" << std::endl;
+        tokens.push_back(token);
+    }
+    // std::cout << std::endl << std::endl;
+    return tokens;
+}
+
+int Server::checkSingle(clientInfo& clientInfo, const std::string& result) {
+    std::vector<std::string> line = split(result, ' ');
+    std::string tmp, tmp2;
+
+    for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) {
+        if (*it == "PASS" && ++it != line.end()) {
+            tmp = *it;
+            tmp2 = getPassword();
+            if (tmp.length() - 1 != tmp2.length())
+                return 1;
+            clientInfo.pass = *it;
+        } else if (*it == "NICK" && ++it != line.end()) {
+            clientInfo.nick = *it;
+        } else if (*it == "USER" && ++it != line.end()) {
+            clientInfo.user = *it;
+        }
+    }
+    return 0;
+}
+
+int Server::check_message(clientInfo& client_info, char* buffer) {
+    std::vector<std::string> tokens = split(buffer, '\n');
+    int res;
+    for (std::vector<std::string>::iterator it = tokens.begin(); it != tokens.end(); ++it) {
+        std::string result = *it;
+        res = checkSingle(client_info, result);
+        if (res == 1)
+            return (1);
+        else if (res == 2)
+            return (2);
+    }
+    return (0);
+}
+
+void Server::create_channel(const std::string& channel_name) {
+    // Check if the channel already exists
+    if (channels.find(channel_name) != channels.end()) {
+        std::cout << "Channel " << channel_name << " already exists." << std::endl;
+        return;
+    }
+
+    // Create a new channel and add it to the map
+    Channel new_channel;
+    new_channel.name = channel_name;
+    channels[channel_name] = new_channel;
+
+    std::cout << "Channel " << channel_name << " created." << std::endl;
+}
+
+void Server::add_user_to_channel(const std::string& channel_name, clientInfo& user) {
+    // Check if the channel exists, create if it does not
+    std::map<std::string, Channel>::iterator it = channels.find(channel_name);
+    if (it == channels.end()) {
+        // Create a new channel
+        Channel new_channel;
+        new_channel.name = channel_name;
+        it = channels.insert(std::make_pair(channel_name, new_channel)).first;
+        std::string msg = ":" + user.nick + "!d@localhost JOIN " + channel_name + "\r\n";
+        send(user.socket_fd, msg.c_str(), msg.size(), MSG_DONTWAIT);
+        std::cout << "Channel " << channel_name << " created." << std::endl;
+    }
+
+    // Get the channel
+    Channel& channel = it->second;
+
+    // Check if the user is already in the channel
+    for (std::vector<clientInfo*>::iterator uit = channel.users.begin(); uit != channel.users.end(); ++uit) {
+        if ((*uit)->socket_fd == user.socket_fd) {
+            std::cout << "User " << user.nick << " is already in channel " << channel_name << "." << std::endl;
+            return;
+        }
+    }
+
+    // Add the user to the channel
+    channel.users.push_back(&user);
+    user.channels.push_back(channel_name);
+
+    std::cout << "User " << user.nick << " added to channel " << channel_name << "." << std::endl;
+}
+
+
+void Server::send_channel_message(const std::string& channel_name, const std::string& message) {
+    // Find the channel
+    std::map<std::string, Channel>::iterator it = channels.find(channel_name);
+    if (it == channels.end()) {
+        std::cerr << "Channel " << channel_name << " does not exist." << std::endl;
+        return;
+    }
+
+    // Broadcast the message to all users in the channel
+    Channel& channel = it->second;
+    for (std::vector<clientInfo*>::iterator cit = channel.users.begin(); cit != channel.users.end(); ++cit) {
+        send((*cit)->socket_fd, message.c_str(), message.size(), 0);
+    }
+
+    // Print the message to the server console
+    std::cout << "Message sent to channel " << channel_name << ": " << message << std::endl;
+}
+
+
+

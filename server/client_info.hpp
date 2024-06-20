@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:22:35 by joaoped2          #+#    #+#             */
-/*   Updated: 2024/06/19 14:53:45 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/20 12:38:24 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,12 @@
 
 # include "../libs.hpp"
 
-struct Client_info {
+struct clientInfo {
 	int socket_fd;
 	std::string nick;
 	std::string user;
 	std::string pass;
+	std::vector<std::string> channels;
 };
 
 #endif

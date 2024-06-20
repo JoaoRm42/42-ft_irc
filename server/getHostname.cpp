@@ -6,13 +6,13 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 11:13:02 by joaoped2          #+#    #+#             */
-/*   Updated: 2024/06/18 12:20:45 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/20 11:48:28 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libs.hpp"
 
-std::string Server::display_hostname() {
+std::string Server::displayHostname() {
 	char hostname[256];
 
 	memset(hostname, 0, sizeof(hostname));
@@ -25,7 +25,7 @@ std::string Server::display_hostname() {
 }
 
 std::string Server::getIP() {
-	std::string tmp = display_hostname();
+	std::string tmp = displayHostname();
 	const char *hostname = tmp.c_str();
     struct addrinfo hints, *res, *p;
     memset(&hints, 0, sizeof hints);

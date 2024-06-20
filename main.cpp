@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:12:43 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/18 14:08:03 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/20 11:49:12 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,12 @@ void print_line(const std::string& label, const std::string& value) {
     std::cout << "│" << std::setw(39) << label << ": " << value << std::setw(total) << "│" << std::endl;
 }
 
-void Server::print_cool_intro() {
+void Server::printCoolntro() {
     system("clear");
-    std::string string = display_hostname();
+    std::string string = displayHostname();
     std::string ip = getIP();
-    std::string port = get_port();
-    std::string pass = get_password();
+    std::string port = getPort();
+    std::string pass = getPassword();
     std::cout << "┌──────────────────────────────────────────────────────────────────────────────────────────────┐\n";
     std::cout << "│  __________  __________  __________  __________  __________  __________  _________________   │\n";
     std::cout << "│ ||F        |||T        |||_        |||I        |||R        |||C        |||                |  │\n";
@@ -44,8 +44,8 @@ int main(int ac, char **av) {
     if (ac == 3)
     {
         Server teste(av);
-        std::vector<Client_info> client;
-        teste.print_cool_intro();
+        std::vector<clientInfo> client;
+        teste.printCoolntro();
         teste.epollFunction();
     }
     else
