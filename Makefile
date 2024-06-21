@@ -13,7 +13,7 @@
 NAME = ircserv
 CXX = c++
 CXXFLAGS = -std=c++98 -Wall -Wextra -Werror -g
-SRCS = main.cpp server/server.cpp server/getHostname.cpp
+SRCS = main.cpp server/server.cpp server/getHostname.cpp server/getChannel.cpp channel/Channel.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(NAME)

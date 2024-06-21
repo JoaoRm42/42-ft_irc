@@ -16,14 +16,16 @@
 
 # include "../libs.hpp"
 # include "client_info.hpp"
-# include "../channel/channel.hpp"
+# include "../channel/Channel.hpp"
+
+class	Channel;
 
 class Server {
 private:
     std::string _port;
     std::string _password;
     std::vector<struct clientInfo> _clientInfo;
-    std::map<std::string, Channel> channels;
+    std::map<std::string, Channel *> _channelsList;
 
 public:
     Server();
@@ -49,9 +51,15 @@ public:
     std::vector<std::string> split(const std::string &str, char delimiter);
     int checkSingle(clientInfo& clientInfo, const std::string& result);
 	int check_message(clientInfo& client_info, char* buffer);
-    void create_channel(const std::string& channel_name);
-    void add_user_to_channel(const std::string& channel_name, clientInfo& user);
-    void send_channel_message(const std::string& channel_name, const std::string& message);
+    //void create_channel(const std::string& channel_name);
+    //void add_user_to_channel(const std::string& channel_name, clientInfo& user);
+    void sendChannelMessage(std::string channelName, std::string message, clientInfo& user);
+
+	void	sendMessage(int fd, std::string message);
+
+	//channels funtions
+	bool	checkForOperators(std::string line, clientInfo& user);
+	void	tryToJoinChannel(std::string& channelName, clientInfo& user);
 };
 
 
