@@ -63,6 +63,19 @@ int Server::listenUser(int sockfd) {
     return 0;
 }
 
+void setNonBlocking(int socket) {
+    int flags = fcntl(socket, F_GETFL, 0);
+    if (flags == -1) {
+        std::cerr << "Failed to get socket flags" << std::endl;
+        return;
+    }
+
+    if (fcntl(socket, F_SETFL, flags | O_NONBLOCK) == -1) {
+        std::cerr << "Failed to set non-blocking mode" << std::endl;
+    }
+}
+
+
 void Server::handleNewConnection(int epoll_fd, int sockfd) {
     struct sockaddr_in clientAddr;
     socklen_t clientAddrLen = sizeof(clientAddr);
@@ -71,6 +84,9 @@ void Server::handleNewConnection(int epoll_fd, int sockfd) {
         std::cerr << "Failed to accept client connection" << std::endl;
         return;
     }
+
+    // Set the client socket to non-blocking mode
+    setNonBlocking(clientSocket);
 
     char buffer[1024];
     int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
@@ -105,6 +121,7 @@ void Server::handleNewConnection(int epoll_fd, int sockfd) {
         return;
     }
 }
+
 
 void Server::handleClientData(int epoll_fd, int clientSocket) {
     char buffer[1024];

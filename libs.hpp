@@ -30,6 +30,8 @@
 # include <iomanip>
 # include <map>
 # include <stdint.h>
+#include <fcntl.h>
+
 
 //Server Libs
 # include "server/server.hpp"
