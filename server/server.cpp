@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:20 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/20 16:25:34 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/21 14:01:38 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,16 +63,21 @@ int Server::listenUser(int sockfd) {
     return 0;
 }
 
-void setNonBlocking(int socket) {
+std::string setNonBlocking(int socket) {
     int flags = fcntl(socket, F_GETFL, 0);
+    char buffer[1024];
+    recv(socket, buffer, sizeof(buffer) - 1, 0);
+    std::string tmp = buffer;
     if (flags == -1) {
         std::cerr << "Failed to get socket flags" << std::endl;
-        return;
+        return(tmp);
     }
 
     if (fcntl(socket, F_SETFL, flags | O_NONBLOCK) == -1) {
         std::cerr << "Failed to set non-blocking mode" << std::endl;
     }
+    // std::cout << buffer << std::endl << std::endl << std::endl;
+    return (tmp);
 }
 
 
@@ -85,30 +90,24 @@ void Server::handleNewConnection(int epoll_fd, int sockfd) {
         return;
     }
 
-    // Set the client socket to non-blocking mode
-    setNonBlocking(clientSocket);
-
-    char buffer[1024];
-    int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
-    if (bytesRead < 0) {
-        std::cerr << "Failed to receive data from client" << std::endl;
-        close(clientSocket);
-        return;
-    }
-    buffer[bytesRead] = '\0';
+    std::string tmp = setNonBlocking(clientSocket);
+    char *buffer = new char[tmp.size() + 1];
+    std::strcpy(buffer, tmp.c_str());
 
     clientInfo clientInfo;
     clientInfo.socket_fd = clientSocket;
-    int res = check_message(clientInfo, buffer);
+
+    // Process client message to extract nick
+    int res = check_message(clientInfo, buffer); // Make sure this sets clientInfo.nick correctly
     if (res == 1) {
-        std::cout << "Wrong Password!" << std::endl;
+        std::cerr << "Failed to parse client message" << std::endl;
         close(clientSocket);
-        return;
-    } else if (res == 2) {
-        close(clientSocket);
+        delete[] buffer;
         return;
     }
+
     _clientInfo.push_back(clientInfo);
+    delete[] buffer;
 
     std::cout << "New connection from " << inet_ntoa(clientAddr.sin_addr) << ":" << ntohs(clientAddr.sin_port) << std::endl;
 
@@ -123,9 +122,11 @@ void Server::handleNewConnection(int epoll_fd, int sockfd) {
 }
 
 
+
 void Server::handleClientData(int epoll_fd, int clientSocket) {
     char buffer[1024];
-    int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0); // Ensure space for null-terminator
+    int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
+    std::cout << buffer << std::endl;
     if (bytesRead <= 0) {
         if (bytesRead == 0) {
             std::cout << "Connection closed by client" << std::endl;
@@ -135,37 +136,18 @@ void Server::handleClientData(int epoll_fd, int clientSocket) {
         epoll_ctl(epoll_fd, EPOLL_CTL_DEL, clientSocket, NULL);
         close(clientSocket);
     } else {
-        buffer[bytesRead] = '\0'; // Null-terminate the received data
-
-        // Find the clientInfo associated with this socket
+        buffer[bytesRead] = '\0';
         for (std::vector<clientInfo>::iterator it = _clientInfo.begin(); it != _clientInfo.end(); ++it) {
             if (it->socket_fd == clientSocket) {
-                std::stringstream ss;
-                ss << it->nick << ": " << std::string(buffer);
-                std::string message = ss.str();
-
-                // Process commands
                 std::vector<std::string> tokens = split(buffer, ' ');
-                // Inside handleClientData function
                 if (!tokens.empty()) {
                     if (tokens[0] == "JOIN" && tokens.size() > 1) {
                         std::string channel_name = tokens[1];
-                        add_user_to_channel(channel_name, *it); // Add the user to the channel
-                        // Optionally notify the user about successful join
+                        add_user_to_channel(channel_name, *it);
                         std::string join_message = "You have joined channel " + channel_name;
                         send(clientSocket, join_message.c_str(), join_message.size(), 0);
                     }
-                    // Handle other commands...
                 }
-
-
-                // Broadcast the message to other clients
-                /* for (std::vector<clientInfo>::iterator cit = _clientInfo.begin(); cit != _clientInfo.end(); ++cit) {
-                    if (cit->socket_fd != clientSocket) {
-                        send(cit->socket_fd, message.c_str(), message.size(), 0);
-                    }
-                } */
-                // write(1, message.c_str(), message.size());
                 break;
             }
         }
@@ -221,15 +203,12 @@ int Server::epollFunction() {
 }
 
 std::vector<std::string> Server::split(const std::string &str, char delimiter) {
-    // std::cout << std::endl << "split" << std::endl << std::endl;
     std::vector<std::string> tokens;
     std::stringstream ss(str);
     std::string token;
     while (std::getline(ss, token, delimiter)) {
-        // std::cout << "token->$" << token << "$" << std::endl;
         tokens.push_back(token);
     }
-    // std::cout << std::endl << std::endl;
     return tokens;
 }
 
@@ -254,88 +233,91 @@ int Server::checkSingle(clientInfo& clientInfo, const std::string& result) {
 }
 
 int Server::check_message(clientInfo& client_info, char* buffer) {
-    std::vector<std::string> tokens = split(buffer, '\n');
-    int res;
+    std::string message(buffer); // Convert char* buffer to std::string
+    std::vector<std::string> tokens = split(message, '\n');
+
+    // Process each token in the message
     for (std::vector<std::string>::iterator it = tokens.begin(); it != tokens.end(); ++it) {
         std::string result = *it;
-        res = checkSingle(client_info, result);
-        if (res == 1)
-            return (1);
-        else if (res == 2)
-            return (2);
+
+        // Process each part of the token
+        std::vector<std::string> parts = split(result, ' ');
+        for (std::vector<std::string>::iterator it2 = parts.begin(); it2 != parts.end(); ++it2) {
+            if (*it2 == "NICK" && ++it2 != parts.end()) {
+                client_info.nick = *it2; // Set the nick from client message
+                return 0;
+            }
+        }
     }
-    return (0);
+    return 1;
 }
 
-void Server::create_channel(const std::string& channel_name) {
-    // Check if the channel already exists
-    if (channels.find(channel_name) != channels.end()) {
-        std::cout << "Channel " << channel_name << " already exists." << std::endl;
-        return;
+
+void Server::send_msg(int socket_fd, const char* msg) {
+    // Assuming send implementation
+    int bytes_sent = send(socket_fd, msg, strlen(msg), 0);
+    if (bytes_sent == -1) {
+        std::cerr << "Failed to send message to socket " << socket_fd << std::endl;
+    }
+}
+
+    std::string remove_trailing_newline(const std::string& str) {
+        std::string cleaned_str = str;
+        std::string::iterator it = std::find_if(cleaned_str.rbegin(), cleaned_str.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base();
+        cleaned_str.erase(it, cleaned_str.end());
+        return cleaned_str;
     }
 
-    // Create a new channel and add it to the map
-    Channel new_channel;
-    new_channel.name = channel_name;
-    channels[channel_name] = new_channel;
-
-    std::cout << "Channel " << channel_name << " created." << std::endl;
-}
 
 void Server::add_user_to_channel(const std::string& channel_name, clientInfo& user) {
-    // Check if the channel exists, create if it does not
-    std::map<std::string, Channel>::iterator it = channels.find(channel_name);
-    if (it == channels.end()) {
-        // Create a new channel
-        Channel new_channel;
-        new_channel.name = channel_name;
-        it = channels.insert(std::make_pair(channel_name, new_channel)).first;
-        std::string msg = ":" + user.nick + "!d@localhost JOIN " + channel_name + "\r\n";
-        // std::string list_users = ":" + user.nick + "=" + channel_name + user.nick + "\r\n";
-        // sendMessage(client->getFd(), RPL_NAMREPLY(hostname, client->getNickname(), "=", channel, "@" + client->getNickname()));
-        // ---->  https://modern.ircdocs.horse/
-        std::cout << msg << std::endl;
-        send(user.socket_fd, msg.c_str(), msg.size(), MSG_DONTWAIT);
-        // send(user.socket_fd, list_users.c_str(), list_users.size(), MSG_DONTWAIT);
-        std::cout << "Channel " << channel_name << " created." << std::endl;
-    }
+    // std::cout << "1) Handling user with nick: " << user.nick << std::endl;
 
-    // Get the channel
+    // Remove trailing newline characters from channel_name
+    std::string clean_channel_name = remove_trailing_newline(channel_name);
+
+    // Check if the channel exists, create if it does not
+    std::map<std::string, Channel>::iterator it = channels.find(clean_channel_name);
+    std::ostringstream msg_stream;
+    msg_stream << ":" << user.nick << " JOIN " << clean_channel_name << "\r\n";
+    std::string msg = msg_stream.str();
+
+    if (it == channels.end()) {
+        // Create a new channel if it doesn't exist
+        Channel new_channel;
+        new_channel.name = clean_channel_name;
+        it = channels.insert(std::make_pair(clean_channel_name, new_channel)).first;
+        std::cout << "Channel " << new_channel.name << " created" << std::endl;
+    }
+    // std::cout << "2) Handling user with nick: " << user.nick << std::endl;
     Channel& channel = it->second;
 
     // Check if the user is already in the channel
+    bool user_already_in_channel = false;
     for (std::vector<clientInfo*>::iterator uit = channel.users.begin(); uit != channel.users.end(); ++uit) {
         if ((*uit)->socket_fd == user.socket_fd) {
-            std::cout << "User " << user.nick << " is already in channel " << channel_name << "." << std::endl;
-            return;
+            std::cout << "User " << user.nick << " is already in channel " << clean_channel_name << "." << std::endl;
+            user_already_in_channel = true;
+            break;
         }
     }
 
-    // Add the user to the channel
-    channel.users.push_back(&user);
-    user.channels.push_back(channel_name);
+    // std::cout << "3) Handling user with nick: " << user.nick << std::endl;
+    if (!user_already_in_channel) {
+        // Send JOIN message to the user (simplified for demonstration)
+        send_msg(user.socket_fd, msg.c_str());
 
-    std::cout << "User " << user.nick << " added to channel " << channel_name << "." << std::endl;
+        // std::cout << "4) Handling user with nick: " << user.nick << std::endl;
+        // Add user to the channel
+        channel.users.push_back(&user);
+        user.channels.push_back(clean_channel_name);
+
+        // std::cout << "5) Handling user with nick: " << user.nick << std::endl;
+        // std::cout << user.nick;
+        std::cout << "In channel: "<< clean_channel_name << " a user: " << user.nick << " has joined" << std::endl;
+        // std::cout << "Sent message: " << msg << std::endl; // Log sent message
+    }
 }
 
-
-void Server::send_channel_message(const std::string& channel_name, const std::string& message) {
-    // Find the channel
-    std::map<std::string, Channel>::iterator it = channels.find(channel_name);
-    if (it == channels.end()) {
-        std::cerr << "Channel " << channel_name << " does not exist." << std::endl;
-        return;
-    }
-
-    // Broadcast the message to all users in the channel
-    Channel& channel = it->second;
-    for (std::vector<clientInfo*>::iterator cit = channel.users.begin(); cit != channel.users.end(); ++cit) {
-        send((*cit)->socket_fd, message.c_str(), message.size(), 0);
-    }
-
-    // Print the message to the server console
-    std::cout << "Message sent to channel " << channel_name << ": " << message << std::endl;
-}
 
 
 
