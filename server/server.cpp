@@ -27,7 +27,11 @@ Server& Server::operator=(const Server &obj) {
     return(*this);
 }
 
-Server::~Server() {}
+Server::~Server() {
+	for (std::map<std::string, Channel *>::iterator it = _channelsList.begin(); it != _channelsList.end(); ++it) {
+		delete it->second;
+	}
+}
 
 std::string Server::getPassword() { return ( this->_password ); }
 std::string Server::getPort() { return ( this->_port ); }
@@ -138,20 +142,25 @@ void Server::handleClientData(int epoll_fd, int clientSocket) {
     } else {
         buffer[bytesRead] = '\0';
         for (std::vector<clientInfo>::iterator it = _clientInfo.begin(); it != _clientInfo.end(); ++it) {
-            if (it->socket_fd == clientSocket) {
-                std::vector<std::string> tokens = split(buffer, ' ');
-                if (!tokens.empty()) {
-                    if (tokens[0] == "JOIN" && tokens.size() > 1) {
-                        std::string channel_name = tokens[1];
-                        add_user_to_channel(channel_name, *it);
-                        std::string join_message = "You have joined channel " + channel_name;
-                        send(clientSocket, join_message.c_str(), join_message.size(), 0);
-                    }
-                }
-                break;
-            }
-        }
-    }
+			if (it->socket_fd == clientSocket) {
+				std::stringstream ss;
+				ss << it->nick << ": " << std::string(buffer);
+				std::string message = ss.str();
+
+				// Process commands
+				std::vector<std::string> tokens = split(buffer, ' ');
+				// Inside handleClientData function
+				if (!tokens.empty()) {
+					if (checkForOperators(buffer, *it) == true) {
+						std::cout << "comando executado\n";
+					} else if (tokens[0] == "PRIVMSG" && tokens.size() > 1) {
+						sendChannelMessage(tokens[1], buffer, *it);
+						std::cout << "manda mensagem normal \n";
+					}
+					break;
+				}
+			}
+		}
 }
 
 int Server::epollFunction() {
@@ -216,19 +225,35 @@ int Server::checkSingle(clientInfo& clientInfo, const std::string& result) {
     std::vector<std::string> line = split(result, ' ');
     std::string tmp, tmp2;
 
-    for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) {
-        if (*it == "PASS" && ++it != line.end()) {
-            tmp = *it;
-            tmp2 = getPassword();
-            if (tmp.length() - 1 != tmp2.length())
-                return 1;
-            clientInfo.pass = *it;
-        } else if (*it == "NICK" && ++it != line.end()) {
-            clientInfo.nick = *it;
-        } else if (*it == "USER" && ++it != line.end()) {
-            clientInfo.user = *it;
-        }
-    }
+	for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) {
+		if (*it == "PASS" && ++it != line.end()) {
+			tmp = *it;
+			tmp2 = getPassword();
+			if (tmp.length() - 1 != tmp2.length())
+				return 1;
+			clientInfo.pass = *it;
+		} else if (*it == "NICK" && ++it != line.end()) {
+			clientInfo.nick = *it;
+		} else if (*it == "USER" && ++it != line.end()) {
+			clientInfo.user = *it;
+		}
+	}
+	/*while (clientInfo.pass.empty() && clientInfo.nick.empty() && clientInfo.user.empty())
+	{
+		for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) {
+			if (*it == "PASS" && ++it != line.end()) {
+				tmp = *it;
+				tmp2 = getPassword();
+				if (tmp.length() - 1 != tmp2.length())
+					return 1;
+				clientInfo.pass = *it;
+			} else if (*it == "NICK" && ++it != line.end()) {
+				clientInfo.nick = *it;
+			} else if (*it == "USER" && ++it != line.end()) {
+				clientInfo.user = *it;
+			}
+		}
+	}*/
     return 0;
 }
 
@@ -253,71 +278,32 @@ int Server::check_message(clientInfo& client_info, char* buffer) {
 }
 
 
-void Server::send_msg(int socket_fd, const char* msg) {
-    // Assuming send implementation
-    int bytes_sent = send(socket_fd, msg, strlen(msg), 0);
-    if (bytes_sent == -1) {
-        std::cerr << "Failed to send message to socket " << socket_fd << std::endl;
-    }
+void	Server::sendMessage(int fd, std::string message) {
+	const char	*buffer = message.c_str();
+	send(fd, buffer, std::strlen(buffer), MSG_DONTWAIT);
 }
 
-    std::string remove_trailing_newline(const std::string& str) {
-        std::string cleaned_str = str;
-        std::string::iterator it = std::find_if(cleaned_str.rbegin(), cleaned_str.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base();
-        cleaned_str.erase(it, cleaned_str.end());
-        return cleaned_str;
-    }
+void Server::sendChannelMessage(std::string channelName, std::string message, clientInfo& user) {
+    // Find the channel
 
+	if (channelName.find('\r') != std::string::npos)
+		channelName.erase(channelName.find('\r'));
 
-void Server::add_user_to_channel(const std::string& channel_name, clientInfo& user) {
-    // std::cout << "1) Handling user with nick: " << user.nick << std::endl;
+	std::map<std::string, Channel*>::iterator it = _channelsList.find(channelName);
+	if (it == _channelsList.end()) {
+		std::cerr << "Channel " << channelName << " does not exist." << std::endl;
+		return;
+	}
 
-    // Remove trailing newline characters from channel_name
-    std::string clean_channel_name = remove_trailing_newline(channel_name);
-
-    // Check if the channel exists, create if it does not
-    std::map<std::string, Channel>::iterator it = channels.find(clean_channel_name);
-    std::ostringstream msg_stream;
-    msg_stream << ":" << user.nick << " JOIN " << clean_channel_name << "\r\n";
-    std::string msg = msg_stream.str();
-
-    if (it == channels.end()) {
-        // Create a new channel if it doesn't exist
-        Channel new_channel;
-        new_channel.name = clean_channel_name;
-        it = channels.insert(std::make_pair(clean_channel_name, new_channel)).first;
-        std::cout << "Channel " << new_channel.name << " created" << std::endl;
-    }
-    // std::cout << "2) Handling user with nick: " << user.nick << std::endl;
-    Channel& channel = it->second;
-
-    // Check if the user is already in the channel
-    bool user_already_in_channel = false;
-    for (std::vector<clientInfo*>::iterator uit = channel.users.begin(); uit != channel.users.end(); ++uit) {
-        if ((*uit)->socket_fd == user.socket_fd) {
-            std::cout << "User " << user.nick << " is already in channel " << clean_channel_name << "." << std::endl;
-            user_already_in_channel = true;
-            break;
-        }
-    }
-
-    // std::cout << "3) Handling user with nick: " << user.nick << std::endl;
-    if (!user_already_in_channel) {
-        // Send JOIN message to the user (simplified for demonstration)
-        send_msg(user.socket_fd, msg.c_str());
-
-        // std::cout << "4) Handling user with nick: " << user.nick << std::endl;
-        // Add user to the channel
-        channel.users.push_back(&user);
-        user.channels.push_back(clean_channel_name);
-
-        // std::cout << "5) Handling user with nick: " << user.nick << std::endl;
-        // std::cout << user.nick;
-        std::cout << "In channel: "<< clean_channel_name << " a user: " << user.nick << " has joined" << std::endl;
-        // std::cout << "Sent message: " << msg << std::endl; // Log sent message
-    }
+	std::vector<int> membersFd = it->second->getMenbersFd();
+	if (membersFd.size() < 2) {
+		std::cerr << "Channel " << channelName << " has fewer than 2 members." << std::endl;
+		return;
+	}
+	for (std::vector<int>::iterator itt = membersFd.begin(); itt != membersFd.end(); ++itt) {
+		if (user.socket_fd != *itt) {  // Ensure not to send the message to the sender
+			std::string msg = ":" + user.nick + " PRIVMSG " + channelName + " :" + message + "\r\n";
+			sendMessage(*itt, msg);  // Send the message to the member
+		}
+	}
 }
-
-
-
-

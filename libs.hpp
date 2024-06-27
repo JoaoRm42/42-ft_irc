@@ -34,8 +34,9 @@
 # include <errno.h>
 # include <algorithm>
 
-
 //Server Libs
 # include "server/server.hpp"
+# include "channel/Channel.hpp"
+
 
 #endif
