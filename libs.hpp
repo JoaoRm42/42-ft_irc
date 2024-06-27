@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:26:24 by joaoped2          #+#    #+#             */
-/*   Updated: 2024/06/18 13:46:10 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/27 12:50:07 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@
 # include <map>
 # include <stdint.h>
 # include <algorithm>
+#include <errno.h>
+#include <fcntl.h>
 
 //Server Libs
 # include "server/server.hpp"

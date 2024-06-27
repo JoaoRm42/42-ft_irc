@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:28 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/20 13:17:57 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/27 13:03:03 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ public:
     void handleClientData(int epoll_fd, int clientSocket);
     int epollFunction();
     std::vector<std::string> split(const std::string &str, char delimiter);
-    int checkSingle(clientInfo& clientInfo, const std::string& result);
+    int checkSingle(clientInfo& clientInfo, char* result);
 	int check_message(clientInfo& client_info, char* buffer);
     //void create_channel(const std::string& channel_name);
     //void add_user_to_channel(const std::string& channel_name, clientInfo& user);

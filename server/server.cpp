@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:20 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/20 16:25:34 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/27 14:30:01 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,23 +67,77 @@ int Server::listenUser(int sockfd) {
     return 0;
 }
 
+void clearCharPointer(char* str) {
+    if (str) {
+        std::memset(str, '\0', std::strlen(str));
+    }
+}
+
+int Server::checkSingle(clientInfo& clientInfo, char* result) {
+    std::vector<std::string> line = split(result, '\n');
+    std::string clientPassword;
+    std::string serverPassword = getPassword();
+    std::string content(result);
+
+    while (1) {
+        for (std::vector<std::string>::iterator lineIt = line.begin(); lineIt != line.end(); ++lineIt) {
+            std::string saver = *lineIt;
+            std::vector<std::string> tokens = split(saver, ' ');
+            for (std::vector<std::string>::iterator line2It = tokens.begin(); line2It != tokens.end(); ++line2It) {
+                if (*line2It == "PASS") {
+                    line2It++;
+                    clientPassword = *line2It;
+                    if (clientPassword.length() - 1 != serverPassword.length())
+                    {
+                        serverPassword.clear();
+                        return 1;
+                    }
+                    clientInfo.pass = *line2It;
+                    serverPassword.clear();
+                } else if (*line2It == "NICK") {
+                    line2It++;
+                    clientInfo.nick = *line2It;
+                } else if (*line2It == "USER") {
+                    line2It++;
+                    clientInfo.user = *line2It;
+                }
+            }
+        }
+        // std::cout << "Nick: " << clientInfo.nick << " Pass: " << clientInfo.pass << " User: " << clientInfo.user << std::endl;
+        if (!clientInfo.nick.empty() && !clientInfo.pass.empty() && !clientInfo.user.empty())
+            break;
+    }
+    return 0;
+}
+
+int Server::check_message(clientInfo& client_info, char* buffer) {
+    int res = checkSingle(client_info, buffer);
+    if (res == 1)
+        return 1;
+    else if (res == 2)
+        return 2;
+    return 0;
+}
+
 void Server::handleNewConnection(int epoll_fd, int sockfd) {
     struct sockaddr_in clientAddr;
     socklen_t clientAddrLen = sizeof(clientAddr);
     int clientSocket = accept(sockfd, (struct sockaddr*)&clientAddr, &clientAddrLen);
     if (clientSocket == -1) {
-        std::cerr << "Failed to accept client connection" << std::endl;
+        std::cerr << "Failed to accept client connection: " << strerror(errno) << std::endl;
         return;
     }
 
     char buffer[1024];
     int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
-    if (bytesRead < 0) {
-        std::cerr << "Failed to receive data from client" << std::endl;
-        close(clientSocket);
-        return;
-    }
+    // if (bytesRead < 0) {
+    //     std::cerr << "Failed to receive data from client: " << strerror(errno) << std::endl;
+    //     close(clientSocket);
+    //     return;
+    // }
     buffer[bytesRead] = '\0';
+
+    // std::cout << "Received data 1: " << buffer << std::endl;
 
     clientInfo clientInfo;
     clientInfo.socket_fd = clientSocket;
@@ -96,6 +150,9 @@ void Server::handleNewConnection(int epoll_fd, int sockfd) {
         close(clientSocket);
         return;
     }
+    std::cout << "Nick: " << clientInfo.nick << std::endl;
+    std::cout << "Pass: " << clientInfo.pass << std::endl;
+    std::cout << "User: " << clientInfo.user << std::endl;
     _clientInfo.push_back(clientInfo);
 
     std::cout << "New connection from " << inet_ntoa(clientAddr.sin_addr) << ":" << ntohs(clientAddr.sin_port) << std::endl;
@@ -104,7 +161,7 @@ void Server::handleNewConnection(int epoll_fd, int sockfd) {
     event.events = EPOLLIN | EPOLLET;
     event.data.fd = clientSocket;
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, clientSocket, &event) == -1) {
-        std::cerr << "Failed to add client socket to epoll" << std::endl;
+        std::cerr << "Failed to add client socket to epoll: " << strerror(errno) << std::endl;
         close(clientSocket);
         return;
     }
@@ -168,7 +225,8 @@ int Server::epollFunction() {
         std::cerr << "Epoll creation failed" << std::endl;
         return 1;
     }
-
+    int flags = fcntl(sockfd, F_GETFL, 0);
+    fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
     struct epoll_event event;
     event.events = EPOLLIN | EPOLLET;
     event.data.fd = sockfd;
@@ -207,56 +265,6 @@ std::vector<std::string> Server::split(const std::string &str, char delimiter) {
     }
     // std::cout << std::endl << std::endl;
     return tokens;
-}
-
-int Server::checkSingle(clientInfo& clientInfo, const std::string& result) {
-    std::vector<std::string> line = split(result, ' ');
-    std::string tmp, tmp2;
-
-	for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) {
-		if (*it == "PASS" && ++it != line.end()) {
-			tmp = *it;
-			tmp2 = getPassword();
-			if (tmp.length() - 1 != tmp2.length())
-				return 1;
-			clientInfo.pass = *it;
-		} else if (*it == "NICK" && ++it != line.end()) {
-			clientInfo.nick = *it;
-		} else if (*it == "USER" && ++it != line.end()) {
-			clientInfo.user = *it;
-		}
-	}
-	/*while (clientInfo.pass.empty() && clientInfo.nick.empty() && clientInfo.user.empty())
-	{
-		for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) {
-			if (*it == "PASS" && ++it != line.end()) {
-				tmp = *it;
-				tmp2 = getPassword();
-				if (tmp.length() - 1 != tmp2.length())
-					return 1;
-				clientInfo.pass = *it;
-			} else if (*it == "NICK" && ++it != line.end()) {
-				clientInfo.nick = *it;
-			} else if (*it == "USER" && ++it != line.end()) {
-				clientInfo.user = *it;
-			}
-		}
-	}*/
-    return 0;
-}
-
-int Server::check_message(clientInfo& client_info, char* buffer) {
-    std::vector<std::string> tokens = split(buffer, '\n');
-    int res;
-    for (std::vector<std::string>::iterator it = tokens.begin(); it != tokens.end(); ++it) {
-        std::string result = *it;
-        res = checkSingle(client_info, result);
-        if (res == 1)
-            return (1);
-        else if (res == 2)
-            return (2);
-    }
-    return (0);
 }
 
 void	Server::sendMessage(int fd, std::string message) {
