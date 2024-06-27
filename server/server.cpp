@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:20 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/21 14:01:38 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/20 16:25:34 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,24 +67,6 @@ int Server::listenUser(int sockfd) {
     return 0;
 }
 
-std::string setNonBlocking(int socket) {
-    int flags = fcntl(socket, F_GETFL, 0);
-    char buffer[1024];
-    recv(socket, buffer, sizeof(buffer) - 1, 0);
-    std::string tmp = buffer;
-    if (flags == -1) {
-        std::cerr << "Failed to get socket flags" << std::endl;
-        return(tmp);
-    }
-
-    if (fcntl(socket, F_SETFL, flags | O_NONBLOCK) == -1) {
-        std::cerr << "Failed to set non-blocking mode" << std::endl;
-    }
-    // std::cout << buffer << std::endl << std::endl << std::endl;
-    return (tmp);
-}
-
-
 void Server::handleNewConnection(int epoll_fd, int sockfd) {
     struct sockaddr_in clientAddr;
     socklen_t clientAddrLen = sizeof(clientAddr);
@@ -94,24 +76,27 @@ void Server::handleNewConnection(int epoll_fd, int sockfd) {
         return;
     }
 
-    std::string tmp = setNonBlocking(clientSocket);
-    char *buffer = new char[tmp.size() + 1];
-    std::strcpy(buffer, tmp.c_str());
+    char buffer[1024];
+    int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
+    if (bytesRead < 0) {
+        std::cerr << "Failed to receive data from client" << std::endl;
+        close(clientSocket);
+        return;
+    }
+    buffer[bytesRead] = '\0';
 
     clientInfo clientInfo;
     clientInfo.socket_fd = clientSocket;
-
-    // Process client message to extract nick
-    int res = check_message(clientInfo, buffer); // Make sure this sets clientInfo.nick correctly
+    int res = check_message(clientInfo, buffer);
     if (res == 1) {
-        std::cerr << "Failed to parse client message" << std::endl;
+        std::cout << "Wrong Password!" << std::endl;
         close(clientSocket);
-        delete[] buffer;
+        return;
+    } else if (res == 2) {
+        close(clientSocket);
         return;
     }
-
     _clientInfo.push_back(clientInfo);
-    delete[] buffer;
 
     std::cout << "New connection from " << inet_ntoa(clientAddr.sin_addr) << ":" << ntohs(clientAddr.sin_port) << std::endl;
 
@@ -125,12 +110,9 @@ void Server::handleNewConnection(int epoll_fd, int sockfd) {
     }
 }
 
-
-
 void Server::handleClientData(int epoll_fd, int clientSocket) {
     char buffer[1024];
-    int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
-    std::cout << buffer << std::endl;
+    int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0); // Ensure space for null-terminator
     if (bytesRead <= 0) {
         if (bytesRead == 0) {
             std::cout << "Connection closed by client" << std::endl;
@@ -140,7 +122,9 @@ void Server::handleClientData(int epoll_fd, int clientSocket) {
         epoll_ctl(epoll_fd, EPOLL_CTL_DEL, clientSocket, NULL);
         close(clientSocket);
     } else {
-        buffer[bytesRead] = '\0';
+        buffer[bytesRead] = '\0'; // Null-terminate the received data
+
+        // Find the clientInfo associated with this socket
         for (std::vector<clientInfo>::iterator it = _clientInfo.begin(); it != _clientInfo.end(); ++it) {
 			if (it->socket_fd == clientSocket) {
 				std::stringstream ss;
@@ -161,6 +145,7 @@ void Server::handleClientData(int epoll_fd, int clientSocket) {
 				}
 			}
 		}
+    }
 }
 
 int Server::epollFunction() {
@@ -212,12 +197,15 @@ int Server::epollFunction() {
 }
 
 std::vector<std::string> Server::split(const std::string &str, char delimiter) {
+    // std::cout << std::endl << "split" << std::endl << std::endl;
     std::vector<std::string> tokens;
     std::stringstream ss(str);
     std::string token;
     while (std::getline(ss, token, delimiter)) {
+        // std::cout << "token->$" << token << "$" << std::endl;
         tokens.push_back(token);
     }
+    // std::cout << std::endl << std::endl;
     return tokens;
 }
 
@@ -258,25 +246,18 @@ int Server::checkSingle(clientInfo& clientInfo, const std::string& result) {
 }
 
 int Server::check_message(clientInfo& client_info, char* buffer) {
-    std::string message(buffer); // Convert char* buffer to std::string
-    std::vector<std::string> tokens = split(message, '\n');
-
-    // Process each token in the message
+    std::vector<std::string> tokens = split(buffer, '\n');
+    int res;
     for (std::vector<std::string>::iterator it = tokens.begin(); it != tokens.end(); ++it) {
         std::string result = *it;
-
-        // Process each part of the token
-        std::vector<std::string> parts = split(result, ' ');
-        for (std::vector<std::string>::iterator it2 = parts.begin(); it2 != parts.end(); ++it2) {
-            if (*it2 == "NICK" && ++it2 != parts.end()) {
-                client_info.nick = *it2; // Set the nick from client message
-                return 0;
-            }
-        }
+        res = checkSingle(client_info, result);
+        if (res == 1)
+            return (1);
+        else if (res == 2)
+            return (2);
     }
-    return 1;
+    return (0);
 }
-
 
 void	Server::sendMessage(int fd, std::string message) {
 	const char	*buffer = message.c_str();

@@ -25,8 +25,8 @@ std::string Server::displayHostname() {
 }
 
 std::string Server::getIP() {
-    std::string tmp = displayHostname();
-    const char *hostname = tmp.c_str();
+	std::string tmp = displayHostname();
+	const char *hostname = tmp.c_str();
     struct addrinfo hints, *res, *p;
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
@@ -35,27 +35,27 @@ std::string Server::getIP() {
     int status = getaddrinfo(hostname, 0, &hints, &res);
     if (status != 0) {
         std::cerr << "getaddrinfo error: " << gai_strerror(status) << std::endl;
-        return "0";
+        return ("0");
     }
 
-    std::string ip_version, ip_address;
+	std::string tmp2;
     for (p = res; p != 0; p = p->ai_next) {
         void* addr;
+        const char* ipver;
         char ipstr[INET6_ADDRSTRLEN];
         if (p->ai_family == AF_INET) {
             struct sockaddr_in* ipv4 = (struct sockaddr_in*)p->ai_addr;
             addr = &(ipv4->sin_addr);
-            ip_version = "IPv4";
+            ipver = "IPv4";
         } else {
             struct sockaddr_in6* ipv6 = (struct sockaddr_in6*)p->ai_addr;
             addr = &(ipv6->sin6_addr);
-            ip_version = "IPv6";
+            ipver = "IPv6";
         }
         inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
-        ip_address = ipstr;
-        break;
+		tmp2 = ipstr;
+		break ;
     }
     freeaddrinfo(res);
-    return ip_version + ": " + ip_address;
+	return (tmp2);
 }
-
