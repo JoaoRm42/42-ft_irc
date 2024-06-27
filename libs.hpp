@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:26:24 by joaoped2          #+#    #+#             */
-/*   Updated: 2024/06/18 13:46:10 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/21 13:28:48 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@
 # include <iomanip>
 # include <map>
 # include <stdint.h>
+# include <fcntl.h>
+# include <errno.h>
 # include <algorithm>
 
 //Server Libs

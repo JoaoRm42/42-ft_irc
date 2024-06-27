@@ -6,13 +6,13 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:28 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/20 13:17:57 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/06/21 13:23:04 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
-# define MAX_EVENTS 10
+# define MAX_EVENTS 1000
 
 # include "../libs.hpp"
 # include "client_info.hpp"
