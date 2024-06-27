@@ -25,8 +25,10 @@ private:
 	std::vector<int>			_membersFd;
 	std::string	_topic;
 	std::string	_password;
-	bool	inviteOnly;
-	size_t	numOfMembers;
+	bool	_inviteOnly;
+	bool	_passwordNeed;
+	size_t	_numOfMembers;
+	size_t	_numMaxOfMembers;
 public:
 	Channel(std::string name);
 	~Channel();
@@ -34,6 +36,11 @@ public:
 	void	setListOfAdmins(clientInfo& user);
 	std::vector<int>	getMenbersFd(void);
 	int					getFirstFd(void);
+	bool				getInviteOnly(void);
+	bool				getPasswordNeed(void);
+	std::string			getPassword(void);
+	size_t				getNumOfMembers(void);
+	size_t				getNumMaxOfMembers(void);
 };
 
 #endif

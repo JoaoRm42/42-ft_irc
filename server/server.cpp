@@ -107,6 +107,7 @@ int Server::checkSingle(clientInfo& clientInfo, char* result) {
         if (!clientInfo.nick.empty() && !clientInfo.pass.empty() && !clientInfo.user.empty())
             break;
     }
+	clientInfo.numOfChannels = 0;
     return 0;
 }
 
@@ -150,9 +151,9 @@ void Server::handleNewConnection(int epoll_fd, int sockfd) {
         close(clientSocket);
         return;
     }
-    std::cout << "Nick: " << clientInfo.nick << std::endl;
+    /*std::cout << "Nick: " << clientInfo.nick << std::endl;
     std::cout << "Pass: " << clientInfo.pass << std::endl;
-    std::cout << "User: " << clientInfo.user << std::endl;
+    std::cout << "User: " << clientInfo.user << std::endl;*/
     _clientInfo.push_back(clientInfo);
 
     std::cout << "New connection from " << inet_ntoa(clientAddr.sin_addr) << ":" << ntohs(clientAddr.sin_port) << std::endl;
@@ -238,7 +239,7 @@ int Server::epollFunction() {
     std::cout << "Server started. Listening on port " << getPort() << "..." << std::endl;
 
     epoll_event events[MAX_EVENTS];
-
+	//sendMessage(sockfd, "CHANLIMIT=#&:25\r\n");
     while (true) {
         int numEvents = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
         for (int i = 0; i < numEvents; ++i) {

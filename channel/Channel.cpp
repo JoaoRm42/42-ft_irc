@@ -13,8 +13,10 @@
 #include "Channel.hpp"
 
 Channel::Channel(std::string name) : _channelName(name) {
-	inviteOnly = false;
-	numOfMembers = 0;
+	_inviteOnly = false;
+	_numOfMembers = 0;
+	_passwordNeed = false;
+	_numMaxOfMembers = std::numeric_limits<int>::max();
 }
 
 Channel::~Channel() {}
@@ -22,7 +24,7 @@ Channel::~Channel() {}
 void	Channel::setListOfMembers(clientInfo &user) {
 	_listOfMembers.push_back(user.nick);
 	_membersFd.push_back(user.socket_fd);
-	numOfMembers++;
+	_numOfMembers++;
 }
 
 void	Channel::setListOfAdmins(clientInfo &user) {
@@ -35,4 +37,24 @@ std::vector<int>	Channel::getMenbersFd() {
 
 int	Channel::getFirstFd() {
 	return (this->_membersFd[0]);
+}
+
+bool	Channel::getInviteOnly() {
+	return (_inviteOnly);
+}
+
+bool	Channel::getPasswordNeed() {
+	return (_passwordNeed);
+}
+
+std::string	Channel::getPassword(){
+	return (_password);
+}
+
+size_t	Channel::getNumOfMembers() {
+	return (_numOfMembers);
+}
+
+size_t	Channel::getNumMaxOfMembers() {
+	return (_numMaxOfMembers);
 }

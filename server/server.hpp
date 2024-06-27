@@ -60,6 +60,7 @@ public:
 	//channels funtions
 	bool	checkForOperators(std::string line, clientInfo& user);
 	void	tryToJoinChannel(std::string& channelName, clientInfo& user);
+	void	joinExistingChannel(std::string channelName, Channel *thisChannel, clientInfo& user);
 };
 
 
