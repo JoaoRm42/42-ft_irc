@@ -13,10 +13,13 @@
 #include "../libs.hpp"
 
 bool	Server::checkForOperators(std::string line, clientInfo& user) {
+	// nao esta a chegar as informacoes do user
+	std::cout << "este eh o nick do user aqui: " << user.nick << std::endl;
 	std::vector<std::string> tokens = split(line, ' ');
 	if (tokens[0] == "JOIN" && tokens.size() > 1)
 	{
-		std::cout << "join command\n";
+		//std::cout << "join command\n";
+		//std::cout << line << std::endl;
 		tryToJoinChannel(tokens[1], user);
 		return (true);
 	}
@@ -76,11 +79,12 @@ void Server::tryToJoinChannel(std::string& channelName, clientInfo& user) {
 	newChannel->setListOfMembers(user);
 	newChannel->setListOfAdmins(user);
 
-	for (std::map<std::string, Channel *>::iterator it = _channelsList.begin(); it != _channelsList.end(); it++)
+	/*for (std::map<std::string, Channel *>::iterator it = _channelsList.begin(); it != _channelsList.end(); it++)
 	{
 		std::cout << it->first << " and " << it->second << " and " << it->second->getFirstFd() <<  std::endl;
-	}
+	}*/
 
+	std::cout << "este eh o nick do user: " << user.nick << std::endl;
 	sendMessage(user.socket_fd, msg);
 
 	/*std::string msg2 = ":" + user.nick + " MODE " + channelName + " +t" + std::string() + "\r\n";

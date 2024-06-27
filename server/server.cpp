@@ -213,19 +213,35 @@ int Server::checkSingle(clientInfo& clientInfo, const std::string& result) {
     std::vector<std::string> line = split(result, ' ');
     std::string tmp, tmp2;
 
-    for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) {
-        if (*it == "PASS" && ++it != line.end()) {
-            tmp = *it;
-            tmp2 = getPassword();
-            if (tmp.length() - 1 != tmp2.length())
-                return 1;
-            clientInfo.pass = *it;
-        } else if (*it == "NICK" && ++it != line.end()) {
-            clientInfo.nick = *it;
-        } else if (*it == "USER" && ++it != line.end()) {
-            clientInfo.user = *it;
-        }
-    }
+	for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) {
+		if (*it == "PASS" && ++it != line.end()) {
+			tmp = *it;
+			tmp2 = getPassword();
+			if (tmp.length() - 1 != tmp2.length())
+				return 1;
+			clientInfo.pass = *it;
+		} else if (*it == "NICK" && ++it != line.end()) {
+			clientInfo.nick = *it;
+		} else if (*it == "USER" && ++it != line.end()) {
+			clientInfo.user = *it;
+		}
+	}
+	/*while (clientInfo.pass.empty() && clientInfo.nick.empty() && clientInfo.user.empty())
+	{
+		for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) {
+			if (*it == "PASS" && ++it != line.end()) {
+				tmp = *it;
+				tmp2 = getPassword();
+				if (tmp.length() - 1 != tmp2.length())
+					return 1;
+				clientInfo.pass = *it;
+			} else if (*it == "NICK" && ++it != line.end()) {
+				clientInfo.nick = *it;
+			} else if (*it == "USER" && ++it != line.end()) {
+				clientInfo.user = *it;
+			}
+		}
+	}*/
     return 0;
 }
 
