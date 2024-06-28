@@ -18,9 +18,11 @@ bool	Server::checkForOperators(std::string line, clientInfo& user) {
 	if (tokens[0] == "JOIN" && tokens.size() > 1)
 	{
 		if (tokens[1][0] == '#' || tokens[1][0] == '&') {
-			tryToJoinChannel(tokens[1], user);
+			tryToJoinChannel(tokens[1], user, tokens);
 		}
 		else {
+			if (tokens[1].find('\r') != std::string::npos)
+				tokens[1].erase(tokens[1].find('\r'));
 			std::string msgBadChanMask = ":" + displayHostname() + " 476 " + user.nick + " " + tokens[1] + " :Bad Channel Mask\r\n";
 			sendMessage(user.socket_fd, msgBadChanMask);
 		}
@@ -54,7 +56,7 @@ bool	Server::checkForOperators(std::string line, clientInfo& user) {
 	return (false);
 }
 
-void Server::tryToJoinChannel(std::string& channelName, clientInfo& user) {
+void Server::tryToJoinChannel(std::string& channelName, clientInfo& user, std::vector<std::string> tokens) {
 	// Check if the channel exists, create if it does not
 
 	if (user.numOfChannels >= LIMITOFCHANNELS)
@@ -69,9 +71,14 @@ void Server::tryToJoinChannel(std::string& channelName, clientInfo& user) {
 	{
 		if (it->first == channelName)
 		{
-			//std::map<std::string, Channel *> tmp;
-			//tmp[it->first] = it->second;
-			joinExistingChannel(channelName, it->second, user);
+			if (tokens.size() > 2)
+				joinExistingChannel(channelName, it->second, user, tokens[2], 1);
+			else
+			{
+				std::string	noPass = "no password";
+				joinExistingChannel(channelName, it->second, user, noPass, 0);
+			}
+			//joinExistingChannel(channelName, it->second, user);
 			return ;
 		}
 	}
@@ -98,7 +105,7 @@ void Server::tryToJoinChannel(std::string& channelName, clientInfo& user) {
 	sendMessage(user.socket_fd, msgEndOfList);
 }
 
-void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, clientInfo &user) {
+void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, clientInfo &user, std::string channelPass, int flag) {
 	//check se ja eh membro FALTA FAZER
 
 	if (thisChannel->getInviteOnly() == true)
@@ -107,15 +114,17 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 		sendMessage(user.socket_fd, msgInviteOnly);
 		return;
 	}
-	/*if (thisChannel->getPasswordNeed() == true)
+	if (thisChannel->getPasswordNeed() == true)
 	{
-		if (thisChannel->getPassword() != passwordChannel)
+		if (channelPass.find('\r') != std::string::npos)
+			channelPass.erase(channelPass.find('\r'));
+		if (flag == 0 || thisChannel->getPassword() != channelPass)
 		{
 			std::string msgWrongPassword = ":" + displayHostname() + " 475 " + user.nick + " " + channelName + " :Cannot join channel (+k)\r\n";
 			sendMessage(user.socket_fd, msgWrongPassword);
 			return;
 		}
-	}*/
+	}
 	if (thisChannel->getNumOfMembers() >= thisChannel->getNumMaxOfMembers())
 	{
 		std::string msgChannelFull = ":" + displayHostname() + " 471 " + user.nick + " " + channelName + " :Cannot join channel (+l)\r\n";

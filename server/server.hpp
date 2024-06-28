@@ -59,8 +59,8 @@ public:
 
 	//channels funtions
 	bool	checkForOperators(std::string line, clientInfo& user);
-	void	tryToJoinChannel(std::string& channelName, clientInfo& user);
-	void	joinExistingChannel(std::string channelName, Channel *thisChannel, clientInfo& user);
+	void	tryToJoinChannel(std::string& channelName, clientInfo& user, std::vector<std::string> tokens);
+	void	joinExistingChannel(std::string channelName, Channel *thisChannel, clientInfo& user, std::string channelPass, int flag);
 };
 
 
