@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:20 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/27 14:30:01 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/07/01 13:30:40 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,26 @@ void clearCharPointer(char* str) {
     }
 }
 
+void Server::fillInfo(clientInfo& clientInfo) {
+    char buffer[1024];
+    while (1) {
+        std::vector<std::string> something = split(std::string(buffer), '\n');
+        std::vector<std::string> another = split(something.at(0), ' ');
+        if (another.at(0) == "NICK"){
+            clientInfo.nick = another.at(1);
+        } else if (another.at(0) == "PASS") {
+            clientInfo.pass = another.at(1);
+        } else if (another.at(0) == "USER") {
+            clientInfo.user = another.at(1);
+        }
+        if (!clientInfo.nick.empty() && !clientInfo.pass.empty() && !clientInfo.user.empty()) {
+            break;
+        }
+        recv(clientInfo.socket_fd, buffer, sizeof(buffer) - 1, 0);
+    }
+    return ;
+}
+
 int Server::checkSingle(clientInfo& clientInfo, char* result) {
     std::vector<std::string> line = split(result, '\n');
     std::string clientPassword;
@@ -103,9 +123,13 @@ int Server::checkSingle(clientInfo& clientInfo, char* result) {
                 }
             }
         }
-        // std::cout << "Nick: " << clientInfo.nick << " Pass: " << clientInfo.pass << " User: " << clientInfo.user << std::endl;
-        if (!clientInfo.nick.empty() && !clientInfo.pass.empty() && !clientInfo.user.empty())
+        if (!clientInfo.nick.empty() && !clientInfo.pass.empty() && !clientInfo.user.empty()) {
+            std::cout << "Success!" << std::endl;
             break;
+        }
+        else {
+            fillInfo(clientInfo);
+        }
     }
 	clientInfo.numOfChannels = 0;
     return 0;

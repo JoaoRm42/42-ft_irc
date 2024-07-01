@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:28 by marvin            #+#    #+#             */
-/*   Updated: 2024/06/27 13:03:03 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/07/01 13:29:52 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ public:
     void sendChannelMessage(std::string channelName, std::string message, clientInfo& user);
 
 	void	sendMessage(int fd, std::string message);
+    void    fillInfo(clientInfo& clientInfo);
 
 	//channels funtions
 	bool	checkForOperators(std::string line, clientInfo& user);
