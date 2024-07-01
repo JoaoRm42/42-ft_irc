@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   getChannel.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: macastan <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 12:39:05 by macastan          #+#    #+#             */
-/*   Updated: 2024/06/20 12:39:06 by macastan         ###   ########.fr       */
+/*   Updated: 2024/07/01 19:02:49 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libs.hpp"
 
-bool	Server::checkForOperators(std::string line, clientInfo& user) {
+bool	Server::checkForOperators(std::string line, clientInfo* user) {
 	//Check the operator and send to the function
 	std::vector<std::string> tokens = split(line, ' ');
 	if (tokens[0] == "JOIN" && tokens.size() > 1)
@@ -23,8 +23,8 @@ bool	Server::checkForOperators(std::string line, clientInfo& user) {
 		else {
 			if (tokens[1].find('\r') != std::string::npos)
 				tokens[1].erase(tokens[1].find('\r'));
-			std::string msgBadChanMask = ":" + displayHostname() + " 476 " + user.nick + " " + tokens[1] + " :Bad Channel Mask\r\n";
-			sendMessage(user.socket_fd, msgBadChanMask);
+			std::string msgBadChanMask = ":" + displayHostname() + " 476 " + user->nick + " " + tokens[1] + " :Bad Channel Mask\r\n";
+			sendMessage(user->socket_fd, msgBadChanMask);
 		}
 		return (true);
 	}
@@ -56,13 +56,13 @@ bool	Server::checkForOperators(std::string line, clientInfo& user) {
 	return (false);
 }
 
-void Server::tryToJoinChannel(std::string& channelName, clientInfo& user, std::vector<std::string> tokens) {
+void Server::tryToJoinChannel(std::string& channelName, clientInfo* user, std::vector<std::string> tokens) {
 	// Check if the channel exists, create if it does not
 
-	if (user.numOfChannels >= LIMITOFCHANNELS)
+	if (user->numOfChannels >= LIMITOFCHANNELS)
 	{
-		std::string msgTooManyChannels = ":" + displayHostname() + " 405 " + user.nick + " " + channelName + " :You have joined too many channels\r\n";
-		sendMessage(user.socket_fd, msgTooManyChannels);
+		std::string msgTooManyChannels = ":" + displayHostname() + " 405 " + user->nick + " " + channelName + " :You have joined too many channels\r\n";
+		sendMessage(user->socket_fd, msgTooManyChannels);
 		return ;
 	}
 	if (channelName.find('\r') != std::string::npos)
@@ -86,32 +86,50 @@ void Server::tryToJoinChannel(std::string& channelName, clientInfo& user, std::v
 	Channel* newChannel = new Channel(channelName);
 	_channelsList[channelName] = newChannel;
 	//adicionar channel ao cliente e adicionar ++ ao num de canais
-	user.channels.push_back(channelName);
-	user.numOfChannels++;
+	user->channels.push_back(channelName);
+	user->numOfChannels++;
 	newChannel->setListOfMembers(user);
 	newChannel->setListOfAdmins(user);
 
-	std::string	msgJoin = ":" + user.nick + " JOIN " + channelName + "\r\n";
-	sendMessage(user.socket_fd, msgJoin);
+	sendMessage(user->socket_fd, JOIN(user->nick, channelName));
 
 	//verificar necessidade de setar o mode a +t
-	std::string msgMode = ":" + user.nick + " MODE " + channelName + " +t" + std::string() + "\r\n";
-	sendMessage(user.socket_fd, msgMode);
+	sendMessage(user->socket_fd, MODE(user->nick, channelName));
 
-	std::string msgNamReply = ":" + displayHostname() + " 353 " + user.nick + " = " + channelName + " :" + user.nick + "\r\n";
-	sendMessage(user.socket_fd, msgNamReply);
+	sendMessage(user->socket_fd, NAMEREPLY(displayHostname(), user->nick, "=", channelName, "@" + user->nick));
 
-	std::string msgEndOfList = ":" + displayHostname() + " 366 " + user.nick + " " + channelName + " :End of /NAMES list.\r\n";
-	sendMessage(user.socket_fd, msgEndOfList);
+	sendMessage(user->socket_fd, ENDOFLIST(displayHostname(), user->nick, channelName));
 }
 
-void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, clientInfo &user, std::string channelPass, int flag) {
+std::string getTargets(Channel* channel)
+{
+	std::string targets;
+	std::vector<std::string> members = channel->getlistOfMembers(), admins = channel->getlistOfAdmins();
+	size_t tmp = 0;
+	for (size_t i = 0; i < members.size(); i++)
+	{
+		if (tmp > 0)
+			targets += " ";
+		targets += members[i];
+		tmp++;
+	}
+	for (size_t i = 0; i < admins.size(); i++)
+	{
+		if (tmp > 0)
+			targets += " ";
+		targets += "@" + admins[i];
+		tmp++;
+	}
+	return (targets);
+}
+
+void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, clientInfo *user, std::string channelPass, int flag) {
 	//check se ja eh membro FALTA FAZER
 
 	if (thisChannel->getInviteOnly() == true)
 	{
-		std::string msgInviteOnly = ":" + displayHostname() + " 473 " + user.nick + " " + channelName + " :Cannot join channel (+i)\r\n";
-		sendMessage(user.socket_fd, msgInviteOnly);
+		std::string msgInviteOnly = ":" + displayHostname() + " 473 " + user->nick + " " + channelName + " :Cannot join channel (+i)\r\n";
+		sendMessage(user->socket_fd, msgInviteOnly);
 		return;
 	}
 	if (thisChannel->getPasswordNeed() == true)
@@ -120,30 +138,31 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 			channelPass.erase(channelPass.find('\r'));
 		if (flag == 0 || thisChannel->getPassword() != channelPass)
 		{
-			std::string msgWrongPassword = ":" + displayHostname() + " 475 " + user.nick + " " + channelName + " :Cannot join channel (+k)\r\n";
-			sendMessage(user.socket_fd, msgWrongPassword);
+			std::string msgWrongPassword = ":" + displayHostname() + " 475 " + user->nick + " " + channelName + " :Cannot join channel (+k)\r\n";
+			sendMessage(user->socket_fd, msgWrongPassword);
 			return;
 		}
 	}
 	if (thisChannel->getNumOfMembers() >= thisChannel->getNumMaxOfMembers())
 	{
-		std::string msgChannelFull = ":" + displayHostname() + " 471 " + user.nick + " " + channelName + " :Cannot join channel (+l)\r\n";
-		sendMessage(user.socket_fd, msgChannelFull);
+		std::string msgChannelFull = ":" + displayHostname() + " 471 " + user->nick + " " + channelName + " :Cannot join channel (+l)\r\n";
+		sendMessage(user->socket_fd, msgChannelFull);
 		return;
 	}
 
-	user.channels.push_back(channelName);
-	user.numOfChannels++;
+	user->channels.push_back(channelName);
 	thisChannel->setListOfMembers(user);
+	std::string targets = getTargets(thisChannel);
 
-	std::string	msgJoin = ":" + user.nick + " JOIN " + channelName + "\r\n";
-	sendMessage(user.socket_fd, msgJoin);
+	sendMessage(user->socket_fd, JOIN(user->nick, channelName));
+
+	sendMessage(user->socket_fd, NAMEREPLY(displayHostname(), user->nick, "@", channelName, targets));
+
+	sendMessage(user->socket_fd, ENDOFLIST(displayHostname(), user->nick, channelName));
+
+	thisChannel->joinBroadcastChannel(user, JOINBROD(user->nick, channelName));
+
+	// sendMessage(user->socket_fd, JOINBROD(user->nick, channelName));
 
 	//verificar necessidade de setar os mode
-
-	std::string msgNamReply = ":" + displayHostname() + " 353 " + user.nick + " = " + channelName + " :" + user.nick + "\r\n";
-	sendMessage(user.socket_fd, msgNamReply);
-
-	std::string msgEndOfList = ":" + displayHostname() + " 366 " + user.nick + " " + channelName + " :End of /NAMES list.\r\n";
-	sendMessage(user.socket_fd, msgEndOfList);
 }

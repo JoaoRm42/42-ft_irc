@@ -6,7 +6,7 @@
 /*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 11:11:28 by marvin            #+#    #+#             */
-/*   Updated: 2024/07/01 13:29:52 by joaoped2         ###   ########.fr       */
+/*   Updated: 2024/07/01 18:25:10 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,15 @@ private:
     std::string _port;
     std::string _password;
     std::vector<struct clientInfo> _clientInfo;
+    std::map<int, struct clientInfo*> _tmpClients;
     std::map<std::string, Channel *> _channelsList;
+    std::map<int, std::string> _messages;
 
 public:
     Server();
-    Server(char **av);
-    Server(const Server &obj);
-    Server &operator=(const Server &obj);
+    Server(char **);
+    Server(const Server &);
+    Server &operator=(const Server &);
     ~Server();
 
     // Getters
@@ -43,25 +45,28 @@ public:
 	uint16_t getPortAsUint16();
     void printCoolntro();
     int createUser();
-    int bindUser(int sockfd, const struct sockaddr_in& server_addr);
-    int listenUser(int sockfd);
-    void handleNewConnection(int epoll_fd, int sockfd);
-    void handleClientData(int epoll_fd, int clientSocket);
+    int bindUser(int, const struct sockaddr_in&);
+    int listenUser(int);
+    void handleNewConnection(int, int);
+    void handleClientData(int, int);
     int epollFunction();
-    std::vector<std::string> split(const std::string &str, char delimiter);
-    int checkSingle(clientInfo& clientInfo, char* result);
-	int check_message(clientInfo& client_info, char* buffer);
+    std::vector<std::string> split(const std::string &, char);
+    std::vector<std::string> splitspace(const std::string &);
+    void initInput(std::pair<std::vector<std::string>, std::string>*, std::string);
+    int checkSingle(clientInfo*, std::string);
+	int check_message(clientInfo*, std::string);
     //void create_channel(const std::string& channel_name);
     //void add_user_to_channel(const std::string& channel_name, clientInfo& user);
-    void sendChannelMessage(std::string channelName, std::string message, clientInfo& user);
+    void sendChannelMessage(std::pair<std::vector<std::string>, std::string>, clientInfo*);
+    void joinBroadcastChannel(std::string , Channel *, clientInfo *);
 
-	void	sendMessage(int fd, std::string message);
-    void    fillInfo(clientInfo& clientInfo);
+	void	sendMessage(int, std::string);
+    void    fillInfo(clientInfo*);
 
 	//channels funtions
-	bool	checkForOperators(std::string line, clientInfo& user);
-	void	tryToJoinChannel(std::string& channelName, clientInfo& user, std::vector<std::string> tokens);
-	void	joinExistingChannel(std::string channelName, Channel *thisChannel, clientInfo& user, std::string channelPass, int flag);
+	bool	checkForOperators(std::string, clientInfo*);
+	void	tryToJoinChannel(std::string&, clientInfo*, std::vector<std::string>);
+	void	joinExistingChannel(std::string, Channel *, clientInfo*, std::string, int);
 };
 
 

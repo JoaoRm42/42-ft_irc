@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: macastan <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 14:57:52 by macastan          #+#    #+#             */
-/*   Updated: 2024/06/18 14:57:54 by macastan         ###   ########.fr       */
+/*   Updated: 2024/07/01 18:59:46 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,15 +32,19 @@ private:
 public:
 	Channel(std::string name);
 	~Channel();
-	void	setListOfMembers(clientInfo& user);
-	void	setListOfAdmins(clientInfo& user);
-	std::vector<int>	getMenbersFd(void);
-	int					getFirstFd(void);
-	bool				getInviteOnly(void);
-	bool				getPasswordNeed(void);
-	std::string			getPassword(void);
-	size_t				getNumOfMembers(void);
-	size_t				getNumMaxOfMembers(void);
+	void	setListOfMembers(clientInfo* user);
+	void	setListOfAdmins(clientInfo* user);
+	std::vector<std::string>	getlistOfMembers(void);
+	std::vector<std::string>	getlistOfAdmins(void);
+	std::vector<int>			getMembersFd(void);
+	int							getFirstFd(void);
+	bool						getInviteOnly(void);
+	bool						getPasswordNeed(void);
+	std::string					getPassword(void);
+	size_t						getNumOfMembers(void);
+	size_t						getNumMaxOfMembers(void);
+	void						joinBroadcastChannel(clientInfo *, std::string);
+	void						sendMessageChannel(int, std::string);
 };
 
 #endif

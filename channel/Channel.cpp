@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: macastan <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: joaoped2 <joaoped2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 14:57:40 by macastan          #+#    #+#             */
-/*   Updated: 2024/06/18 14:57:42 by macastan         ###   ########.fr       */
+/*   Updated: 2024/07/01 19:03:22 by joaoped2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,18 +21,26 @@ Channel::Channel(std::string name) : _channelName(name) {
 
 Channel::~Channel() {}
 
-void	Channel::setListOfMembers(clientInfo &user) {
-	_listOfMembers.push_back(user.nick);
-	_membersFd.push_back(user.socket_fd);
+void	Channel::setListOfMembers(clientInfo *user) {
+	_listOfMembers.push_back(user->nick);
+	_membersFd.push_back(user->socket_fd);
 	_numOfMembers++;
 }
 
-void	Channel::setListOfAdmins(clientInfo &user) {
-	_listOfAdmins.push_back(user.nick);
+void	Channel::setListOfAdmins(clientInfo *user) {
+	_listOfAdmins.push_back(user->nick);
 }
 
-std::vector<int>	Channel::getMenbersFd() {
+std::vector<int>	Channel::getMembersFd() {
 	return (this->_membersFd);
+}
+
+std::vector<std::string>	Channel::getlistOfAdmins() {
+	return (this->_listOfAdmins);
+}
+
+std::vector<std::string>	Channel::getlistOfMembers() {
+	return (this->_listOfAdmins);
 }
 
 int	Channel::getFirstFd() {
@@ -57,4 +65,17 @@ size_t	Channel::getNumOfMembers() {
 
 size_t	Channel::getNumMaxOfMembers() {
 	return (_numMaxOfMembers);
+}
+
+void	Channel::sendMessageChannel(int fd, std::string message) {
+	const char	*buffer = message.c_str();
+	send(fd, buffer, std::strlen(buffer), MSG_DONTWAIT);
+}
+
+void Channel::joinBroadcastChannel(clientInfo *user, std::string message) {
+	for (size_t i = 0; i < _membersFd.size(); i++)
+	{
+		if (_membersFd[i] != user->socket_fd)
+			sendMessageChannel(_membersFd[i], message);
+	}
 }
