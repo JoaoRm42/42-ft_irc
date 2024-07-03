@@ -40,7 +40,7 @@ std::vector<std::string>	Channel::getlistOfAdmins() {
 }
 
 std::vector<std::string>	Channel::getlistOfMembers() {
-	return (this->_listOfAdmins);
+	return (this->_listOfMembers);
 }
 
 int	Channel::getFirstFd() {
@@ -78,4 +78,65 @@ void Channel::joinBroadcastChannel(clientInfo *user, std::string message) {
 		if (_membersFd[i] != user->socket_fd)
 			sendMessageChannel(_membersFd[i], message);
 	}
+}
+
+std::string	Channel::getMembersForList() {
+	std::string	allMembers;
+
+	size_t tmp = 0;
+	for (size_t i = 0; i < _listOfMembers.size(); i++)
+	{
+		bool	isAdm = false;
+		for (size_t j = 0; j < _listOfAdmins.size(); j++)
+		{
+			if (_listOfMembers[i] == _listOfAdmins[j])
+			{
+				isAdm = true;
+				break;
+			}
+		}
+		if (isAdm == true)
+		{
+			if (tmp > 0)
+				allMembers += " ";
+			allMembers += "@" + _listOfAdmins[i];
+			tmp++;
+		}
+		else
+		{
+			if (tmp > 0)
+				allMembers += " ";
+			allMembers += _listOfMembers[i];
+			tmp++;
+		}
+	}
+	return (allMembers);
+}
+
+void Channel::removeUser(clientInfo *user) {
+	for (std::vector<std::string>::iterator	it = _listOfMembers.begin(); it != _listOfMembers.end(); it++)
+	{
+		if (*it == user->nick)
+		{
+			it = _listOfMembers.erase(it);
+			break ;
+		}
+	}
+	for (std::vector<std::string>::iterator	it = _listOfAdmins.begin(); it != _listOfAdmins.end(); it++)
+	{
+		if (it->c_str() == user->nick)
+		{
+			it = _listOfAdmins.erase(it);
+			break ;
+		}
+	}
+	for (std::vector<int>::iterator	it = _membersFd.begin(); it != _membersFd.end(); it++)
+	{
+		if (*it == user->socket_fd)
+		{
+			it = _membersFd.erase(it);
+			break ;
+		}
+	}
+	_numOfMembers--;
 }

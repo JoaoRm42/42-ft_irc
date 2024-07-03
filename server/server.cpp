@@ -103,12 +103,12 @@ void ft_printargs(std::vector<std::string> args, std::string type)
     std::cout << std::endl;
 }
 
-void ft_printinput(std::pair<std::vector<std::string>, std::string> input)
+/*void ft_printinput(std::pair<std::vector<std::string>, std::string> input)
 {
     std::cout << "------ Input ------\n";
     ft_printargs(input.first, "args");
     std::cout << "text: \"" << input.second << "\"" << std::endl << std::endl;
-}
+}*/
 
 size_t ft_findstr(std::string str)
 {
@@ -281,7 +281,7 @@ void Server::handleClientData(int epoll_fd, int clientSocket) {
         std::pair<std::vector<std::string>, std::string> input;
         int res = check_message(_tmpClients[clientSocket], line);
         initInput(&input, line);
-        ft_printinput(input);
+        //ft_printinput(input);
         if (res == 1) {
             // close(clientSocket);
             return;
@@ -395,7 +395,7 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 
     std::vector<std::string> args;
     getArgsPro(&args, input, 1);
-    ft_printinput(input);
+    //ft_printinput(input);
 	std::map<std::string, Channel*>::iterator it = _channelsList.find(args[0]);
 	if (it == _channelsList.end()) {
 		std::cerr << "Channel " << args[0] << " does not exist." << std::endl;

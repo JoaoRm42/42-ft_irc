@@ -45,6 +45,8 @@ public:
 	size_t						getNumMaxOfMembers(void);
 	void						joinBroadcastChannel(clientInfo *, std::string);
 	void						sendMessageChannel(int, std::string);
+	std::string					getMembersForList(void);
+	void						removeUser(clientInfo *user);
 };
 
 #endif
