@@ -44,9 +44,7 @@ void	Server::partChannel(std::string channelName, Channel *thisChannel, clientIn
 	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
 	{
 		if (thisChannel->getlistOfMembers()[k] == user->nick)
-		{
 			break ;
-		}
 	}
 	if (k == thisChannel->getlistOfMembers().size())
 	{
@@ -55,7 +53,17 @@ void	Server::partChannel(std::string channelName, Channel *thisChannel, clientIn
 		return;
 	}
 
-	std::string msgPart = ":" + user->nick + " PART " + channelName + "\r\n";
+	if (reason.find('\r') != std::string::npos)
+		reason.erase(reason.find('\r'));
+	if (reason[0] == ':')
+		reason = reason.substr(1, reason.size() - 1);
+	reason = "\"" + reason + "\"";
+
+	std::string msgPart;
+	if (flag == 0)
+		msgPart = ":" + user->nick + " PART " + channelName + "\r\n";
+	else
+		msgPart = ":" + user->nick + " PART " + channelName + " :" + reason + "\r\n";
 	sendMessage(user->socket_fd, msgPart);
 
 	thisChannel->removeUser(user);
@@ -65,11 +73,6 @@ void	Server::partChannel(std::string channelName, Channel *thisChannel, clientIn
 		return;
 	}
 
-	if (reason.find('\r') != std::string::npos)
-		reason.erase(reason.find('\r'));
-	if (reason[0] == ':')
-		reason = reason.substr(1, reason.size() - 1);
-	reason = "\"" + reason + "\"";
 	std::string msgPartBroadcast;
 	if (flag == 0)
 		msgPartBroadcast = ":" + user->nick + " PART :" + channelName + "\r\n";

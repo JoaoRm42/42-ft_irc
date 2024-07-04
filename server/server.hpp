@@ -63,6 +63,8 @@ public:
 	void	tryToPartChannel(std::string&, clientInfo*, std::vector<std::string>);
 	void	partChannel(std::string, Channel *, clientInfo*, std::string, int);
 	void	removeChannel(std::string);
+	void	tryToKick(std::string&, clientInfo*, std::vector<std::string>);
+	void	kickChannel(std::string, Channel *, clientInfo*, std::string, int, std::string);
 };
 
 

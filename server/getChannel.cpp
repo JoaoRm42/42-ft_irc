@@ -34,12 +34,12 @@ bool	Server::checkForOperators(std::string line, clientInfo* user) {
 		tryToPartChannel(tokens[1], user, tokens);
 		return (true);
 	}
-	/*if (tokens[0] == "KICK" && tokens.size() > 1)
+	if (tokens[0] == "KICK" && tokens.size() > 1)
 	{
-		std::cout << "kick command\n";
+		tryToKick(tokens[1], user, tokens);
 		return (true);
 	}
-	if (tokens[0] == "INVITE" && tokens.size() > 1)
+	/*if (tokens[0] == "INVITE" && tokens.size() > 1)
 	{
 		std::cout << "invite command\n";
 		return (true);
