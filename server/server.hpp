@@ -50,20 +50,13 @@ public:
     int bindUser(int, const struct sockaddr_in&);
     int listenUser(int);
     void handleNewConnection(int, int);
-    void handleClientData(int, int);
+    void handleClientData(int);
     int epollFunction();
-    std::vector<std::string> split(const std::string &, char);
-    std::vector<std::string> splitspace(const std::string &);
-    void initInput(std::pair<std::vector<std::string>, std::string>*, std::string);
-    int checkSingle(Client *user, std::string line);
-	int check_message(Client *client_info, std::string line);
-    //void create_channel(const std::string& channel_name);
-    //void add_user_to_channel(const std::string& channel_name, clientInfo& user);
-    void sendChannelMessage(std::pair<std::vector<std::string>, std::string> input, Client *user);
-    void joinBroadcastChannel(std::string , Channel *, clientInfo *);
+    int checkSingle(Client*, std::string);
+	int checkMessage(Client*, std::string);
+    void sendChannelMessage(std::pair<std::vector<std::string>, std::string>, Client*);
 
 	void	sendMessage(int, std::string);
-    void    fillInfo(clientInfo*);
 
 	//channels functions
 	bool	checkForOperators(std::string line, Client* user);

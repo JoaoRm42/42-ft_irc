@@ -20,7 +20,8 @@ SRCS = main.cpp \
 	channel/Channel.cpp \
 	client/Client.cpp \
 	server/channelOperators/joinCommand.cpp \
-	server/channelOperators/partCommand.cpp
+	server/channelOperators/partCommand.cpp \
+	utils/utils.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(NAME)

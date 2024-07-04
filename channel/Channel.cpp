@@ -118,7 +118,7 @@ void Channel::removeUser(Client *user) {
 	{
 		if (*it == user->getNick())
 		{
-			it = _listOfMembers.erase(it);
+			_listOfMembers.erase(it);
 			break ;
 		}
 	}
@@ -126,7 +126,7 @@ void Channel::removeUser(Client *user) {
 	{
 		if (it->c_str() == user->getNick())
 		{
-			it = _listOfAdmins.erase(it);
+			_listOfAdmins.erase(it);
 			break ;
 		}
 	}
@@ -134,7 +134,7 @@ void Channel::removeUser(Client *user) {
 	{
 		if (*it == user->getSocketFD())
 		{
-			it = _membersFd.erase(it);
+			_membersFd.erase(it);
 			break ;
 		}
 	}

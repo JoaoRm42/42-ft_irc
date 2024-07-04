@@ -54,8 +54,6 @@ void	Server::partChannel(std::string channelName, Channel *thisChannel, Client *
 		sendMessage(user->getSocketFD(), msgNotOnChannel);
 		return;
 	}
-	(void)reason;
-	(void)flag;
 
 	std::string msgPart = ":" + user->getNick() + " PART " + channelName + "\r\n";
 	sendMessage(user->getSocketFD(), msgPart);

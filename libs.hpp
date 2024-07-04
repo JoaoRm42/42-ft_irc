@@ -32,12 +32,13 @@
 # include <stdint.h>
 # include <algorithm>
 # include <errno.h>
-#include <fcntl.h>
+# include <fcntl.h>
 # include <limits>
 
 //Server Libs
 # include "server/server.hpp"
 # include "channel/Channel.hpp"
+# include "utils/utills.hpp"
 # include "client/Client.hpp"
 
 #define LIMITOFCHANNELS	50
