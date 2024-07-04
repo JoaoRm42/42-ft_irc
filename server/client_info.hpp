@@ -21,7 +21,7 @@ struct clientInfo {
 	std::string user;
 	std::string pass;
 	std::vector<std::string> channels;
-	size_t	numOfChannels;
+	size_t numOfChannels;
 };
 
 #endif

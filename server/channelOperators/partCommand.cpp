@@ -13,7 +13,7 @@
 #include "../server.hpp"
 #include "../../libs.hpp"
 
-void	Server::tryToPartChannel(std::string& channelName, clientInfo* user, std::vector<std::string> tokens) {
+void	Server::tryToPartChannel(std::string& channelName, Client *user, std::vector<std::string> tokens) {
 	if (channelName.find('\r') != std::string::npos)
 		channelName.erase(channelName.find('\r'));
 	std::map<std::string, Channel *>::iterator it;
@@ -33,32 +33,32 @@ void	Server::tryToPartChannel(std::string& channelName, clientInfo* user, std::v
 	}
 	if (it == _channelsList.end())
 	{
-		std::string msgNotOnChannel = ":" + displayHostname() + " 403 " + user->nick + " " + channelName + " :No such channel\r\n";
-		sendMessage(user->socket_fd, msgNotOnChannel);
+		std::string msgNotOnChannel = ":" + displayHostname() + " 403 " + user->getNick() + " " + channelName + " :No such channel\r\n";
+		sendMessage(user->getSocketFD(), msgNotOnChannel);
 		return;
 	}
 }
 
-void	Server::partChannel(std::string channelName, Channel *thisChannel, clientInfo *user, std::string reason, int flag) {
+void	Server::partChannel(std::string channelName, Channel *thisChannel, Client *user, std::string reason, int flag) {
 	size_t k;
 	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
 	{
-		if (thisChannel->getlistOfMembers()[k] == user->nick)
+		if (thisChannel->getlistOfMembers()[k] == user->getNick())
 		{
 			break ;
 		}
 	}
 	if (k == thisChannel->getlistOfMembers().size())
 	{
-		std::string msgNotOnChannel = ":" + displayHostname() + " 442 " + user->nick + " " + channelName + " :You're not on that channel\r\n";
-		sendMessage(user->socket_fd, msgNotOnChannel);
+		std::string msgNotOnChannel = ":" + displayHostname() + " 442 " + user->getNick() + " " + channelName + " :You're not on that channel\r\n";
+		sendMessage(user->getSocketFD(), msgNotOnChannel);
 		return;
 	}
 	(void)reason;
 	(void)flag;
 
-	std::string msgPart = ":" + user->nick + " PART " + channelName + "\r\n";
-	sendMessage(user->socket_fd, msgPart);
+	std::string msgPart = ":" + user->getNick() + " PART " + channelName + "\r\n";
+	sendMessage(user->getSocketFD(), msgPart);
 
 	thisChannel->removeUser(user);
 	if (thisChannel->getNumOfMembers() == 0)
@@ -74,12 +74,12 @@ void	Server::partChannel(std::string channelName, Channel *thisChannel, clientIn
 	reason = "\"" + reason + "\"";
 	std::string msgPartBroadcast;
 	if (flag == 0)
-		msgPartBroadcast = ":" + user->nick + " PART :" + channelName + "\r\n";
+		msgPartBroadcast = ":" + user->getNick() + " PART :" + channelName + "\r\n";
 	else
-		msgPartBroadcast = ":" + user->nick + " PART :" + channelName + " " + reason + "\r\n";
+		msgPartBroadcast = ":" + user->getNick() + " PART :" + channelName + " " + reason + "\r\n";
 	for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
 	{
-		if (thisChannel->getMembersFd()[i] != user->socket_fd)
+		if (thisChannel->getMembersFd()[i] != user->getSocketFD())
 			sendMessage(thisChannel->getMembersFd()[i], msgPartBroadcast);
 	}
 }

@@ -16,6 +16,8 @@
 # include "../libs.hpp"
 # include "../server/client_info.hpp"
 
+class Client;
+
 class	Channel
 {
 private:
@@ -32,8 +34,8 @@ private:
 public:
 	Channel(std::string name);
 	~Channel();
-	void	setListOfMembers(clientInfo* user);
-	void	setListOfAdmins(clientInfo* user);
+	void	setListOfMembers(Client *user);
+	void	setListOfAdmins(Client *user);
 	std::vector<std::string>	getlistOfMembers(void);
 	std::vector<std::string>	getlistOfAdmins(void);
 	std::vector<int>			getMembersFd(void);
@@ -46,7 +48,7 @@ public:
 	void						joinBroadcastChannel(clientInfo *, std::string);
 	void						sendMessageChannel(int, std::string);
 	std::string					getMembersForList(void);
-	void						removeUser(clientInfo *user);
+	void						removeUser(Client *user);
 };
 
 #endif

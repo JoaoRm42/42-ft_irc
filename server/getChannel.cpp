@@ -12,7 +12,7 @@
 
 #include "../libs.hpp"
 
-bool	Server::checkForOperators(std::string line, clientInfo* user) {
+bool	Server::checkForOperators(std::string line, Client* user) {
 	//Check the operator and send to the function
 	std::vector<std::string> tokens = split(line, ' ');
 	if (tokens[0] == "JOIN" && tokens.size() > 1)
@@ -23,8 +23,8 @@ bool	Server::checkForOperators(std::string line, clientInfo* user) {
 		else {
 			if (tokens[1].find('\r') != std::string::npos)
 				tokens[1].erase(tokens[1].find('\r'));
-			std::string msgBadChanMask = ":" + displayHostname() + " 476 " + user->nick + " " + tokens[1] + " :Bad Channel Mask\r\n";
-			sendMessage(user->socket_fd, msgBadChanMask);
+			std::string msgBadChanMask = ":" + displayHostname() + " 476 " + user->getNick() + " " + tokens[1] + " :Bad Channel Mask\r\n";
+			sendMessage(user->getSocketFD(), msgBadChanMask);
 		}
 		return (true);
 	}

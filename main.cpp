@@ -44,7 +44,6 @@ int main(int ac, char **av) {
     if (ac == 3)
     {
         Server teste(av);
-        std::vector<clientInfo> client;
         teste.printCoolntro();
         teste.epollFunction();
     }

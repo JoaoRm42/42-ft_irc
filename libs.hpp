@@ -38,6 +38,7 @@
 //Server Libs
 # include "server/server.hpp"
 # include "channel/Channel.hpp"
+# include "client/Client.hpp"
 
 #define LIMITOFCHANNELS	50
 

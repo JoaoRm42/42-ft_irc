@@ -18,6 +18,7 @@ SRCS = main.cpp \
 	server/getHostname.cpp \
 	server/getChannel.cpp \
 	channel/Channel.cpp \
+	client/Client.cpp \
 	server/channelOperators/joinCommand.cpp \
 	server/channelOperators/partCommand.cpp
 OBJS = $(SRCS:.cpp=.o)
