@@ -69,6 +69,7 @@ public:
 	void	joinExistingChannel(std::string, Channel *, clientInfo*, std::string, int);
 	void	tryToPartChannel(std::string&, clientInfo*, std::vector<std::string>);
 	void	partChannel(std::string, Channel *, clientInfo*, std::string, int);
+	void	removeChannel(std::string);
 };
 
 

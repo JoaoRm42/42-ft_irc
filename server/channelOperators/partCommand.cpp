@@ -61,16 +61,17 @@ void	Server::partChannel(std::string channelName, Channel *thisChannel, clientIn
 	sendMessage(user->socket_fd, msgPart);
 
 	thisChannel->removeUser(user);
+	if (thisChannel->getNumOfMembers() == 0)
+	{
+		removeChannel(channelName);
+		return;
+	}
 
-	//acho que nao esta a remover as cenas na funcao removeUser, ver amanha!!!!!!!
-
-	std::string allMembers = thisChannel->getMembersForList();
-	std::string msgNamReply = ":" + displayHostname() + " 353 " + user->nick + " = " + channelName + " :" + allMembers + "\r\n";
-	sendMessage(user->socket_fd, msgNamReply);
-
-	std::string msgEndOfList = ":" + displayHostname() + " 366 " + user->nick + " " + channelName + " :End of /NAMES list.\r\n";
-	sendMessage(user->socket_fd, msgEndOfList);
-
+	if (reason.find('\r') != std::string::npos)
+		reason.erase(reason.find('\r'));
+	if (reason[0] == ':')
+		reason = reason.substr(1, reason.size() - 1);
+	reason = "\"" + reason + "\"";
 	std::string msgPartBroadcast;
 	if (flag == 0)
 		msgPartBroadcast = ":" + user->nick + " PART :" + channelName + "\r\n";
@@ -80,5 +81,16 @@ void	Server::partChannel(std::string channelName, Channel *thisChannel, clientIn
 	{
 		if (thisChannel->getMembersFd()[i] != user->socket_fd)
 			sendMessage(thisChannel->getMembersFd()[i], msgPartBroadcast);
+	}
+}
+
+void	Server::removeChannel(std::string channelName) {
+	for (std::map<std::string, Channel *>::iterator it = _channelsList.begin(); it != _channelsList.end(); ++it) {
+		if (it->first == channelName)
+		{
+			delete it->second;
+			_channelsList.erase(it);
+			break;
+		}
 	}
 }
