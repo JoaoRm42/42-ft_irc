@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../libs.hpp"
+#include "../utils/utills.hpp"
 
 bool	Server::checkForOperators(std::string line, clientInfo* user) {
 	//Check the operator and send to the function
