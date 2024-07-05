@@ -10,6 +10,16 @@
 #                                                                              #
 # **************************************************************************** #
 
+FRAME1 := ⠁⠂⠄⡀⠄⠂⠁
+FRAME2 := ⠂⠄⡀⠄⠂⠁⠂
+FRAME3 := ⠄⡀⠄⠂⠁⠂⠄
+FRAME4 := ⡀⠄⠂⠁⠂⠄⡀
+FRAME5 := ⠄⠂⠁⠂⠄⡀⠄
+FRAME6 := ⠂⠁⠂⠄⡀⠄⠂
+
+FRAMES := $(FRAME1) $(FRAME2) $(FRAME3) $(FRAME4) $(FRAME5) $(FRAME6)
+
+
 NAME = ircserv
 CXX = c++
 CXXFLAGS = -std=c++98 -Wall -Wextra -Werror -g
@@ -23,16 +33,61 @@ SRCS = main.cpp \
 	utils/utils.cpp \
 	server/channelOperators/kickCommand.cpp
 OBJS = $(SRCS:.cpp=.o)
+OBJ_DIR = obj
+OBJ_FILES = $(addprefix $(OBJ_DIR)/, $(OBJS))
 
 all: $(NAME)
 
-$(NAME):	$(OBJS)
-			@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+$(NAME): $(OBJ_FILES)
+			@echo "Done!"
+			@sleep 0.5
+			@clear
+			for frame in $(FRAMES); do \
+				clear; \
+				echo "$$frame Linking..."; \
+				sleep 0.2; \
+			done;
+			@clear
+			@$(CXX) $(CXXFLAGS) $(OBJ_FILES) -o $(NAME)
+			@echo "Compilation Done!"
+			@sleep 0.5
+
+$(OBJ_DIR)/%.o: %.cpp
+			@mkdir -p $(dir $@)
+			for frame in $(FRAMES); do \
+				clear; \
+				echo "$$frame Compiling $<"; \
+				sleep 0.1; \
+			done;
+			@clear
+			@echo "$(FRAME6) Compiled $<..."
+			@$(CXX) $(CXXFLAGS) -c $< -o $@
+			@sleep 0.5
+			@clear
+
 
 clean:
-			@rm -rf $(OBJS)
+			@clear
+			for frame in $(FRAMES); do \
+				clear; \
+				echo "$$frame Cleaning..."; \
+				sleep 0.2; \
+			done;
+			@clear
+			@rm -rf $(OBJ_DIR)
+			@echo "Done!"
 
-fclean:		clean
+fclean: clean
+			@clear
+			for frame in $(FRAMES); do \
+				clear; \
+				echo "$$frame Force cleaning..."; \
+				sleep 0.2; \
+			done;
+			@clear
 			@rm -rf $(NAME)
+			@echo "Done!"
 
-re:			fclean all
+re: fclean all
+			@clear
+			@echo "Rebuild complete!"
