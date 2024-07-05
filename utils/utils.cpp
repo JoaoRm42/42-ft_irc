@@ -4,17 +4,39 @@
 
 #include "utills.hpp"
 
-std::string channelSplit(std::string &line) {
-	std::string	result;
-
-	for (int i = 0; line[i]; i++) {
+std::vector<std::string> channelSplit(std::string &line) {
+	if (line.find('\r') != std::string::npos)
+		line.erase(line.find('\r'));
+//	std::cout << line << "\n\n\n";
+	std::vector<std::string>	result;
+	std::string					tmp;
+	int i = 0;
+	while (line[i]) {
+		if (line[i] == ' ') {
+			i++;
+			result.push_back(tmp);
+//			std::cout << tmp << "\n\n\n";
+			tmp.clear();
+		}
 		if (line[i] == ':') {
+//			std::cout << "Dois pontos" << "\n\n\n";
 			i++;
 			while (line[i]) {
-				result += line[i];
+				tmp += line[i];
 				i++;
 			}
+			result.push_back(tmp);
+			tmp.clear();
 		}
+		if (line[i] != ' ' || line[i] != ':') {
+//			std::cout << line[i] << "\n";
+			tmp += line[i];
+		}
+		if (line[i + 1] == '\0') {
+			result.push_back(tmp);
+			tmp.clear();
+		}
+		i++;
 	}
 	return (result);
 }

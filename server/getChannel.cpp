@@ -15,11 +15,12 @@
 
 bool	Server::checkForOperators(std::string line, clientInfo* user) {
 	//Check the operator and send to the function
-	std::vector<std::string> tokens = split(line, ' ');
+	std::vector<std::string> tokens = channelSplit(line);
 
-//VV-----------Mudancas----------VV//
-//	std::string result = channelSplit(line);
-
+//std::vector<std::string> result = channelSplit(line);
+//for (std::vector<std::string>::iterator it = tokens.begin(); it != tokens.end(); it++) {
+//	std::cout << *it << "\n";
+//}
 
 	if (tokens[0] == "JOIN" && tokens.size() > 1)
 	{
