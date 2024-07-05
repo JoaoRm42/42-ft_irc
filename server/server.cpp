@@ -161,7 +161,7 @@ void Server::handleClientData(int clientSocket) {
 
 		res = checkMessage(_tmpClients[clientSocket], line);
 		initInput(&input, line);
-		printInput(input);
+		printInput(input, _tmpClients[clientSocket]);
 		if (res == 1 || res == 2)
 			return;
 		tokens = split(line, ' ');
@@ -243,7 +243,7 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 
 	std::vector<std::string> args;
 	getArgsPro(&args, input, 1);
-	printInput(input);
+//	printInput(input);
 	std::map<std::string, Channel*>::iterator it = _channelsList.find(args[0]);
 	if (it == _channelsList.end()) {
 		std::cerr << "Channel " << args[0] << " does not exist." << std::endl;
@@ -251,10 +251,10 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 	}
 
 	std::vector<int> membersFd = it->second->getMembersFd();
-	if (membersFd.size() < 2) {
+/*	if (membersFd.size() < 2) {
 		std::cerr << "Channel " << args[0] << " has fewer than 2 members." << std::endl;
 		return;
-	}
+	}*/
 	for (std::vector<int>::iterator itt = membersFd.begin(); itt != membersFd.end(); ++itt) {
 		if (user->socket_fd != *itt) {  // Ensure not to send the message to the sender
 			sendMessage(*itt, PRIVMSG(user->nick, args[0], args[1]));  // Send the message to the member
