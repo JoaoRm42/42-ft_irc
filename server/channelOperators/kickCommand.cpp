@@ -14,8 +14,7 @@
 #include "../../libs.hpp"
 
 void	Server::tryToKick(std::string& channelName, clientInfo* user, std::vector<std::string> tokens){
-	if (channelName.find('\r') != std::string::npos)
-		channelName.erase(channelName.find('\r'));
+
 	std::map<std::string, Channel *>::iterator it;
 	for (it = _channelsList.begin(); it != _channelsList.end(); it++)
 	{
@@ -67,8 +66,6 @@ void	Server::kickChannel(std::string channelName, Channel *thisChannel, clientIn
 	}
 
 	//check se o membro que sera kickado esta no canal
-	if (kickedUser.find('\r') != std::string::npos)
-		kickedUser.erase(kickedUser.find('\r'));
 	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
 	{
 		if (thisChannel->getlistOfMembers()[k] == kickedUser)
@@ -81,12 +78,7 @@ void	Server::kickChannel(std::string channelName, Channel *thisChannel, clientIn
 		return;
 	}
 
-	if (reason.find('\r') != std::string::npos)
-		reason.erase(reason.find('\r'));
-	if (reason[0] == ':')
-		reason = reason.substr(1, reason.size() - 1);
 	reason = "\"" + reason + "\"";
-
 	std::string msgKick;
 	if (flag == 0)
 		msgKick = ":" + user->nick + " KICK " + channelName + " " + kickedUser + "\r\n";

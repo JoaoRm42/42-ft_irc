@@ -22,8 +22,7 @@ void Server::tryToJoinChannel(std::string& channelName, clientInfo* user, std::v
 		sendMessage(user->socket_fd, msgTooManyChannels);
 		return ;
 	}
-	if (channelName.find('\r') != std::string::npos)
-		channelName.erase(channelName.find('\r'));
+
 	for (std::map<std::string, Channel *>::iterator it = _channelsList.begin(); it != _channelsList.end(); it++)
 	{
 		if (it->first == channelName)
@@ -74,8 +73,6 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 	}
 	if (thisChannel->getPasswordNeed() == true)
 	{
-		if (channelPass.find('\r') != std::string::npos)
-			channelPass.erase(channelPass.find('\r'));
 		if (flag == 0 || thisChannel->getPassword() != channelPass)
 		{
 			std::string msgWrongPassword = ":" + displayHostname() + " 475 " + user->nick + " " + channelName + " :Cannot join channel (+k)\r\n";

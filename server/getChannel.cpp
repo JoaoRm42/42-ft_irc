@@ -28,8 +28,6 @@ bool	Server::checkForOperators(std::string line, clientInfo* user) {
 			tryToJoinChannel(tokens[1], user, tokens);
 		}
 		else {
-			if (tokens[1].find('\r') != std::string::npos)
-				tokens[1].erase(tokens[1].find('\r'));
 			std::string msgBadChanMask = ":" + displayHostname() + " 476 " + user->nick + " " + tokens[1] + " :Bad Channel Mask\r\n";
 			sendMessage(user->socket_fd, msgBadChanMask);
 		}

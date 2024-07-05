@@ -14,8 +14,7 @@
 #include "../../libs.hpp"
 
 void	Server::tryToPartChannel(std::string& channelName, clientInfo* user, std::vector<std::string> tokens) {
-	if (channelName.find('\r') != std::string::npos)
-		channelName.erase(channelName.find('\r'));
+
 	std::map<std::string, Channel *>::iterator it;
 	for (it = _channelsList.begin(); it != _channelsList.end(); it++)
 	{
@@ -53,12 +52,7 @@ void	Server::partChannel(std::string channelName, Channel *thisChannel, clientIn
 		return;
 	}
 
-	if (reason.find('\r') != std::string::npos)
-		reason.erase(reason.find('\r'));
-	if (reason[0] == ':')
-		reason = reason.substr(1, reason.size() - 1);
 	reason = "\"" + reason + "\"";
-
 	std::string msgPart;
 	if (flag == 0)
 		msgPart = ":" + user->nick + " PART " + channelName + "\r\n";
