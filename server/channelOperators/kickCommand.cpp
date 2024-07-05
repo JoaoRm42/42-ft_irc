@@ -87,7 +87,6 @@ void	Server::kickChannel(std::string channelName, Channel *thisChannel, clientIn
 		reason = reason.substr(1, reason.size() - 1);
 	reason = "\"" + reason + "\"";
 
-	//":" + t_string(client) + " KICK " + t_string(channel) + " " + t_string(user) + " :" + t_string(reason) + "\r\n"
 	std::string msgKick;
 	if (flag == 0)
 		msgKick = ":" + user->nick + " KICK " + channelName + " " + kickedUser + "\r\n";
@@ -98,7 +97,7 @@ void	Server::kickChannel(std::string channelName, Channel *thisChannel, clientIn
 		sendMessage(thisChannel->getMembersFd()[i], msgKick);
 	}
 
-	thisChannel->removeUser2(kickedUser, thisChannel->getOneUserFd(kickedUser));
+	thisChannel->removeUserKick(kickedUser, thisChannel->getOneUserFd(kickedUser));
 	if (thisChannel->getNumOfMembers() == 0)
 	{
 		removeChannel(channelName);

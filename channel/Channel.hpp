@@ -48,7 +48,7 @@ public:
 	std::string					getMembersForList(void);
 	void						removeUser(clientInfo *user);
 	int							getOneUserFd(std::string userName);
-	void						removeUser2(std::string userName, int fdUser);
+	void						removeUserKick(std::string userName, int fdUser);
 };
 
 #endif

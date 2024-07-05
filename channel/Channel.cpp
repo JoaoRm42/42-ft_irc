@@ -155,7 +155,7 @@ int	Channel::getOneUserFd(std::string userName) {
 	return (_membersFd[position]);
 }
 
-void Channel::removeUser2(std::string userName, int fdUser) {
+void Channel::removeUserKick(std::string userName, int fdUser) {
 	for (std::vector<std::string>::iterator	it = _listOfMembers.begin(); it != _listOfMembers.end(); it++)
 	{
 		if (*it == userName)
