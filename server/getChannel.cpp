@@ -16,6 +16,11 @@
 bool	Server::checkForOperators(std::string line, clientInfo* user) {
 	//Check the operator and send to the function
 	std::vector<std::string> tokens = split(line, ' ');
+
+//VV-----------Mudancas----------VV//
+//	std::string result = channelSplit(line);
+
+
 	if (tokens[0] == "JOIN" && tokens.size() > 1)
 	{
 		if (tokens[1][0] == '#' || tokens[1][0] == '&') {

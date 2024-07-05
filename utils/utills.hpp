@@ -11,7 +11,7 @@ std::vector<std::string>	split(const std::string &, char);
 std::vector<std::string>	splitSpace(const std::string &str);
 void						getArgsPro(std::vector<std::string>* args, std::pair<std::vector<std::string>, std::string> input, size_t start);
 size_t						checkStr(const std::string& str);
-//size_t findStr(std::string str);
+std::string					channelSplit(std::string &line);
 void						clearCharPointer(char *str);
 std::string					returnQuantity(const std::string &character, int size);
 void						printInput(std::pair<std::vector<std::string>, std::string> input, clientInfo* client);

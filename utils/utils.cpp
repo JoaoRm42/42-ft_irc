@@ -4,6 +4,21 @@
 
 #include "utills.hpp"
 
+std::string channelSplit(std::string &line) {
+	std::string	result;
+
+	for (int i = 0; line[i]; i++) {
+		if (line[i] == ':') {
+			i++;
+			while (line[i]) {
+				result += line[i];
+				i++;
+			}
+		}
+	}
+	return (result);
+}
+
 std::vector<std::string> splitSpace(const std::string &str) {
     std::vector<std::string> tokens;
     std::stringstream ss(str);
