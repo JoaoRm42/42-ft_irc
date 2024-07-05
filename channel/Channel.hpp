@@ -43,10 +43,12 @@ public:
 	std::string					getPassword(void);
 	size_t						getNumOfMembers(void);
 	size_t						getNumMaxOfMembers(void);
-	void						joinBroadcastChannel(clientInfo *, std::string);
-	void						sendMessageChannel(int, std::string);
+	//void						joinBroadcastChannel(clientInfo *, std::string);
+	//void						sendMessageChannel(int, std::string);
 	std::string					getMembersForList(void);
 	void						removeUser(clientInfo *user);
+	int							getOneUserFd(std::string userName);
+	void						removeUser2(std::string userName, int fdUser);
 };
 
 #endif

@@ -86,14 +86,22 @@ void	Server::kickChannel(std::string channelName, Channel *thisChannel, clientIn
 	if (reason[0] == ':')
 		reason = reason.substr(1, reason.size() - 1);
 	reason = "\"" + reason + "\"";
-	(void)flag;
-	//msg ta errada ver amanha!!!!!!!!!!!!!!!!!
-	/*std::string msgKick;
+
+	//":" + t_string(client) + " KICK " + t_string(channel) + " " + t_string(user) + " :" + t_string(reason) + "\r\n"
+	std::string msgKick;
 	if (flag == 0)
 		msgKick = ":" + user->nick + " KICK " + channelName + " " + kickedUser + "\r\n";
 	else
 		msgKick = ":" + user->nick + " KICK " + channelName + " " + kickedUser + " :" + reason + "\r\n";
-	sendMessage(user->socket_fd, msgKick);*/
-	//thisChannel->removeUser(get claudio part);
+	for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
+	{
+		sendMessage(thisChannel->getMembersFd()[i], msgKick);
+	}
 
+	thisChannel->removeUser2(kickedUser, thisChannel->getOneUserFd(kickedUser));
+	if (thisChannel->getNumOfMembers() == 0)
+	{
+		removeChannel(channelName);
+		return;
+	}
 }

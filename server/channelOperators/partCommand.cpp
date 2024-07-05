@@ -64,24 +64,16 @@ void	Server::partChannel(std::string channelName, Channel *thisChannel, clientIn
 		msgPart = ":" + user->nick + " PART " + channelName + "\r\n";
 	else
 		msgPart = ":" + user->nick + " PART " + channelName + " :" + reason + "\r\n";
-	sendMessage(user->socket_fd, msgPart);
+	for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
+	{
+		sendMessage(thisChannel->getMembersFd()[i], msgPart);
+	}
 
 	thisChannel->removeUser(user);
 	if (thisChannel->getNumOfMembers() == 0)
 	{
 		removeChannel(channelName);
 		return;
-	}
-
-	std::string msgPartBroadcast;
-	if (flag == 0)
-		msgPartBroadcast = ":" + user->nick + " PART :" + channelName + "\r\n";
-	else
-		msgPartBroadcast = ":" + user->nick + " PART :" + channelName + " " + reason + "\r\n";
-	for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
-	{
-		if (thisChannel->getMembersFd()[i] != user->socket_fd)
-			sendMessage(thisChannel->getMembersFd()[i], msgPartBroadcast);
 	}
 }
 
