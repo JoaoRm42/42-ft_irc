@@ -14,6 +14,9 @@
 #include "../../libs.hpp"
 
 void	Server::tryToPartChannel(std::string& channelName, Client *user, std::vector<std::string> tokens) {
+	for(size_t i = 0; i < tokens.size(); i++)
+		std::cout << tokens[i] << " ";
+	std::cout << "<- aqui passou assim" << std::endl;
 	std::map<std::string, Channel *>::iterator it;
 	for (it = _channelsList.begin(); it != _channelsList.end(); it++)
 	{

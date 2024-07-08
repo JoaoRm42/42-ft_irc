@@ -48,8 +48,8 @@ void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vecto
 	std::string	msgJoin = ":" + user->getNick() + " JOIN " + channelName + "\r\n";
 	sendMessage(user->getSocketFD(), msgJoin);
 
-	std::string msgMode = ":" + user->getNick() + " MODE " + channelName + " +t\r\n";
-	sendMessage(user->getSocketFD(), msgMode);
+	//std::string msgMode = ":" + user->getNick() + " MODE " + channelName + " +t\r\n";
+	//(user->getSocketFD(), msgMode);
 
 	std::string msgNamReply = ":" + displayHostname() + " 353 " + user->getNick() + " = " + channelName + " :@" + user->getNick() + "\r\n";
 	sendMessage(user->getSocketFD(), msgNamReply);
@@ -95,8 +95,8 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 	sendMessage(user->getSocketFD(), msgJoin);
 
 	//verificar necessidade de setar o mode a +t
-	std::string msgMode = ":" + user->getNick() + " MODE " + channelName + " +t\r\n";
-	sendMessage(user->getSocketFD(), msgMode);
+	//std::string msgMode = ":" + user->getNick() + " MODE " + channelName + " +t\r\n";
+	//sendMessage(user->getSocketFD(), msgMode);
 
 	std::string msgNamReply = ":" + displayHostname() + " 353 " + user->getNick() + " = " + channelName + " :" + allMembers + "\r\n";
 	sendMessage(user->getSocketFD(), msgNamReply);
