@@ -52,5 +52,5 @@ bool	Server::checkForOperators(std::string line, Client* user) {
 		std::cout << "mode command\n";
 		return (true);
 	}*/
-	return (false);
+	return (true);
 }
