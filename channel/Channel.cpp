@@ -67,7 +67,7 @@ size_t	Channel::getNumMaxOfMembers() {
 	return (_numMaxOfMembers);
 }
 
-void	Channel::sendMessageChannel(int fd, std::string message) {
+/*void	Channel::sendMessageChannel(int fd, std::string message) {
 	const char	*buffer = message.c_str();
 	send(fd, buffer, std::strlen(buffer), MSG_DONTWAIT);
 }
@@ -78,7 +78,7 @@ void Channel::joinBroadcastChannel(clientInfo *user, std::string message) {
 		if (_membersFd[i] != user->socket_fd)
 			sendMessageChannel(_membersFd[i], message);
 	}
-}
+}*/
 
 std::string	Channel::getMembersForList() {
 	std::string	allMembers;
@@ -133,6 +133,48 @@ void Channel::removeUser(Client *user) {
 	for (std::vector<int>::iterator	it = _membersFd.begin(); it != _membersFd.end(); it++)
 	{
 		if (*it == user->getSocketFD())
+		{
+			_membersFd.erase(it);
+			break ;
+		}
+	}
+	_numOfMembers--;
+}
+
+int	Channel::getOneUserFd(std::string userName) {
+	int	position = 0;
+	for (std::vector<std::string>::iterator	it = _listOfMembers.begin(); it != _listOfMembers.end(); it++)
+	{
+		if (*it == userName)
+		{
+			_listOfMembers.erase(it);
+			break ;
+		}
+		position++;
+	}
+	return (_membersFd[position]);
+}
+
+void Channel::removeUserKick(std::string userName, int fdUser) {
+	for (std::vector<std::string>::iterator	it = _listOfMembers.begin(); it != _listOfMembers.end(); it++)
+	{
+		if (*it == userName)
+		{
+			_listOfMembers.erase(it);
+			break ;
+		}
+	}
+	for (std::vector<std::string>::iterator	it = _listOfAdmins.begin(); it != _listOfAdmins.end(); it++)
+	{
+		if (it->c_str() == userName)
+		{
+			_listOfAdmins.erase(it);
+			break ;
+		}
+	}
+	for (std::vector<int>::iterator	it = _membersFd.begin(); it != _membersFd.end(); it++)
+	{
+		if (*it == fdUser)
 		{
 			_membersFd.erase(it);
 			break ;

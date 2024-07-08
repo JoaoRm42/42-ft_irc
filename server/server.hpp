@@ -65,6 +65,8 @@ public:
 	void	tryToPartChannel(std::string &channelName, Client *user, std::vector<std::string> tokens);
 	void	partChannel(std::string channelName, Channel *thisChannel, Client *user, std::string reason, int flag);
 	void	removeChannel(std::string);
+	void	tryToKick(std::string&, Client *, std::vector<std::string>);
+	void	kickChannel(std::string, Channel *, Client *, std::string, int, std::string);
 };
 
 

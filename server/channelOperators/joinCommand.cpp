@@ -22,8 +22,6 @@ void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vecto
 		sendMessage(user->getSocketFD(), msgTooManyChannels);
 		return ;
 	}
-	if (channelName.find('\r') != std::string::npos)
-		channelName.erase(channelName.find('\r'));
 	for (std::map<std::string, Channel *>::iterator it = _channelsList.begin(); it != _channelsList.end(); it++)
 	{
 		if (it->first == channelName)
@@ -41,7 +39,7 @@ void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vecto
 
 	Channel* newChannel = new Channel(channelName);
 	_channelsList[channelName] = newChannel;
-	//adicionar channel ao cliente e adicionar ++ ao num de canais
+	//tirar debug depois
 	if (user->addBackChannel(channelName) == -1)
 		std::cout << "DEBUG: Client is at max channels" << std::endl;
 	newChannel->setListOfMembers(user);
@@ -74,8 +72,6 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 	}
 	if (thisChannel->getPasswordNeed())
 	{
-		if (channelPass.find('\r') != std::string::npos)
-			channelPass.erase(channelPass.find('\r'));
 		if (flag == 0 || thisChannel->getPassword() != channelPass)
 		{
 			std::string msgWrongPassword = ":" + displayHostname() + " 475 " + user->getNick() + " " + channelName + " :Cannot join channel (+k)\r\n";
@@ -89,7 +85,7 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 		sendMessage(user->getSocketFD(), msgChannelFull);
 		return;
 	}
-
+	//tirar debug depois
 	if (user->addBackChannel(channelName) == -1)
 		std::cout << "Debug: The user is alredy in the MAX channels" << std::endl;
 	thisChannel->setListOfMembers(user);

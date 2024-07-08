@@ -15,5 +15,6 @@ void clearCharPointer(char* str);
 std::string returnQuantity(std::string character, int size);
 void printInput(std::pair<std::vector<std::string>, std::string> input);
 void initInput(std::pair<std::vector<std::string>, std::string>*, std::string);
+std::vector<std::string> channelSplit(std::string &line);
 
 #endif

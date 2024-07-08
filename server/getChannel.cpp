@@ -15,15 +15,13 @@
 
 bool	Server::checkForOperators(std::string line, Client* user) {
 	//Check the operator and send to the function
-	std::vector<std::string> tokens = split(line, ' ');
+	std::vector<std::string> tokens = channelSplit(line);
 	if (tokens[0] == "JOIN" && tokens.size() > 1)
 	{
 		if (tokens[1][0] == '#' || tokens[1][0] == '&') {
 			tryToJoinChannel(tokens[1], user, tokens);
 		}
 		else {
-			if (tokens[1].find('\r') != std::string::npos)
-				tokens[1].erase(tokens[1].find('\r'));
 			std::string msgBadChanMask = ":" + displayHostname() + " 476 " + user->getNick() + " " + tokens[1] + " :Bad Channel Mask\r\n";
 			sendMessage(user->getSocketFD(), msgBadChanMask);
 		}
@@ -34,12 +32,12 @@ bool	Server::checkForOperators(std::string line, Client* user) {
 		tryToPartChannel(tokens[1], user, tokens);
 		return (true);
 	}
-	/*if (tokens[0] == "KICK" && tokens.size() > 1)
+	if (tokens[0] == "KICK" && tokens.size() > 1)
 	{
-		std::cout << "kick command\n";
+		tryToKick(tokens[1], user, tokens);
 		return (true);
 	}
-	if (tokens[0] == "INVITE" && tokens.size() > 1)
+	/*if (tokens[0] == "INVITE" && tokens.size() > 1)
 	{
 		std::cout << "invite command\n";
 		return (true);

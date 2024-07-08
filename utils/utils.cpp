@@ -4,6 +4,43 @@
 
 #include "utills.hpp"
 
+std::vector<std::string> channelSplit(std::string &line) {
+	if (line.find('\r') != std::string::npos)
+		line.erase(line.find('\r'));
+//	std::cout << line << "\n\n\n";
+	std::vector<std::string>	result;
+	std::string					tmp;
+	int i = 0;
+	while (line[i]) {
+		if (line[i] == ' ') {
+			i++;
+			result.push_back(tmp);
+//			std::cout << tmp << "\n\n\n";
+			tmp.clear();
+		}
+		if (line[i] == ':') {
+//			std::cout << "Dois pontos" << "\n\n\n";
+			i++;
+			while (line[i]) {
+				tmp += line[i];
+				i++;
+			}
+			result.push_back(tmp);
+			tmp.clear();
+		}
+		if (line[i] != ' ' || line[i] != ':') {
+//			std::cout << line[i] << "\n";
+			tmp += line[i];
+		}
+		if (line[i + 1] == '\0') {
+			result.push_back(tmp);
+			tmp.clear();
+		}
+		i++;
+	}
+	return (result);
+}
+
 std::vector<std::string> splitSpace(const std::string &str) {
     // std::cout << std::endl << "split" << std::endl << std::endl;
     std::vector<std::string> tokens;
