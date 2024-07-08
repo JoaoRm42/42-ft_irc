@@ -13,7 +13,7 @@
 #include "../libs.hpp"
 #include "../utils/utils.hpp"
 
-bool	Server::checkForOperators(std::string line, Client* user) {
+bool Server::checkForOperators(std::string line, Client *user, std::pair<std::vector<std::string>, std::string > input) {
 	//Check the operator and send to the function
 	std::vector<std::string> tokens = channelSplit(line);
 	if (tokens[0] == "JOIN" && tokens.size() > 1)
@@ -76,25 +76,27 @@ bool	Server::checkForOperators(std::string line, Client* user) {
 			tryToPartChannel(tokens[1], user, tokens);
 		return (true);
 	}
-	if (tokens[0] == "KICK" && tokens.size() > 1)
-	{
+	if (tokens[0] == "KICK" && tokens.size() > 1) {
 		tryToKick(tokens[1], user, tokens);
 		return (true);
 	}
-	/*if (tokens[0] == "INVITE" && tokens.size() > 1)
-	{
-		std::cout << "invite command\n";
-		return (true);
+	if (tokens[0] == "PRIVMSG" && tokens.size() > 1) {
+		sendChannelMessage(input, user);
 	}
-	if (tokens[0] == "TOPIC" && tokens.size() > 1)
-	{
-		std::cout << "topic command\n";
+		/*if (tokens[0] == "INVITE" && tokens.size() > 1)
+		{
+			std::cout << "invite command\n";
+			return (true);
+		}
+		if (tokens[0] == "TOPIC" && tokens.size() > 1)
+		{
+			std::cout << "topic command\n";
+			return (true);
+		}
+		if (tokens[0] == "MODE" && tokens.size() > 1)
+		{
+			std::cout << "mode command\n";
+			return (true);
+		}*/
 		return (true);
-	}
-	if (tokens[0] == "MODE" && tokens.size() > 1)
-	{
-		std::cout << "mode command\n";
-		return (true);
-	}*/
-	return (true);
 }

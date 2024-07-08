@@ -114,14 +114,10 @@ void Server::handleClientData(int clientSocket) {
 		initInput(&input, line);
 		printInput(input, _tmpClients[clientSocket]);
 		tokens = split(line, ' ');
-
 		if (!tokens.empty()) {
-			bool check = _tmpClients[clientSocket]->checkClientParams(getPassword(), line);
-			if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket])) {
+			bool check = _tmpClients[clientSocket]->checkClientParams(*this, line);
+			if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket], input)) {
 				std::cout << "comando executado\n";
-			}
-			else if (tokens[0] == "PRIVMSG" && tokens.size() > 1 && _tmpClients[clientSocket]->getValidData()) {
-				sendChannelMessage(input, _tmpClients[clientSocket]);
 			}
 			else if (!check && tokens[0] != "CAP") {
 				std::cerr << "Invalid command" << std::endl;
@@ -203,7 +199,6 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 		std::cerr << "Channel " << args[0] << " does not exist." << std::endl;
 		return;
 	}
-
 	std::vector<int> membersFd = it->second->getMembersFd();
 	if (membersFd.size() < 2) {
 		std::cerr << "Channel " << args[0] << " has fewer than 2 members." << std::endl;

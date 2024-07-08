@@ -65,12 +65,8 @@ void Client::setValidData(const bool data) {
 	isValidData = data;
 }
 
-bool Client::checkClientParams(std::string serverPassword, const std::string& buffer) {
+bool Client::checkClientParams(Server& Server, const std::string& buffer) {
 	std::vector<std::string> tmp = split(buffer, ' ');
-	for(std::vector<std::string>::iterator it = tmp.begin(); it != tmp.end(); it++)
-	{
-		std::cout << " " << *it << std::endl;
-	}
 	setValidData(false);
 	if (tmp[0] == "PASS")
 	{
@@ -82,7 +78,7 @@ bool Client::checkClientParams(std::string serverPassword, const std::string& bu
 			std::cout << "Required Password!" << std::endl;
 			return (true);
 		}
-		if (tmp[1] != serverPassword) {
+		if (tmp[1] != Server.getPassword()) {
 			std::cout << "Wrong Password!" << std::endl;
 			return (true);
 		}
@@ -94,13 +90,19 @@ bool Client::checkClientParams(std::string serverPassword, const std::string& bu
 			std::cout << "Required Nickname!" << std::endl;
 			return (true);
 		}
+		if (tmp[1] == "ola" || tmp[1] == "adeus") {
+			Server.sendMessage(socket_fd, "ERROR :Invalid Nickname\n");
+			return (true);
+		}
 		nick = tmp[1];
 		std::cout << "Nick Set!" << std::endl;
 		return (true);
 	}
 	else if (tmp[0] == "USER") {
-		if (!user.empty()) {
-			std::cout << "User already set!" << std::endl;
+		if (!user.empty()) { {
+				std::cout << "Entered here!" << std::endl;
+				std::cout << "User already set!" << std::endl;
+			}
 			setValidData(false);
 			return (true);
 		}
@@ -113,7 +115,7 @@ bool Client::checkClientParams(std::string serverPassword, const std::string& bu
 			return (true);
 		}
 	}
-	if (pass == serverPassword && !nick.empty() && !user.empty())
+	if (pass == Server.getPassword() && !nick.empty() && !user.empty())
 		setValidData(true);
 	return (false);
 }

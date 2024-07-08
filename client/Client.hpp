@@ -4,6 +4,8 @@
 
 #include "../libs.hpp"
 
+class	Server;
+
 class Client {
   private:
 	int socket_fd;
@@ -35,7 +37,7 @@ class Client {
 	int addBackChannel(const std::string& data);
 
 	//Class Functions
-	bool checkClientParams(std::string serverPassword, const std::string& buffer);
+	bool checkClientParams(Server &Server, const std::string& buffer);
 };
 
 

@@ -58,7 +58,7 @@ public:
 	void	sendMessage(int, std::string);
 
 	//channels functions
-	bool	checkForOperators(std::string line, Client* user);
+	bool	checkForOperators(std::string line, Client *user, std::pair<std::vector<std::string>, std::string > input);
 	void	tryToJoinChannel(std::string &channelName, Client *user, std::vector<std::string> tokens);
 	void	joinExistingChannel(std::string channelName, Channel *thisChannel, Client *user, std::string channelPass, int flag);
 	void	tryToPartChannel(std::string &channelName, Client *user, std::vector<std::string> tokens);
