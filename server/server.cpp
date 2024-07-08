@@ -112,7 +112,7 @@ void Server::handleClientData(int clientSocket) {
 		if (line.find("\r") != std::string::npos)
 			line.erase(line.find("\r"));
 		initInput(&input, line);
-		printInput(input);
+		printInput(input, _tmpClients[clientSocket]);
 		tokens = split(line, ' ');
 
 		if (!tokens.empty()) {
@@ -197,7 +197,7 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 
 	std::vector<std::string> args;
 	getArgsPro(&args, input, 1);
-	printInput(input);
+	printInput(input, user);
 	std::map<std::string, Channel*>::iterator it = _channelsList.find(args[0]);
 	if (it == _channelsList.end()) {
 		std::cerr << "Channel " << args[0] << " does not exist." << std::endl;
