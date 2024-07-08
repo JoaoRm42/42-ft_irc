@@ -76,7 +76,7 @@ void getArgsPro(std::vector<std::string>* args, std::pair<std::vector<std::strin
         args->push_back(input.second);
 }
 
-size_t findStr(std::string str) {
+size_t strChecker(std::string str) {
     size_t it = 0, start, end;
     while (str[it] != '\0')
     {
@@ -100,7 +100,6 @@ size_t findStr(std::string str) {
 }
 
 void    initInput(std::pair<std::vector<std::string>, std::string>* input, std::string line) {
-    // std::cout << "line: $" << line << "$\n";
     input->first = splitSpace(line);
     bool message = false;
     size_t len = input->first.size(), i;
@@ -114,7 +113,7 @@ void    initInput(std::pair<std::vector<std::string>, std::string>* input, std::
     }
     if (message == true)
     {
-        size_t pos = findStr(line);
+        size_t pos = strChecker(line);
         input->second = line.substr(pos + 1, line.size() - (pos + 1));
     }
 }
