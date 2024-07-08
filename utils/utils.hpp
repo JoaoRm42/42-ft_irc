@@ -16,5 +16,7 @@ void						clearCharPointer(char *str);
 std::string					returnQuantity(const std::string &character, int size);
 void						printInput(std::pair<std::vector<std::string>, std::string> input, Client* client);
 void						initInput(std::pair<std::vector<std::string>, std::string>* input, const std::string &line);
+void						printVector(std::vector<std::string> vector);
+std::vector<std::string>	returnVector(std::vector<std::string> vector);
 
 #endif

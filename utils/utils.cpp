@@ -4,6 +4,24 @@
 
 #include "utils.hpp"
 
+std::vector<std::string> returnVector(std::vector<std::string> vector) {
+	std::vector<std::string> tmp;
+	for (std::vector<std::string>::iterator it = vector.begin(); it != vector.end(); it++) {
+		tmp.push_back(*it);
+	}
+	return (tmp);
+}
+
+void	printVector(std::vector<std::string> vector) {
+	int	i = 0;
+	for (std::vector<std::string>::iterator it = vector.begin(); it != vector.end(); it++) {
+		std::cout << "Vector string[" << i << "]: " << *it << std::endl;
+		i++;
+	}
+	std::cout << std::endl;
+	return ;
+}
+
 std::vector<std::string> channelSplit(std::string &line) {
 	size_t pos = line.find('\r');
 	if (pos != std::string::npos)
