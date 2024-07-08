@@ -193,7 +193,6 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 
 	std::vector<std::string> args;
 	getArgsPro(&args, input, 1);
-	printInput(input, user);
 	std::map<std::string, Channel*>::iterator it = _channelsList.find(args[0]);
 	if (it == _channelsList.end()) {
 		std::cerr << "Channel " << args[0] << " does not exist." << std::endl;
