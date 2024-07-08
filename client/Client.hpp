@@ -10,8 +10,6 @@ class Client {
 	std::string nick;
 	std::string user;
 	std::string pass;
-
-  private:
 	std::vector<std::string> channels;
 	size_t	numOfChannels;
 
@@ -32,6 +30,9 @@ class Client {
 	void setUser(std::string data);
 	void setPass(std::string data);
 	int addBackChannel(std::string data);
+
+	//Class Functions
+	bool checkClientParams(std::string password, char *buffer);
 };
 
 

@@ -94,9 +94,8 @@ int Server::checkSingle(Client *user, std::string line) {
     return 0;
 }
 
-int Server::check_message(Client *client_info, std::string line) {
-    if (line.find("\r") != std::string::npos)
-        line.erase(line.find("\r"));
+int Server::checkMessage(Client *client_info, std::string line) {
+
     int res = checkSingle(client_info, line);
     if (res == 1)
         return 1;
@@ -116,7 +115,6 @@ void Server::handleNewConnection(int epoll_fd, int sockfd) {
 		std::cerr << "Failed to accept client connection: " << strerror(errno) << std::endl;
 		return ;
 	}
-
 	_tmpClients[clientSocket] = new Client();
 	_tmpClients[clientSocket]->setSocketFD(clientSocket);
 

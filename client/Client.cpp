@@ -56,11 +56,28 @@ void Client::setPass(std::string data) {
 	pass = data;
 }
 
-
-
-
-
-
-
-
-
+bool Client::checkClientParams(std::string serverPassword, char *buffer) {
+	std::vector<std::string> tmp = split(buffer, ' ');
+	if (tmp[0] == "PASS")
+	{
+		if (tmp[1].empty())
+		{
+			std::cout << "Required Password!" << std::endl;
+			return 1;
+		}
+		if (tmp[1] != serverPassword)
+		{
+			std::cout << "Wrong Password!" << std::endl;
+			return 1;
+		}
+		pass= (tmp[1]);
+		serverPassword.clear();
+	}
+	else if (tmp[0] == "NICK") {
+		nick = tmp[1];
+	}
+	else if (tmp[0] == "USER") {
+		user =  tmp[1];
+	}
+	return 0;
+}
