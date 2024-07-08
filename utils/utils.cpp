@@ -5,36 +5,55 @@
 #include "utils.hpp"
 
 std::vector<std::string> channelSplit(std::string &line) {
-    if (line.find('\r') != std::string::npos)
-        line.erase(line.find('\r'));
-    std::vector<std::string>	result;
-    std::string					tmp;
-    int i = 0;
-    while (line[i]) {
-        if (line[i] == ' ') {
-            i++;
-            result.push_back(tmp);
-            tmp.clear();
-        }
-        if (line[i] == ':') {
-            i++;
-            while (line[i]) {
-                tmp += line[i];
-                i++;
-            }
-            result.push_back(tmp);
-            tmp.clear();
-        }
-        if (line[i] != ' ' || line[i] != ':') {
-            tmp += line[i];
-        }
-        if (line[i + 1] == '\0') {
-            result.push_back(tmp);
-            tmp.clear();
-        }
-        i++;
-    }
-    return (result);
+	size_t pos = line.find('\r');
+	if (pos != std::string::npos)
+		line.erase(pos);
+
+	std::vector<std::string> result;
+	std::string tmp;
+	size_t i = 0;  // Use size_t for the index to avoid signed/unsigned comparison issues
+
+	// Loop through the string within bounds
+	while (i < line.length()) {
+		if (line[i] == ' ') {
+			if (!tmp.empty()) {
+				result.push_back(tmp);
+				tmp.clear();
+			}
+			i++;
+			continue;  // Skip the space
+		}
+
+		if (line[i] == ':') {
+			if (!tmp.empty()) {
+				result.push_back(tmp);
+				tmp.clear();
+			}
+			i++;
+			// Append the rest of the string after the colon
+			while (i < line.length()) {
+				tmp += line[i];
+				i++;
+			}
+			if (!tmp.empty()) {
+				result.push_back(tmp);
+				tmp.clear();
+			}
+			break;  // End the loop since we are done
+		}
+
+		// Append characters that are not spaces or colons
+		tmp += line[i];
+		i++;
+
+		// Push the last accumulated string if it's not empty
+		if (i == line.length() && !tmp.empty()) {
+			result.push_back(tmp);
+			tmp.clear();
+		}
+	}
+
+	return result;
 }
 
 std::vector<std::string> splitSpace(const std::string &str) {
