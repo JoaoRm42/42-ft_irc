@@ -52,7 +52,6 @@ public:
     void handleNewConnection(int, int);
     void handleClientData(int);
     int epollFunction();
-    int checkSingle(Client*, std::string);
 	int checkMessage(Client*, std::string);
     void sendChannelMessage(std::pair<std::vector<std::string>, std::string>, Client*);
 

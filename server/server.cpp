@@ -65,43 +65,6 @@ int Server::listenUser(int sockfd) {
 	return (0);
 }
 
-int Server::checkSingle(Client *user, std::string line) {
-    std::string clientPassword;
-    std::string serverPassword = getPassword();
-    std::string content(line);
-    std::vector<std::string> tmp = split(line, ' ');
-    if (tmp[0] == "PASS")
-    {
-        if (tmp[1].empty())
-        {
-            std::cout << "Required Password!" << std::endl;
-            return 1;
-        }
-        if (tmp[1] != serverPassword)
-        {
-            std::cout << "Wrong Password!" << std::endl;
-            return 1;
-        }
-        user->setPass(tmp[1]);
-        serverPassword.clear();
-    }
-    else if (tmp[0] == "NICK") {
-        user->setNick(tmp[1]);
-    }
-    else if (tmp[0] == "USER") {
-        user->setUser(tmp[1]);
-    }
-    return 0;
-}
-
-int Server::checkMessage(Client *client_info, std::string line) {
-
-    int res = checkSingle(client_info, line);
-    if (res == 1)
-        return 1;
-    return 0;
-}
-
 void Server::handleNewConnection(int epoll_fd, int sockfd) {
 	struct sockaddr_in	clientAddr;
 	struct epoll_event	event;
@@ -133,7 +96,6 @@ void Server::handleNewConnection(int epoll_fd, int sockfd) {
 void Server::handleClientData(int clientSocket) {
 	char												buffer[1024];
 	int													bytesRead;
-	int													res;
 	std::string											line;
 	std::vector<std::string>							tokens;
 	std::pair<std::vector<std::string>, std::string>	input;
@@ -149,19 +111,21 @@ void Server::handleClientData(int clientSocket) {
 
 		if (line.find("\r") != std::string::npos)
 			line.erase(line.find("\r"));
-
-		res = checkMessage(_tmpClients[clientSocket], line);
 		initInput(&input, line);
 		printInput(input);
-		if (res == 1 || res == 2)
-			return;
 		tokens = split(line, ' ');
 
 		if (!tokens.empty()) {
-			if (checkForOperators(line, _tmpClients[clientSocket])) {
+			bool check = _tmpClients[clientSocket]->checkClientParams(getPassword(), line);
+			if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket])) {
 				std::cout << "comando executado\n";
-			} else if (tokens[0] == "PRIVMSG" && tokens.size() > 1) {
+			}
+			else if (tokens[0] == "PRIVMSG" && tokens.size() > 1 && _tmpClients[clientSocket]->getValidData()) {
 				sendChannelMessage(input, _tmpClients[clientSocket]);
+			}
+			else if (!check && tokens[0] != "CAP") {
+				std::cerr << "Invalid command" << std::endl;
+				sendMessage(clientSocket, "ERROR :Invalid command\n");
 			}
 		}
 	}
@@ -220,7 +184,6 @@ int Server::epollFunction() {
 			}
 		}
 	}
-
 	close(sockfd);
 	return (0);
 }

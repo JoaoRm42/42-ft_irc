@@ -12,6 +12,7 @@ class Client {
 	std::string pass;
 	std::vector<std::string> channels;
 	size_t	numOfChannels;
+	bool isValidData;
 
   public:
 	Client();
@@ -22,17 +23,19 @@ class Client {
 	std::string getNick() const;
 	std::string getUser() const;
 	std::string getPass() const;
+	bool getValidData() const;
 	size_t getNumOfChannels() const;
 
 	//Setters of Variables
 	void setSocketFD(unsigned int data);
-	void setNick(std::string data);
-	void setUser(std::string data);
-	void setPass(std::string data);
-	int addBackChannel(std::string data);
+	void setNick(const std::string& data);
+	void setUser(const std::string& data);
+	void setPass(const std::string& data);
+	void setValidData(const bool data);
+	int addBackChannel(const std::string& data);
 
 	//Class Functions
-	bool checkClientParams(std::string password, char *buffer);
+	bool checkClientParams(std::string serverPassword, const std::string& buffer);
 };
 
 
