@@ -67,30 +67,51 @@ void Client::setValidData(const bool data) {
 
 bool Client::checkClientParams(std::string serverPassword, const std::string& buffer) {
 	std::vector<std::string> tmp = split(buffer, ' ');
+	for(std::vector<std::string>::iterator it = tmp.begin(); it != tmp.end(); it++)
+	{
+		std::cout << " " << *it << std::endl;
+	}
+	setValidData(false);
 	if (tmp[0] == "PASS")
 	{
-		if (tmp[1].empty())
-		{
+		if (!pass.empty()) {
+			std::cout << "Password already set!" << std::endl;
+			return (true);
+		}
+		if (tmp[1].empty()) {
 			std::cout << "Required Password!" << std::endl;
-			setValidData(false);
 			return (true);
 		}
-		if (tmp[1] != serverPassword)
-		{
+		if (tmp[1] != serverPassword) {
 			std::cout << "Wrong Password!" << std::endl;
-			setValidData(false);
 			return (true);
 		}
-		pass= (tmp[1]);
+		pass = (tmp[1]);
 		return (true);
 	}
 	else if (tmp[0] == "NICK") {
+		if (tmp.size() == 1) {
+			std::cout << "Required Nickname!" << std::endl;
+			return (true);
+		}
 		nick = tmp[1];
+		std::cout << "Nick Set!" << std::endl;
 		return (true);
 	}
 	else if (tmp[0] == "USER") {
-		user =  tmp[1];
-		return (true);
+		if (!user.empty()) {
+			std::cout << "User already set!" << std::endl;
+			setValidData(false);
+			return (true);
+		}
+		else {
+			if (tmp.size() == 1){
+				std::cout << "Required Username!" << std::endl;
+				return (true);
+			}
+			user =  tmp[1];
+			return (true);
+		}
 	}
 	if (pass == serverPassword && !nick.empty() && !user.empty())
 		setValidData(true);
