@@ -87,8 +87,9 @@ bool Client::checkClientParams(Server& Server, const std::string& buffer) {
 		return (true);
 	}
 	else if (tmp[0] == "NICK") {
-		if (tmp.size() == 1) {
-			std::cout << "Required Nickname!" << std::endl;
+		if (tmp.size() == 1 || (tmp.size() == 2 && tmp[1].empty())) {
+			std::string errMsg = ":" + Server.displayHostname() + " 431 " + nick + " :No nickname given\r\n";
+			Server.sendMessage(socket_fd, errMsg);
 			return (true);
 		}
 		std::string nickSet = ":" + nick + " NICK " + tmp[1] + "\r\n";
