@@ -11,8 +11,8 @@
 # **************************************************************************** #
 
 NAME = ircserv
-CXX = g++
-CXXFLAGS = -std=c++98 -g #-Wall -Wextra -Werror -g
+CXX = c++
+CXXFLAGS = -std=c++98 -Wall -Wextra -Werror -g
 SRCS = main.cpp \
 	server/server.cpp \
 	server/getHostname.cpp \

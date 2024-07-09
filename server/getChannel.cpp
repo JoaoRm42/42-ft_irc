@@ -16,8 +16,7 @@
 bool Server::checkForOperators(std::string line, Client *user, std::pair<std::vector<std::string>, std::string > input) {
 	//Check the operator and send to the function
 	std::vector<std::string> tokens = channelSplit(line);
-	if (tokens[0] == "JOIN" && tokens.size() > 1)
-	{
+	if (tokens[0] == "JOIN" && tokens.size() > 1) {
 		if (tokens[1].find(',') != std::string::npos)
 		{
 			std::vector<std::string> channels = split(tokens[1], ',');
@@ -52,8 +51,7 @@ bool Server::checkForOperators(std::string line, Client *user, std::pair<std::ve
 		}
 		return (true);
 	}
-	if (tokens[0] == "PART" && tokens.size() > 1)
-	{
+	if (tokens[0] == "PART" && tokens.size() > 1) {
 		if (tokens[1].find(',') != std::string::npos)
 		{
 			std::vector<std::string> channels = split(tokens[1], ',');
@@ -77,26 +75,47 @@ bool Server::checkForOperators(std::string line, Client *user, std::pair<std::ve
 		return (true);
 	}
 	if (tokens[0] == "KICK" && tokens.size() > 1) {
-		tryToKick(tokens[1], user, tokens);
+		if (tokens[2].find(',') != std::string::npos)
+		{
+			std::vector<std::string> users = split(tokens[2], ',');
+			std::vector<std::string> reason;
+			std::string	channelNameTemp = tokens[1];
+			if (tokens.size() > 3 && tokens[3].find(',') != std::string::npos)
+				reason = split(tokens[3], ',');
+			else if (tokens.size() > 3)
+				reason.push_back(tokens[3]);
+			for (size_t k = 0; k < users.size(); k++)
+			{
+				tokens.clear();
+				tokens.push_back("PART");
+				tokens.push_back(channelNameTemp);
+				tokens.push_back(users[k]);
+				if (k < reason.size())
+					tokens.push_back(reason[k]);
+				tryToKick(tokens[1], user, tokens);
+			}
+		}
+		else
+			tryToKick(tokens[1], user, tokens);
 		return (true);
 	}
+	/*if (tokens[0] == "INVITE" && tokens.size() > 1)
+	{
+		std::cout << "invite command\n";
+		return (true);
+	}
+	if (tokens[0] == "TOPIC" && tokens.size() > 1)
+	{
+		std::cout << "topic command\n";
+		return (true);
+	}
+	if (tokens[0] == "MODE" && tokens.size() > 1)
+	{
+		std::cout << "mode command\n";
+		return (true);
+	}*/
 	if (tokens[0] == "PRIVMSG" && tokens.size() > 1) {
 		sendChannelMessage(input, user);
 	}
-		/*if (tokens[0] == "INVITE" && tokens.size() > 1)
-		{
-			std::cout << "invite command\n";
-			return (true);
-		}
-		if (tokens[0] == "TOPIC" && tokens.size() > 1)
-		{
-			std::cout << "topic command\n";
-			return (true);
-		}
-		if (tokens[0] == "MODE" && tokens.size() > 1)
-		{
-			std::cout << "mode command\n";
-			return (true);
-		}*/
-		return (true);
+	return (true);
 }
