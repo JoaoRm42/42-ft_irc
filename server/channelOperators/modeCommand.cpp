@@ -30,8 +30,6 @@ void	Server::showMode(std::string& channelName, Client *user) {
 		sendMessage(user->getSocketFD(), msgNotOnChannel);
 		return;
 	}
-	//"<client> <channel> <modestring> <mode arguments>..." 324
-	//still nao atualizando os modes
 	std::string allModes = thisChannel->getAllModes();
 	std::string	msgWhatMode = ":" + displayHostname() + " 324 " + user->getNick() + " " + channelName + " " + allModes + "\r\n";
 	sendMessage(user->getSocketFD(), msgWhatMode);

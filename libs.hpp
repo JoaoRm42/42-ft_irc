@@ -44,21 +44,6 @@
 
 #define LIMITOFCHANNELS	50
 
-#define JOIN(nick, channel) \
-	":" + std::string(nick) + " JOIN " + std::string(channel) + "\r\n"
-
-#define JOINBROD(nick, channel) \
-	":" + std::string(nick) + " JOIN :" + std::string(channel) + "\r\n"
-
-#define MODE(nick, channel) \
-	":" + std::string(nick) + " MODE " + std::string(channel) + " +t" + "\r\n"
-
-#define NAMEREPLY(hostname, nick, symbol, channel, users) \
-	":" + std::string(hostname) + " 353 " + std::string(nick) + " " + std::string(symbol) + " " + std::string(channel) + " :" + std::string(users) + "\r\n"
-
-#define ENDOFLIST(hostname, nick, channel) \
-	":" + std::string(hostname) + " 366 " + std::string(nick) + " " + std::string(channel) + " :End of /NAMES list.\r\n"
-
 #define PRIVMSG(nick, channel, message) \
 	":" + std::string(nick) + " PRIVMSG " + std::string(channel) + " :" + std::string(message) + "\r\n"
 
