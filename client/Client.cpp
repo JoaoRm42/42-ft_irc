@@ -131,7 +131,6 @@ bool Client::checkClientParams(Server& Server, const std::string& buffer) {
 	}
 	if (pass == Server.getPassword() && !nick.empty() && !user.empty() && isValidNick && validatedPass) {
 		isValidData = true;
-		Server.sendMessage(socket_fd, "farted!\n");
 	}
 	return (false);
 }
