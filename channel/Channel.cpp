@@ -21,6 +21,10 @@ Channel::Channel(std::string name) : _channelName(name) {
 
 Channel::~Channel() {}
 
+void	Channel::removeBotFromChannel() {
+	_listOfMembers.clear();
+}
+
 void	Channel::setListOfMembers(Client *user) {
 	_listOfMembers.push_back(user->getNick());
 	_membersFd.push_back(user->getSocketFD());

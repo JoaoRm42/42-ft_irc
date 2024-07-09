@@ -34,6 +34,7 @@ private:
 public:
 	Channel(std::string name);
 	~Channel();
+	void	removeBotFromChannel();
 	void	setListOfMembers(Client *user);
 	void	setListOfAdmins(Client *user);
 	std::vector<std::string>	getlistOfMembers(void);

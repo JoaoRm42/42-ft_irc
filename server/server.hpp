@@ -18,44 +18,50 @@
 # include "client_info.hpp"
 # include "../channel/Channel.hpp"
 
+class Bot;
+
 class Client;
 
 class	Channel;
 
 class Server {
-private:
-    std::string _port;
-    std::string _password;
-    std::vector<Client> _clientInfo;
-    std::map<int, Client*> _tmpClients;
-    std::map<std::string, Channel *> _channelsList;
-    std::map<int, std::string> _messages;
+	private:
+		std::string	_port;
+		std::string							_password;
+		std::vector<Client>					_clientInfo;
+		std::map<int, Client*>				_tmpClients;
+		std::map<std::string, Channel *>	_channelsList;
+		std::map<int, std::string>			_messages;
+		int									_socketFdBot;
 
 public:
-    Server();
-    Server(char **);
-    Server(const Server &);
-    Server &operator=(const Server &);
-    ~Server();
+	Server();
+	Server(char **);
+	Server(const Server &);
+	Server &operator=(const Server &);
+	~Server();
 
-    // Getters
-    std::string getPort();
-    std::string getPassword();
+	// Getters
+	std::string	getPort();
+	std::string	getPassword();
 
-    std::string displayHostname();
-    std::string getIP();
+	std::string displayHostname();
+	std::string getIP();
 	uint16_t getPortAsUint16();
-    void printCoolntro();
-    int createUser();
-    int bindUser(int, const struct sockaddr_in&);
-    int listenUser(int);
-    void handleNewConnection(int, int);
-    void handleClientData(int);
-    int epollFunction();
+	void printCoolntro();
+	int createUser();
+	int bindUser(int, const struct sockaddr_in&);
+	int listenUser(int);
+	void handleNewConnection(int, int);
+	void handleClientData(int);
+	int epollFunction();
 	int checkMessage(Client*, std::string);
-    void sendChannelMessage(std::pair<std::vector<std::string>, std::string>, Client*);
+	void sendChannelMessage(std::pair<std::vector<std::string>, std::string>, Client*);
 
 	void	sendMessage(int, std::string);
+
+
+	void createBotAndJoinChannel(const std::string& server, int port, const std::string& channel);
 
 	//channels functions
 	bool	checkForOperators(std::string line, Client *user, std::pair<std::vector<std::string>, std::string > input);

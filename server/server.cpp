@@ -33,7 +33,6 @@ Server::~Server() {
 std::string Server::getPassword() { return ( this->_password ); }
 std::string Server::getPort() { return ( this->_port ); }
 
-
 uint16_t Server::getPortAsUint16() {
 	char			*endptr;
 	unsigned long	port_ul = strtoul(this->_port.c_str(), &endptr, 10);
@@ -225,10 +224,14 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 		return;
 	}
 
+
 	std::vector<int> membersFd = it->second->getMembersFd();
 	for (std::vector<int>::iterator itt = membersFd.begin(); itt != membersFd.end(); ++itt) {
 		if (user->getSocketFD() != *itt) {
 			sendMessage(*itt, PRIVMSG(user->getNick(), args[0], args[1]));
+		}
+		if (args[1] == "!Hello") {
+			sendMessage(*itt, PRIVMSG("BOT", args[0], "Hello there! Having a great day i assume."));
 		}
 	}
 }
