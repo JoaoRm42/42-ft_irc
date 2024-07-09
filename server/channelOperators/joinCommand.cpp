@@ -50,16 +50,16 @@ void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vecto
 
 	std::string	msgJoin = ":" + user->getNick() + " JOIN " + channelName + "\r\n";
 	sendMessage(user->getSocketFD(), msgJoin);
-	std::cout << "aqui 1\n";
+
 	std::string msgMode = ":" + user->getNick() + " MODE " + channelName + " +t\r\n";
+	newChannel->setTopicOn(true);
 	sendMessage(user->getSocketFD(), msgMode);
-	std::cout << "aqui 2\n";
+
 	std::string msgNamReply = ":" + displayHostname() + " 353 " + user->getNick() + " = " + channelName + " :@" + user->getNick() + "\r\n";
 	sendMessage(user->getSocketFD(), msgNamReply);
-	std::cout << "aqui 3\n";
+
 	std::string msgEndOfList = ":" + displayHostname() + " 366 " + user->getNick() + " " + channelName + " :End of /NAMES list.\r\n";
 	sendMessage(user->getSocketFD(), msgEndOfList);
-	std::cout << "aqui 4\n";
 }
 
 void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, Client *user, std::string channelPass, int flag) {

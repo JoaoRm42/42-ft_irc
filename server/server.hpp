@@ -78,6 +78,7 @@ public:
 	void	topicMode(int, Channel *, Client *);
 	void	keyMode(int, Channel *, Client *, std::string);
 	void	limitUserMode(int, Channel *, Client *, std::string);
+	void	showMode(std::string&, Client *);
 };
 
 

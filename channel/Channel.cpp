@@ -229,3 +229,27 @@ void	Channel::setLimitOfUsers(size_t limit, bool limitOn) {
 		_limitOfUsers = false;
 	_numMaxOfMembers = limit;
 }
+
+std::string	Channel::getAllModes() {
+	std::string allModes = "+";
+	std::string allArgs = " ";
+	if (_inviteOnly == true)
+		allModes += "i";
+	if (_passwordNeed == true)
+	{
+		allModes += "k";
+		allArgs += getPassword() + " ";
+	}
+	if (_limitOfUsers == true)
+	{
+		allModes += "l";
+		std::stringstream test;
+		test << getNumMaxOfMembers();
+		std::string x;
+		test >> x;
+		allArgs += x;
+	}
+	if (_topicOn == true)
+		allModes += "t";
+	return (allModes + allArgs);
+}

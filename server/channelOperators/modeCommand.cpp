@@ -13,6 +13,30 @@
 #include "../server.hpp"
 #include "../../libs.hpp"
 
+void	Server::showMode(std::string& channelName, Client *user) {
+	std::map<std::string, Channel *>::iterator it;
+	Channel *thisChannel;
+	for (it = _channelsList.begin(); it != _channelsList.end(); it++)
+	{
+		if (it->first == channelName)
+		{
+			thisChannel = it->second;
+			break;
+		}
+	}
+	if (it == _channelsList.end())
+	{
+		std::string msgNotOnChannel = ":" + displayHostname() + " 403 " + user->getNick() + " " + channelName + " :No such channel\r\n";
+		sendMessage(user->getSocketFD(), msgNotOnChannel);
+		return;
+	}
+	//"<client> <channel> <modestring> <mode arguments>..." 324
+	//still nao atualizando os modes
+	std::string allModes = thisChannel->getAllModes();
+	std::string	msgWhatMode = ":" + displayHostname() + " 324 " + user->getNick() + " " + channelName + " " + allModes + "\r\n";
+	sendMessage(user->getSocketFD(), msgWhatMode);
+}
+
 void	Server::tryToMode(std::string& channelName, Client *user, std::vector<std::string> tokens){
 
 	std::map<std::string, Channel *>::iterator it;
@@ -55,12 +79,6 @@ void	Server::tryToMode(std::string& channelName, Client *user, std::vector<std::
 		std::string msgNotAnOp = ":" + displayHostname() + " 482 " + user->getNick() + " " + channelName + " :You're not channel operator\r\n";
 		sendMessage(user->getSocketFD(), msgNotAnOp);
 		return;
-	}
-	if (tokens.size() < 3){
-		//"<client> <channel> <modestring> <mode arguments>..."
-		//still nao atualizando os modes
-		std::string	msgWhatMode = ":" + user->getNick() + " " + channelName + "+t\r\n";
-		sendMessage(user->getSocketFD(), msgWhatMode);
 	}
 	if (tokens.size() >= 3 && (tokens[2][0] == '+' || tokens[2][0] == '-'))
 		modeChannel(user, tokens, thisChannel);

@@ -61,6 +61,7 @@ public:
 	void						setKeyPass(std::string key, bool keyOn);
 	bool						getLimitOfUsers(void);
 	void						setLimitOfUsers(size_t limit, bool limitOn);
+	std::string					getAllModes(void);
 };
 
 #endif

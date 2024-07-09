@@ -16,6 +16,7 @@
 //System Libs
 # include <iostream>
 # include <string>
+# include <sstream>
 # include <sys/epoll.h>
 # include <sys/types.h>
 # include <sys/socket.h>
