@@ -16,6 +16,7 @@ class Client {
 	size_t	numOfChannels;
 	bool isValidData;
 	bool isValidNick;
+	bool validatedPass;
 
   public:
 	Client();
