@@ -4,7 +4,8 @@
 Client::Client() {
 	socket_fd = 0;
 	numOfChannels = 0;
-	isValidData = 0;
+	isValidData = false;
+	isValidNick = false;
 }
 
 Client::~Client() {}
@@ -90,11 +91,16 @@ bool Client::checkClientParams(Server& Server, const std::string& buffer) {
 			std::cout << "Required Nickname!" << std::endl;
 			return (true);
 		}
-		if (tmp[1] == "ola" || tmp[1] == "adeus") {
-			Server.sendMessage(socket_fd, "ERROR :Invalid Nickname\n");
+		if (checkForbiddenChars(tmp[1])) {
+			nick = tmp[1];
+			std::string errMsg = "ERROR :" + tmp[1] + " Erroneous nickname\r\n";
+			Server.sendMessage(socket_fd, errMsg);
 			return (true);
 		}
+		std::string nickSet = ":" + nick + " NICK " + tmp[1] + "\r\n";
 		nick = tmp[1];
+		isValidNick = true;
+		Server.sendMessage(socket_fd, nickSet);
 		std::cout << "Nick Set!" << std::endl;
 		return (true);
 	}
@@ -115,7 +121,15 @@ bool Client::checkClientParams(Server& Server, const std::string& buffer) {
 			return (true);
 		}
 	}
-	if (pass == Server.getPassword() && !nick.empty() && !user.empty())
+	if (pass == Server.getPassword() && !nick.empty() && !user.empty() && isValidNick)
 		setValidData(true);
+	return (false);
+}
+
+bool Client::checkForbiddenChars(const std::string& toCheck) {
+	if (toCheck.find_last_of("&$:~@%+",0) != toCheck.npos)
+		return (true);
+	if (toCheck.find_first_of(" ,*?!@.") != toCheck.npos)
+		return (true);
 	return (false);
 }

@@ -15,6 +15,7 @@ class Client {
 	std::vector<std::string> channels;
 	size_t	numOfChannels;
 	bool isValidData;
+	bool isValidNick;
 
   public:
 	Client();
@@ -38,6 +39,7 @@ class Client {
 
 	//Class Functions
 	bool checkClientParams(Server &Server, const std::string& buffer);
+	bool checkForbiddenChars(const std::string& toCheck);
 };
 
 
