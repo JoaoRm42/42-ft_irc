@@ -186,6 +186,7 @@ int Server::epollFunction() {
 
 void	Server::sendMessage(int fd, std::string message) {
 	const char	*buffer = message.c_str();
+	std::cout << "SENT TO CLIENT ->" << message << std::endl;
 	send(fd, buffer, std::strlen(buffer), MSG_DONTWAIT);
 }
 
@@ -231,4 +232,12 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 			sendMessage(*itt, PRIVMSG(user->getNick(), args[0], args[1]));
 		}
 	}
+}
+
+bool Server::checkUniqueNick(const std::string& toCheck) {
+	for (std::map<int,Client *>::iterator it=this->_tmpClients.begin(); it!=this->_tmpClients.end(); ++it){
+		if(!toCheck.compare(it->second->getNick()))
+			return (false);
+	}
+	return (true);
 }

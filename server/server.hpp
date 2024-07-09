@@ -56,6 +56,7 @@ public:
     void sendChannelMessage(std::pair<std::vector<std::string>, std::string>, Client*);
 
 	void	sendMessage(int, std::string);
+	bool	checkUniqueNick(const std::string& toCheck);
 
 	//channels functions
 	bool	checkForOperators(std::string line, Client *user, std::pair<std::vector<std::string>, std::string > input);
@@ -66,6 +67,7 @@ public:
 	void	removeChannel(std::string);
 	void	tryToKick(std::string&, Client *, std::vector<std::string>);
 	void	kickChannel(std::string, Channel *, Client *, std::string, int, std::string);
+
 };
 
 
