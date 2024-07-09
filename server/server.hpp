@@ -59,6 +59,7 @@ public:
 	void sendChannelMessage(std::pair<std::vector<std::string>, std::string>, Client*);
 
 	void	sendMessage(int, std::string);
+	bool	checkUniqueNick(const std::string& toCheck);
 
 
 	void createBotAndJoinChannel(const std::string& server, int port, const std::string& channel);
@@ -72,6 +73,7 @@ public:
 	void	removeChannel(std::string);
 	void	tryToKick(std::string&, Client *, std::vector<std::string>);
 	void	kickChannel(std::string, Channel *, Client *, std::string, int, std::string);
+
 };
 
 

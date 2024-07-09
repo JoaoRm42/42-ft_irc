@@ -99,6 +99,11 @@ bool Client::checkClientParams(Server& Server, const std::string& buffer) {
 			Server.sendMessage(socket_fd, nickSet);
 			return (true);
 		}
+		if(!Server.checkUniqueNick(tmp[1])) {
+			std::string errMsg = ":" + Server.displayHostname() + " 433 " + nick + " " + tmp[1] + " :Nickname is already in use\r\n";
+			Server.sendMessage(socket_fd, errMsg);
+			return (true);
+		}
 		nick = tmp[1];
 		isValidNick = true;
 		Server.sendMessage(socket_fd, nickSet);
