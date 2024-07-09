@@ -197,7 +197,6 @@ bool	privmsgChecker(std::vector<std::string> args) {
 }
 
 void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string> input, Client* user) {
-	int flagUser = 0;
 	std::vector<std::string> args;
 	getArgsPro(&args, input, 1);
 
@@ -205,7 +204,6 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 	if (privmsgChecker(args)) {
 		for (it2 = _tmpClients.begin(); it2 != _tmpClients.end(); ++it2) {
 			if (it2->second->getNick() == args[0]) {
-				flagUser = 1;
 				break;
 			}
 		}
