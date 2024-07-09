@@ -18,8 +18,6 @@
 # include "client_info.hpp"
 # include "../channel/Channel.hpp"
 
-class Bot;
-
 class Client;
 
 class	Channel;
@@ -74,7 +72,12 @@ public:
 	void	removeChannel(std::string);
 	void	tryToKick(std::string&, Client *, std::vector<std::string>);
 	void	kickChannel(std::string, Channel *, Client *, std::string, int, std::string);
-
+	void	tryToMode(std::string&, Client *, std::vector<std::string>);
+	void	modeChannel(Client *, std::vector<std::string>, Channel *);
+	void	inviteMode(int, Channel *, Client *);
+	void	topicMode(int, Channel *, Client *);
+	void	keyMode(int, Channel *, Client *, std::string);
+	void	limitUserMode(int, Channel *, Client *, std::string);
 };
 
 

@@ -10,4 +10,185 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../server.hpp"
+#include "../../libs.hpp"
 
+void	Server::tryToMode(std::string& channelName, Client *user, std::vector<std::string> tokens){
+
+	std::map<std::string, Channel *>::iterator it;
+	Channel *thisChannel;
+	for (it = _channelsList.begin(); it != _channelsList.end(); it++)
+	{
+		if (it->first == channelName)
+		{
+			thisChannel = it->second;
+			break;
+		}
+	}
+	if (it == _channelsList.end())
+	{
+		std::string msgNotOnChannel = ":" + displayHostname() + " 403 " + user->getNick() + " " + channelName + " :No such channel\r\n";
+		sendMessage(user->getSocketFD(), msgNotOnChannel);
+		return;
+	}
+	size_t k;
+	//check se o membro esta neste canal
+	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
+	{
+		if (thisChannel->getlistOfMembers()[k] == user->getNick())
+			break ;
+	}
+	if (k == thisChannel->getlistOfMembers().size())
+	{
+		std::string msgNotOnChannel = ":" + displayHostname() + " 442 " + user->getNick() + " " + channelName + " :You're not on that channel\r\n";
+		sendMessage(user->getSocketFD(), msgNotOnChannel);
+		return;
+	}
+	//check se este membro é adm para poder dar kick
+	for (k = 0; k < thisChannel->getlistOfAdmins().size(); k++)
+	{
+		if (thisChannel->getlistOfAdmins()[k] == user->getNick())
+			break ;
+	}
+	if (k == thisChannel->getlistOfAdmins().size())
+	{
+		std::string msgNotAnOp = ":" + displayHostname() + " 482 " + user->getNick() + " " + channelName + " :You're not channel operator\r\n";
+		sendMessage(user->getSocketFD(), msgNotAnOp);
+		return;
+	}
+	if (tokens.size() < 3){
+		//"<client> <channel> <modestring> <mode arguments>..."
+		//still nao atualizando os modes
+		std::string	msgWhatMode = ":" + user->getNick() + " " + channelName + "+t\r\n";
+		sendMessage(user->getSocketFD(), msgWhatMode);
+	}
+	if (tokens.size() >= 3 && (tokens[2][0] == '+' || tokens[2][0] == '-'))
+		modeChannel(user, tokens, thisChannel);
+	/*else if (tokens.size() >= 3)
+		modeUser(user, tokens);*/
+}
+
+void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel *thisChannel) {
+	int	flag = 0; //if =-1 (minus mode) else if =+1 (plus mode)
+	if (tokens[2][0] == '+')
+		flag = 1;
+	else if (tokens[2][0] == '-')
+		flag = -1;
+	for (size_t i = 1; i < tokens[2].size(); i++)
+	{
+		size_t j = 0;
+		if (tokens[2][i] == 'i')
+			inviteMode(flag, thisChannel, user);
+		else if (tokens[2][i] == 't')
+			topicMode(flag, thisChannel, user);
+		else if (tokens[2][i] == 'k')
+		{
+			if (tokens.size() >= (3 + j))
+				keyMode(flag, thisChannel, user, tokens[3 + j++]);
+			else
+			{
+				std::string msgModeSpecifyKey = ":" + displayHostname() + " 324 " + user->getNick() + " " + thisChannel->getChannelName() + " :You must specify a parameter for the key mode\r\n";
+				sendMessage(user->getSocketFD(), msgModeSpecifyKey);
+			}
+		}
+		else if (tokens[2][i] == 'l')
+		{
+			if (flag == 1 && tokens.size() >= (3 + j))
+				limitUserMode(flag, thisChannel, user, tokens[3 + j++]);
+			else if (flag == -1)
+				limitUserMode(flag, thisChannel, user, "unset the limit");
+			else
+			{
+				std::string msgModeSpecifyLimit = ":" + displayHostname() + " 324 " + user->getNick() + " " + thisChannel->getChannelName() + " :You must specify a parameter for the limit mode\r\n";
+				sendMessage(user->getSocketFD(), msgModeSpecifyLimit);
+			}
+		}
+		else if (tokens[2][i] != 'o')
+		{
+			std::string msgModeUnknownFlag = ":" + displayHostname() + " 501 " + user->getNick() + " :Unknown MODE flag\r\n";
+			sendMessage(user->getSocketFD(), msgModeUnknownFlag);
+		}
+	}
+}
+
+void	Server::inviteMode(int flag, Channel *thisChannel, Client *user) {
+	if (flag == 1 && thisChannel->getInviteOnly() == false)
+	{
+		thisChannel->setInviteOnly(true);
+		std::string msgModeInviteOnly = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " +i\r\n";
+		for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
+			sendMessage(thisChannel->getMembersFd()[i], msgModeInviteOnly);
+	}
+	else if (flag == -1 && thisChannel->getInviteOnly() == true)
+	{
+		thisChannel->setInviteOnly(false);
+		std::string msgModeNotInviteOnly = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " -i\r\n";
+		for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
+			sendMessage(thisChannel->getMembersFd()[i], msgModeNotInviteOnly);
+	}
+}
+
+void	Server::topicMode(int flag, Channel *thisChannel, Client *user) {
+	if (flag == 1 && thisChannel->getTopicOn() == false)
+	{
+		thisChannel->setTopicOn(true);
+		std::string msgModeTopicOn = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " +t\r\n";
+		for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
+			sendMessage(thisChannel->getMembersFd()[i], msgModeTopicOn);
+	}
+	else if (flag == -1 && thisChannel->getTopicOn() == true)
+	{
+		thisChannel->setTopicOn(false);
+		std::string msgModeTopicOff = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " -t\r\n";
+		for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
+			sendMessage(thisChannel->getMembersFd()[i], msgModeTopicOff);
+	}
+}
+
+void	Server::keyMode(int flag, Channel *thisChannel, Client *user, std::string key) {
+	if (flag == 1 && thisChannel->getPasswordNeed() == false)
+	{
+		thisChannel->setKeyPass(key, true);
+		std::string msgModeKey = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " +k" + " " + key + "\r\n";
+		for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
+			sendMessage(thisChannel->getMembersFd()[i], msgModeKey);
+	}
+	else if (flag == -1 && thisChannel->getPasswordNeed() == true)
+	{
+		if (thisChannel->getPassword() == key)
+		{
+			thisChannel->setKeyPass(key, false);
+			std::string msgModeNotKey = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " -k\r\n";
+			for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
+				sendMessage(thisChannel->getMembersFd()[i], msgModeNotKey);
+		}
+		else
+		{
+			std::string msgModeUnknownKey = ":" + displayHostname() + " 525 " + user->getNick() + " :Key is not well-formed\r\n";
+			sendMessage(user->getSocketFD(), msgModeUnknownKey);
+		}
+	}
+}
+
+void	Server::limitUserMode(int flag, Channel *thisChannel, Client *user, std::string limit) {
+	size_t	newLimit = std::atoi(limit.c_str());
+	for (size_t i = 0; i < limit.size(); i++)
+	{
+		if (!isdigit(limit[i]))
+			newLimit = 0;
+	}
+	if (flag == -1 && thisChannel->getLimitOfUsers() == true)
+	{
+		thisChannel->setLimitOfUsers(std::numeric_limits<int>::max(), false);
+		std::string msgModeNoLimit = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " -l\r\n";
+		for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
+			sendMessage(thisChannel->getMembersFd()[i], msgModeNoLimit);
+	}
+	else if (flag == 1 && thisChannel->getNumMaxOfMembers() != newLimit)
+	{
+		thisChannel->setLimitOfUsers(newLimit, true);
+		std::string msgModeNoLimit = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " +l" + " " + limit + "\r\n";
+		for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
+			sendMessage(thisChannel->getMembersFd()[i], msgModeNoLimit);
+	}
+}

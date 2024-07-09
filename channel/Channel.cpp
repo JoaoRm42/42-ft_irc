@@ -59,6 +59,10 @@ bool	Channel::getPasswordNeed() {
 	return (_passwordNeed);
 }
 
+bool	Channel::getTopicOn() {
+	return (_topicOn);
+}
+
 std::string	Channel::getPassword(){
 	return (_password);
 }
@@ -185,4 +189,43 @@ void Channel::removeUserKick(std::string userName, int fdUser) {
 		}
 	}
 	_numOfMembers--;
+}
+
+void	Channel::setInviteOnly(bool flag) {
+	_inviteOnly = flag;
+}
+
+std::string	Channel::getChannelName() {
+	return(_channelName);
+}
+
+void	Channel::setTopicOn(bool flag) {
+	_topicOn = flag;
+	if (flag == false)
+		_topic = "/0";
+}
+
+void	Channel::setKeyPass(std::string key, bool keyOn) {
+	if (keyOn == true)
+	{
+		_passwordNeed = true;
+		_password = key;
+	}
+	else
+	{
+		_passwordNeed = false;
+		_password = "/0";
+	}
+}
+
+bool	Channel::getLimitOfUsers() {
+	return (_limitOfUsers);
+}
+
+void	Channel::setLimitOfUsers(size_t limit, bool limitOn) {
+	if (limitOn == true)
+		_limitOfUsers = true;
+	else if (limitOn == false)
+		_limitOfUsers = false;
+	_numMaxOfMembers = limit;
 }

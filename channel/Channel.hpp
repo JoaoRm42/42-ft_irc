@@ -29,6 +29,8 @@ private:
 	std::string	_password;
 	bool	_inviteOnly;
 	bool	_passwordNeed;
+	bool	_topicOn;
+	bool	_limitOfUsers;
 	size_t	_numOfMembers;
 	size_t	_numMaxOfMembers;
 public:
@@ -43,6 +45,7 @@ public:
 	int							getFirstFd(void);
 	bool						getInviteOnly(void);
 	bool						getPasswordNeed(void);
+	bool						getTopicOn(void);
 	std::string					getPassword(void);
 	size_t						getNumOfMembers(void);
 	size_t						getNumMaxOfMembers(void);
@@ -52,6 +55,12 @@ public:
 	void						removeUser(Client *user);
 	int							getOneUserFd(std::string userName);
 	void						removeUserKick(std::string userName, int fdUser);
+	void						setInviteOnly(bool flag);
+	std::string					getChannelName(void);
+	void						setTopicOn(bool flag);
+	void						setKeyPass(std::string key, bool keyOn);
+	bool						getLimitOfUsers(void);
+	void						setLimitOfUsers(size_t limit, bool limitOn);
 };
 
 #endif

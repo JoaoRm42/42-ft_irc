@@ -109,14 +109,15 @@ bool Server::checkForOperators(std::string line, Client *user, std::pair<std::ve
 	{
 		std::cout << "topic command\n";
 		return (true);
-	}
+	}*/
 	if (tokens[0] == "MODE" && tokens.size() > 1)
 	{
-		std::cout << "mode command\n";
+		tryToMode(tokens[1], user, tokens);
 		return (true);
-	}*/
+	}
 	if (tokens[0] == "PRIVMSG" && tokens.size() > 1) {
 		sendChannelMessage(input, user);
+		return (true);
 	}
-	return (true);
+	return (false);
 }
