@@ -91,13 +91,14 @@ bool Client::checkClientParams(Server& Server, const std::string& buffer) {
 			std::cout << "Required Nickname!" << std::endl;
 			return (true);
 		}
+		std::string nickSet = ":" + nick + " NICK " + tmp[1] + "\r\n";
 		if (checkForbiddenChars(tmp[1])) {
+			std::string errMsg = ":" + Server.displayHostname() + " 432 " + nick + " " + tmp[1] + " :Erroneus nickname\r\n";
 			nick = tmp[1];
-			std::string errMsg = "ERROR :" + tmp[1] + " Erroneous nickname\r\n";
 			Server.sendMessage(socket_fd, errMsg);
+			Server.sendMessage(socket_fd, nickSet);
 			return (true);
 		}
-		std::string nickSet = ":" + nick + " NICK " + tmp[1] + "\r\n";
 		nick = tmp[1];
 		isValidNick = true;
 		Server.sendMessage(socket_fd, nickSet);
@@ -122,7 +123,7 @@ bool Client::checkClientParams(Server& Server, const std::string& buffer) {
 		}
 	}
 	if (pass == Server.getPassword() && !nick.empty() && !user.empty() && isValidNick)
-		setValidData(true);
+		isValidData = true;
 	return (false);
 }
 
