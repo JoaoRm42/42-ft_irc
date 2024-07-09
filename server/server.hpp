@@ -44,6 +44,7 @@ public:
 	// Getters
 	std::string	getPort();
 	std::string	getPassword();
+	int 		getSocketFdBot();
 
 	std::string displayHostname();
 	std::string getIP();
@@ -61,8 +62,8 @@ public:
 	void	sendMessage(int, std::string);
 	bool	checkUniqueNick(const std::string& toCheck);
 
-
-	void createBotAndJoinChannel(const std::string& server, int port, const std::string& channel);
+	void	BotJoinChannel(const std::string& channel);
+	void	createBot(const std::string& server, int port);
 
 	//channels functions
 	bool	checkForOperators(std::string line, Client *user, std::pair<std::vector<std::string>, std::string > input);

@@ -45,7 +45,7 @@ void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vecto
 	newChannel->setListOfAdmins(user);
 
 	// Add Bot ///////////////////
-	createBotAndJoinChannel("127.0.0.1", 6667, channelName);
+	BotJoinChannel(channelName);
 	//////////////////////////////
 
 

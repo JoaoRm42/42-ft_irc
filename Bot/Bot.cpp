@@ -1,7 +1,11 @@
 # include "../libs.hpp"
 
-void Server::createBotAndJoinChannel(const std::string& server, int port, const std::string& channel) {
-	int sockfd;
+void Server::BotJoinChannel(const std::string& channel) {
+	std::string msgJoin = "JOIN " + channel + "\r\n";
+	send(this->_socketFdBot , msgJoin.c_str(), msgJoin.size(), MSG_DONTWAIT);
+}
+
+void Server::createBot(const std::string& server, int port) {
 	struct sockaddr_in server_addr;
 	struct hostent *server_host;
 
@@ -11,9 +15,8 @@ void Server::createBotAndJoinChannel(const std::string& server, int port, const 
 		return;
 	}
 
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	this->_socketFdBot = sockfd;
-	if (sockfd < 0) {
+	this->_socketFdBot  = socket(AF_INET, SOCK_STREAM, 0);
+	if (this->_socketFdBot  < 0) {
 		std::cerr << "Error opening socket" << std::endl;
 		return;
 	}
@@ -23,9 +26,9 @@ void Server::createBotAndJoinChannel(const std::string& server, int port, const 
 	memcpy((char *) &server_addr.sin_addr.s_addr, (char *) server_host->h_addr, server_host->h_length);
 	server_addr.sin_port = htons(port);
 
-	if (connect(sockfd, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0) {
+	if (connect(this->_socketFdBot , (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0) {
 		std::cerr << "Error connecting" << std::endl;
-		close(sockfd);
+		close(this->_socketFdBot );
 		return;
 	}
 
@@ -36,10 +39,8 @@ void Server::createBotAndJoinChannel(const std::string& server, int port, const 
 	std::string msgNick = "NICK " + nick + "\r\n";
 	std::string msgUser = "USER " + user + "\r\n";
 	std::string msgPass = "PASS " + pass + "\r\n";
-	std::string msgJoin = "JOIN " + channel + "\r\n";
 
-	send(sockfd, msgNick.c_str(), msgNick.size(), 0);
-	send(sockfd, msgUser.c_str(), msgUser.size(), 0);
-	send(sockfd, msgPass.c_str(), msgPass.size(), 0);
-	send(sockfd, msgJoin.c_str(), msgJoin.size(), 0);
+	send(this->_socketFdBot , msgNick.c_str(), msgNick.size(), MSG_DONTWAIT);
+	send(this->_socketFdBot , msgUser.c_str(), msgUser.size(), MSG_DONTWAIT);
+	send(this->_socketFdBot , msgPass.c_str(), msgPass.size(), MSG_DONTWAIT);
 }

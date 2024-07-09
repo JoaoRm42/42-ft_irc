@@ -32,6 +32,7 @@ Server::~Server() {
 
 std::string Server::getPassword() { return ( this->_password ); }
 std::string Server::getPort() { return ( this->_port ); }
+int 		Server::getSocketFdBot() { return ( this->_socketFdBot ); }
 
 uint16_t Server::getPortAsUint16() {
 	char			*endptr;
@@ -140,7 +141,6 @@ int Server::epollFunction() {
 	server_addr.sin_addr.s_addr = INADDR_ANY;
 	opt = 1;
 	sockfd = createUser();
-
 	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) != 0)
 		return (1);
 	if (bindUser(sockfd, server_addr))
@@ -167,6 +167,7 @@ int Server::epollFunction() {
 
 	std::cout << "Server started. Listening on port " << getPort() << "..." << std::endl;
 
+	createBot("127.0.0.1", 6667);
 	epoll_event events[MAX_EVENTS];
 	//sendMessage(sockfd, "CHANLIMIT=#&:25\r\n");
 	while (true) {
@@ -185,7 +186,7 @@ int Server::epollFunction() {
 
 void	Server::sendMessage(int fd, std::string message) {
 	const char	*buffer = message.c_str();
-	std::cout << "SENT TO CLIENT ->" << message << std::endl;
+//	std::cout << "SENT TO CLIENT ->" << message << std::endl;
 	send(fd, buffer, std::strlen(buffer), MSG_DONTWAIT);
 }
 

@@ -73,6 +73,7 @@ void	Server::partChannel(std::string channelName, Channel *thisChannel, Client *
 	{
 		thisChannel->removeBotFromChannel();
 		removeChannel(channelName);
+//		close(getSocketFdBot());
 		return;
 	}
 }
