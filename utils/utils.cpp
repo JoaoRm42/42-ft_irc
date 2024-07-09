@@ -4,6 +4,16 @@
 
 #include "utils.hpp"
 
+std::string toUpperCase(const std::string& input) {
+	std::string result = input;
+
+	for (size_t i = 0; i < result.length(); ++i) {
+		result[i] = std::toupper(result[i]);
+	}
+
+	return result;
+}
+
 std::vector<std::string> returnVector(std::vector<std::string> vector) {
 	std::vector<std::string> tmp;
 	for (std::vector<std::string>::iterator it = vector.begin(); it != vector.end(); it++) {

@@ -189,23 +189,46 @@ void	Server::sendMessage(int fd, std::string message) {
 	send(fd, buffer, std::strlen(buffer), MSG_DONTWAIT);
 }
 
-void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string> input, Client* user) {
+bool	privmsgChecker(std::vector<std::string> args) {
+	if (args[0][0] != '#' && args[0][0] != '&')
+		return (true);
+	return (false);
+}
 
+void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string> input, Client* user) {
+	int flagUser = 0;
 	std::vector<std::string> args;
 	getArgsPro(&args, input, 1);
+
+	std::map<int, Client*>::iterator it2;
+	if (privmsgChecker(args)) {
+		for (it2 = _tmpClients.begin(); it2 != _tmpClients.end(); ++it2) {
+			if (it2->second->getNick() == args[0]) {
+				flagUser = 1;
+				break;
+			}
+		}
+		if (it2 == _tmpClients.end()){
+			std::string msgNoSuchNick = ":" + displayHostname() + " 401 " + user->getNick() + " " + args[0] + " :No such nick\r\n";
+			sendMessage(user->getSocketFD(), msgNoSuchNick);
+			return ;
+		}
+		std::string msgPrivate = ":" + user->getNick() + " PRIVMSG " + args[0] + " :" + args[1] + "\r\n";
+		sendMessage(it2->second->getSocketFD(), msgPrivate);
+		return ;
+	}
+
 	std::map<std::string, Channel*>::iterator it = _channelsList.find(args[0]);
 	if (it == _channelsList.end()) {
-		std::cerr << "Channel " << args[0] << " does not exist." << std::endl;
+		std::string msgNoSuchChannel = ":" + displayHostname() + " 401 " + user->getNick() + " " + args[0] + " :No such channel\r\n";
+		sendMessage(user->getSocketFD(), msgNoSuchChannel);
 		return;
 	}
+
 	std::vector<int> membersFd = it->second->getMembersFd();
-	if (membersFd.size() < 2) {
-		std::cerr << "Channel " << args[0] << " has fewer than 2 members." << std::endl;
-		return;
-	}
 	for (std::vector<int>::iterator itt = membersFd.begin(); itt != membersFd.end(); ++itt) {
-		if (user->getSocketFD() != *itt) {  // Ensure not to send the message to the sender
-			sendMessage(*itt, PRIVMSG(user->getNick(), args[0], args[1]));  // Send the message to the member
+		if (user->getSocketFD() != *itt) {
+			sendMessage(*itt, PRIVMSG(user->getNick(), args[0], args[1]));
 		}
 	}
 }

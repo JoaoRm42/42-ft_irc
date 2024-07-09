@@ -15,7 +15,9 @@
 
 bool Server::checkForOperators(std::string line, Client *user, std::pair<std::vector<std::string>, std::string > input) {
 	//Check the operator and send to the function
+	std::cout << line << std::endl;
 	std::vector<std::string> tokens = channelSplit(line);
+	tokens[0] = toUpperCase(tokens[0]);
 	if (tokens[0] == "JOIN" && tokens.size() > 1) {
 		if (tokens[1].find(',') != std::string::npos)
 		{
