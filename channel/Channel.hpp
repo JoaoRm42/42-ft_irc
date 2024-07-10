@@ -34,6 +34,9 @@ private:
 	size_t	_numMaxOfMembers;
 	std::time_t	_creationTime;
 	std::string	_creationTimeString;
+	std::string _topicTimeString;
+	std::time_t	_topicTime;
+	std::string _topicNick;
 public:
 	Channel(std::string name);
 	~Channel();
@@ -66,6 +69,10 @@ public:
 	std::time_t					getCreationTime(void);
 	void						setCrationTimeString(void);
 	std::string					getCreationTimeString(void);
+	std::string					getTopic(void);
+	void						setTopic(std::string newTopic, std::string user);
+	std::string					getTopicNick(void);
+	std::string					getTopicTime(void);
 };
 
 #endif

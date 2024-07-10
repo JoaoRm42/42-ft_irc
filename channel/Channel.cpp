@@ -214,11 +214,34 @@ std::string	Channel::getChannelName() {
 void	Channel::setTopicOn(bool flag) {
 	if (flag == false)
 	{
-		_topic = "/0";
+		_topic.clear();
 		_topicOn = false;
 	}
 	else
 		_topicOn = true;
+}
+
+std::string	Channel::getTopic() {
+	return (_topic);
+}
+
+void	Channel::setTopic(std::string newTopic, std::string user) {
+	_topic = newTopic;
+	_topicNick = user;
+	_topicTime = time(0);
+	time(&_topicTime);
+
+	std::ostringstream out;
+	out << _topicTime;
+	_topicTimeString = out.str();
+}
+
+std::string Channel::getTopicNick() {
+	return (_topicNick);
+}
+
+std::string Channel::getTopicTime() {
+	return (_topicTimeString);
 }
 
 void	Channel::setKeyPass(std::string key, bool keyOn) {

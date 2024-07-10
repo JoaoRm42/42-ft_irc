@@ -104,12 +104,12 @@ bool Server::checkForOperators(std::string line, Client *user, std::pair<std::ve
 	{
 		std::cout << "invite command\n";
 		return (true);
-	}
+	}*/
 	if (tokens[0] == "TOPIC" && tokens.size() > 1)
 	{
-		std::cout << "topic command\n";
+		tryTopic(tokens[1], user, tokens);
 		return (true);
-	}*/
+	}
 	if (tokens[0] == "MODE" && tokens.size() > 1)
 	{
 		if (tokens.size() == 2)

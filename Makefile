@@ -28,6 +28,7 @@ SRCS = main.cpp \
 	utils/utils.cpp \
 	server/channelOperators/kickCommand.cpp \
 	server/channelOperators/modeCommand.cpp \
+	server/channelOperators/topicCommand.cpp \
 	Bot/Bot.cpp
 OBJS = $(SRCS:.cpp=.o)
 
