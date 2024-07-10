@@ -33,6 +33,8 @@ private:
 	bool	_limitOfUsers;
 	size_t	_numOfMembers;
 	size_t	_numMaxOfMembers;
+	std::time_t	_creationTime;
+	std::string	_creationTimeString;
 public:
 	Channel(std::string name);
 	~Channel();
@@ -62,6 +64,9 @@ public:
 	bool						getLimitOfUsers(void);
 	void						setLimitOfUsers(size_t limit, bool limitOn);
 	std::string					getAllModes(void);
+	std::time_t					getCreationTime(void);
+	void						setCrationTimeString(void);
+	std::string					getCreationTimeString(void);
 };
 
 #endif

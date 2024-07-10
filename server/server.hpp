@@ -79,6 +79,7 @@ public:
 	void	keyMode(int, Channel *, Client *, std::string);
 	void	limitUserMode(int, Channel *, Client *, std::string);
 	void	showMode(std::string&, Client *);
+	void	modeUser(Client *, std::vector<std::string>, Channel *);
 };
 
 

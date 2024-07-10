@@ -17,6 +17,7 @@ Channel::Channel(std::string name) : _channelName(name) {
 	_numOfMembers = 0;
 	_passwordNeed = false;
 	_numMaxOfMembers = std::numeric_limits<int>::max();
+	setCrationTimeString();
 }
 
 Channel::~Channel() {}
@@ -252,4 +253,21 @@ std::string	Channel::getAllModes() {
 	if (_topicOn == true)
 		allModes += "t";
 	return (allModes + allArgs);
+}
+
+std::time_t	Channel::getCreationTime() {
+	return (_creationTime);
+}
+
+void	Channel::setCrationTimeString() {
+	_creationTime = time(0);
+	time(&this->_creationTime);
+
+	std::ostringstream oss;
+	oss << this->_creationTime;
+	_creationTimeString = oss.str();
+}
+
+std::string	Channel::getCreationTimeString() {
+	return (_creationTimeString);
 }

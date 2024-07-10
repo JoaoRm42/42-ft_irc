@@ -33,6 +33,9 @@ void	Server::showMode(std::string& channelName, Client *user) {
 	std::string allModes = thisChannel->getAllModes();
 	std::string	msgWhatMode = ":" + displayHostname() + " 324 " + user->getNick() + " " + channelName + " " + allModes + "\r\n";
 	sendMessage(user->getSocketFD(), msgWhatMode);
+
+	std::string	msgCreationTime = ":" + displayHostname() + " 329 " + user->getNick() + " " + channelName + " " + thisChannel->getCreationTimeString() + "\r\n";
+	sendMessage(user->getSocketFD(), msgCreationTime);
 }
 
 void	Server::tryToMode(std::string& channelName, Client *user, std::vector<std::string> tokens){
@@ -80,8 +83,14 @@ void	Server::tryToMode(std::string& channelName, Client *user, std::vector<std::
 	}
 	if (tokens.size() >= 3 && (tokens[2][0] == '+' || tokens[2][0] == '-'))
 		modeChannel(user, tokens, thisChannel);
-	/*else if (tokens.size() >= 3)
-		modeUser(user, tokens);*/
+	else if (tokens.size() >= 3)
+		modeUser(user, tokens, thisChannel);
+}
+
+void	Server::modeUser(Client *user, std::vector<std::string> tokens, Channel *thisChannel) {
+	(void)user;
+	(void)tokens;
+	(void)thisChannel;
 }
 
 void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel *thisChannel) {
