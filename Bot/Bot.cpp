@@ -107,7 +107,7 @@ void Server::BotSendAsciiArt(const std::string& userNick) {
 	asciiArtLines.push_back("              , ,");
 	asciiArtLines.push_back("             /| |\\");
 	asciiArtLines.push_back("            / | | \\");
-	asciiArtLines.push_back("            | | | |     Nice try jackass!");
+	asciiArtLines.push_back("            | | | |     Nice try Dummy!");
 	asciiArtLines.push_back("            \\ | | /");
 	asciiArtLines.push_back("             \\|w|/    /");
 	asciiArtLines.push_back("             /_ _\\   /      , ");

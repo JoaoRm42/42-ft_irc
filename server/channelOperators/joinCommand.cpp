@@ -47,6 +47,7 @@ void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vecto
 	// Add Bot ///////////////////
 	BotJoinChannel(channelName);
 
+	// Dar MOD ao bot aqui
 
 	std::string	msgJoin = ":" + user->getNick() + " JOIN " + channelName + "\r\n";
 	sendMessage(user->getSocketFD(), msgJoin);
@@ -60,6 +61,8 @@ void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vecto
 
 	std::string msgEndOfList = ":" + displayHostname() + " 366 " + user->getNick() + " " + channelName + " :End of /NAMES list.\r\n";
 	sendMessage(user->getSocketFD(), msgEndOfList);
+
+	//Mandar Mensagem com os comandos do BOT
 }
 
 void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, Client *user, std::string channelPass, int flag) {
@@ -110,4 +113,5 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 		if (thisChannel->getMembersFd()[i] != user->getSocketFD())
 			sendMessage(thisChannel->getMembersFd()[i], msgJoinBroadcast);
 	}
+	//Mandar Mensagem com os comandos do BOT
 }
