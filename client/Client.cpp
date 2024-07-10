@@ -24,10 +24,6 @@ std::string Client::getUser() const {
 	return (user);
 }
 
-std::string Client::getPass() const {
-	return (pass);
-}
-
 size_t Client::getNumOfChannels() const {
 	return (numOfChannels);
 }
@@ -60,10 +56,6 @@ int Client::addBackChannel(const std::string& data) {
 	return (-1);
 }
 
-void Client::setPass(const std::string& data) {
-	pass = data;
-}
-
 void Client::setValidData(const bool data) {
 	isValidData = data;
 }
@@ -73,12 +65,12 @@ bool Client::checkClientParams(Server& Server, const std::string& buffer) {
 	isValidData = false;
 	if (tmp[0] == "PASS")
 	{
-		if (validatedPass) {
-			Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 462 " + ":You may not reregister\r\n");
+		if (tmp.size() != 2 ) {
+			Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 461 " + "PASS :Not enough parameters\r\n");
 			return (true);
 		}
-		if (tmp[1].empty()) {
-			Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 461 " + "PASS :Not enough parameters\r\n");
+		if (validatedPass) {
+			Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 462 " + ":You may not reregister\r\n");
 			return (true);
 		}
 		if (tmp[1] != Server.getPassword()) {
@@ -144,13 +136,13 @@ void Client::checkNick(Server& Server, const std::vector<std::string> &tmp) {
 }
 
 void Client::checkUser(Server& Server, const std::vector<std::string> &tmp) {
-	if (tmp.size() < 4) {
-		Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 461 " + "USER :Not enough parameters\r\n");
-		return;
-	}
 	if (validatedUser) {
 		Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 462 " + ":You may not reregister\r\n");
 		return ;
+	}
+	if (tmp.size() < 4) {
+		Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 461 " + "USER :Not enough parameters\r\n");
+		return;
 	}
 	if (tmp[2] == "0" && tmp[3] == "*") {
 		user = tmp[1];
