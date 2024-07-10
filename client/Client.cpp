@@ -7,6 +7,7 @@ Client::Client() {
 	isValidData = false;
 	isValidNick = false;
 	validatedPass = false;
+	validatedUser = false;
 }
 
 Client::~Client() {}
@@ -69,11 +70,9 @@ void Client::setValidData(const bool data) {
 
 bool Client::checkClientParams(Server& Server, const std::string& buffer) {
 	std::vector<std::string> tmp = split(buffer, ' ');
+	isValidData = false;
 	if (tmp[0] == "PASS")
 	{
-		if(validatedPass) {
-
-		}
 		if (!pass.empty()) {
 			std::cout << "Password already set!" << std::endl;
 			return (true);
@@ -95,23 +94,10 @@ bool Client::checkClientParams(Server& Server, const std::string& buffer) {
 		return (true);
 	}
 	else if (tmp[0] == "USER" && validatedPass) {
-		if (!user.empty()) { {
-				std::cout << "Entered here!" << std::endl;
-				std::cout << "User already set!" << std::endl;
-			}
-			setValidData(false);
-			return (true);
+		checkUser(Server, tmp);
+		return (true);
 		}
-		else {
-			if (tmp.size() == 1){
-				std::cout << "Required Username!" << std::endl;
-				return (true);
-			}
-			user =  tmp[1];
-			return (true);
-		}
-	}
-	if (pass == Server.getPassword() && !nick.empty() && !user.empty() && isValidNick && validatedPass) {
+	if (!nick.empty() && !user.empty() && isValidNick && validatedPass) {
 		isValidData = true;
 	}
 	return (false);
@@ -156,4 +142,21 @@ void Client::checksNick(Server& Server, const std::vector<std::string> &tmp) {
 	Server.sendMessage(socket_fd, ":" + nick + " NICK " + tmp[1] + "\r\n");
 	nick = tmp[1];
 	isValidNick = true;
+}
+
+void Client::checkUser(Server& Server, const std::vector<std::string> &tmp) {
+	if (!user.empty()) {
+		{
+			Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 462 " + ":You may not reregister\r\n");
+		}
+		return ;
+	}
+	else {
+		if (tmp.size() == 1) {
+			Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 461 " + "USER :Not enough parameters\r\n");
+			return ;
+		}
+		user = tmp[1];
+		return;
+	}
 }

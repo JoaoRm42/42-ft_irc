@@ -17,6 +17,7 @@ class Client {
 	bool isValidData;
 	bool isValidNick;
 	bool validatedPass;
+	bool validatedUser;
 
   public:
 	Client();
@@ -42,6 +43,7 @@ class Client {
 	bool checkClientParams(Server &Server, const std::string& buffer);
 	bool checkForbiddenChars(const std::string& toCheck);
 	void checksNick(Server &Server, const std::vector<std::string> &tmp);
+	void checkUser(Server &Server, const std::vector<std::string> &tmp);
 };
 
 

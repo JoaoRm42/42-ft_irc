@@ -33,7 +33,7 @@ void Server::createBot(const std::string& server, int port) {
 	}
 
     std::string msgPass = "PASS pass\r\n";
-	std::string msgNick = "NICK BOT\r\n";
+	std::string msgNick = "NICK BOTRIMMING\r\n";
 	std::string msgUser = "USER BOT 0 * :realname\r\n";
 
     sendMessage(this->_socketFdBot, msgPass);
