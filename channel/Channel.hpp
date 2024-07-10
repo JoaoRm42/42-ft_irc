@@ -14,7 +14,6 @@
 # define CHANNEL_HPP
 
 # include "../libs.hpp"
-# include "../server/client_info.hpp"
 
 class Client;
 

@@ -15,7 +15,6 @@
 # define MAX_EVENTS 10
 
 # include "../libs.hpp"
-# include "client_info.hpp"
 # include "../channel/Channel.hpp"
 
 class Client;
@@ -44,43 +43,45 @@ public:
 	std::string	getPassword();
 	int 		getSocketFdBot();
 
-	std::string displayHostname();
-	std::string getIP();
-	uint16_t getPortAsUint16();
-	void printCoolntro();
-	int createUser();
-	int bindUser(int, const struct sockaddr_in&);
-	int listenUser(int);
-	void handleNewConnection(int, int);
-	void handleClientData(int);
-	int epollFunction();
-	int checkMessage(Client*, std::string);
-	void sendChannelMessage(std::pair<std::vector<std::string>, std::string>, Client*);
+	std::string	displayHostname();
+	std::string	getIP();
+	uint16_t	getPortAsUint16();
+	void		printCoolntro();
+	int			createUser();
+	int			bindUser(int, const struct sockaddr_in&);
+	int			listenUser(int);
+	void		handleNewConnection(int, int);
+	void		handleClientData(int);
+	int			epollFunction();
+	int			checkMessage(Client*, std::string);
+	void 		sendChannelMessage(std::pair<std::vector<std::string>, std::string>, Client*);
 
 	void	sendMessage(int, std::string);
 	bool	checkUniqueNick(const std::string& toCheck);
 	Client *_getUserClass(const std::string&);
 
-	void	BotJoinChannel(const std::string& channel);
-	void	createBot(const std::string& server, int port);
+	void		BotJoinChannel(const std::string& channel);
+	void		createBot(const std::string& server, int port);
+	void		BotSendAsciiArt(const std::string& userNick);
+	std::string	BotJokes();
 
 	//channels functions
-	bool	checkForOperators(std::string line, Client *user, std::pair<std::vector<std::string>, std::string > input);
-	void	tryToJoinChannel(std::string &channelName, Client *user, std::vector<std::string> tokens);
-	void	joinExistingChannel(std::string channelName, Channel *thisChannel, Client *user, std::string channelPass, int flag);
-	void	tryToPartChannel(std::string &channelName, Client *user, std::vector<std::string> tokens);
-	void	partChannel(std::string channelName, Channel *thisChannel, Client *user, std::string reason, int flag);
-	void	removeChannel(std::string);
-	void	tryToKick(std::string&, Client *, std::vector<std::string>);
-	void	kickChannel(std::string, Channel *, Client *, std::string, int, std::string);
-	void	tryToMode(std::string&, Client *, std::vector<std::string>);
-	void	modeChannel(Client *, std::vector<std::string>, Channel *);
-	void	inviteMode(int, Channel *, Client *);
-	void	topicMode(int, Channel *, Client *);
-	void	keyMode(int, Channel *, Client *, std::string);
-	void	limitUserMode(int, Channel *, Client *, std::string);
-	void	showMode(std::string&, Client *);
-	void	modeUser(Client *, std::vector<std::string>, Channel *);
+	bool		checkForOperators(std::string line, Client *user, std::pair<std::vector<std::string>, std::string > input);
+	void		tryToJoinChannel(std::string &channelName, Client *user, std::vector<std::string> tokens);
+	void		joinExistingChannel(std::string channelName, Channel *thisChannel, Client *user, std::string channelPass, int flag);
+	void		tryToPartChannel(std::string &channelName, Client *user, std::vector<std::string> tokens);
+	void		partChannel(std::string channelName, Channel *thisChannel, Client *user, std::string reason, int flag);
+	void		removeChannel(std::string);
+	void		tryToKick(std::string&, Client *, std::vector<std::string>);
+	void		kickChannel(std::string, Channel *, Client *, std::string, int, std::string);
+	void		tryToMode(std::string&, Client *, std::vector<std::string>);
+	void		modeChannel(Client *, std::vector<std::string>, Channel *);
+	void		inviteMode(int, Channel *, Client *);
+	void		topicMode(int, Channel *, Client *);
+	void		keyMode(int, Channel *, Client *, std::string);
+	void		limitUserMode(int, Channel *, Client *, std::string);
+	void		showMode(std::string&, Client *);
+	void		modeUser(Client *, std::vector<std::string>, Channel *);
 };
 
 
