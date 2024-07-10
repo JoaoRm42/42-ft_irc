@@ -1,5 +1,42 @@
 # include "../libs.hpp"
 
+void Server::BotSendAsciiArt(const std::string& userNick) {
+	std::vector<std::string> asciiArtLines;
+
+	asciiArtLines.push_back("              , ,");
+	asciiArtLines.push_back("             /| |\\");
+	asciiArtLines.push_back("            / | | \\");
+	asciiArtLines.push_back("            | | | |     Nice try jackass!");
+	asciiArtLines.push_back("            \\ | | /");
+	asciiArtLines.push_back("             \\|w|/    /");
+	asciiArtLines.push_back("             /_ _\\   /      , ");
+	asciiArtLines.push_back("  /\\       _:()_():_       /]");
+	asciiArtLines.push_back("  ||_     : ._=Y=_  :     / /");
+	asciiArtLines.push_back(" [)(_,    ',__\\W/ _,'    /  \\");
+	asciiArtLines.push_back(" [) \\_/\\    _/'='\\      /-/\\)");
+	asciiArtLines.push_back("  [_| \\ \\  ///  \\ '._  / /");
+	asciiArtLines.push_back("  :;   \\ \\///   / |  '` /");
+	asciiArtLines.push_back("  ;::   \\ `|:   : |',_.'");
+	asciiArtLines.push_back("  \"\"\"    \\_|:   : |   ");
+	asciiArtLines.push_back("           |:   : |'\".");
+	asciiArtLines.push_back("           /`._.'  \\");
+	asciiArtLines.push_back("          /  /|   /");
+	asciiArtLines.push_back("         |  \\ /  /");
+	asciiArtLines.push_back("          '. '. /");
+	asciiArtLines.push_back("            '. '");
+	asciiArtLines.push_back("            / \\ \\");
+	asciiArtLines.push_back("           / / \\'=,");
+	asciiArtLines.push_back("     .----' /   \\ (\\__ ");
+	asciiArtLines.push_back("    (((____/     \\ \\  )");
+	asciiArtLines.push_back("                  '.\\_)");
+
+
+	for (size_t i = 0; i < asciiArtLines.size(); ++i) {
+		std::string msgAsciiArt = "PRIVMSG " + userNick + " :" + asciiArtLines[i] + "\r\n";
+		sendMessage(this->_socketFdBot, msgAsciiArt);
+	}
+}
+
 void Server::BotJoinChannel(const std::string& channel) {
 	std::string msgJoin = "JOIN " + channel + "\r\n";
     sendMessage(this->_socketFdBot, msgJoin);

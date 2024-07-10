@@ -80,6 +80,10 @@ void	Server::kickChannel(std::string channelName, Channel *thisChannel, Client *
 
 	reason = "\"" + reason + "\"";
 	std::string msgKick;
+	if (kickedUser == "BOT") {
+		BotSendAsciiArt(user->getNick());
+		return ;
+	}
 	if (flag == 0)
 		msgKick = ":" + user->getNick() + " KICK " + channelName + " " + kickedUser + "\r\n";
 	else

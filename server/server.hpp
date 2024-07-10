@@ -15,7 +15,6 @@
 # define MAX_EVENTS 10
 
 # include "../libs.hpp"
-# include "client_info.hpp"
 # include "../channel/Channel.hpp"
 
 class Client;
@@ -62,6 +61,8 @@ public:
 
 	void	BotJoinChannel(const std::string& channel);
 	void	createBot(const std::string& server, int port);
+	void	BotSendAsciiArt(const std::string& userNick);
+//	void	BotSendAsciiArt2(const std::string &userNick);
 
 	//channels functions
 	bool	checkForOperators(std::string line, Client *user, std::pair<std::vector<std::string>, std::string > input);
