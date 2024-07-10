@@ -11,7 +11,6 @@ class Client {
 	int socket_fd;
 	std::string nick;
 	std::string user;
-	std::string pass;
 	std::vector<std::string> channels;
 	size_t	numOfChannels;
 	bool isValidData;
@@ -27,7 +26,6 @@ class Client {
 	int getSocketFD() const;
 	std::string getNick() const;
 	std::string getUser() const;
-	std::string getPass() const;
 	bool getValidData() const;
 	size_t getNumOfChannels() const;
 
@@ -42,7 +40,7 @@ class Client {
 	//Class Functions
 	bool checkClientParams(Server &Server, const std::string& buffer);
 	bool checkForbiddenChars(const std::string& toCheck);
-	void checksNick(Server &Server, const std::vector<std::string> &tmp);
+	void checkNick(Server &Server, const std::vector<std::string> &tmp);
 	void checkUser(Server &Server, const std::vector<std::string> &tmp);
 };
 
