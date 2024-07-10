@@ -243,3 +243,12 @@ bool Server::checkUniqueNick(const std::string& toCheck) {
 	}
 	return (true);
 }
+
+Client *Server::_getUserClass(const std::string& userNick) {
+	std::map<int,Client *>::iterator it;
+	for (it = _tmpClients.begin(); it != _tmpClients.end(); ++it) {
+		if(it->second->getNick() == userNick)
+			return (it->second);
+	}
+	return (it->second);
+}

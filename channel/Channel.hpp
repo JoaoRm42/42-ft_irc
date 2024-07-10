@@ -41,6 +41,8 @@ public:
 	void	removeBotFromChannel();
 	void	setListOfMembers(Client *user);
 	void	setListOfAdmins(Client *user);
+	void	removeAdmin(Client *user);
+	bool	isAdm(std::string userName);
 	std::vector<std::string>	getlistOfMembers(void);
 	std::vector<std::string>	getlistOfAdmins(void);
 	std::vector<int>			getMembersFd(void);
@@ -51,8 +53,6 @@ public:
 	std::string					getPassword(void);
 	size_t						getNumOfMembers(void);
 	size_t						getNumMaxOfMembers(void);
-	//void						joinBroadcastChannel(clientInfo *, std::string);
-	//void						sendMessageChannel(int, std::string);
 	std::string					getMembersForList(void);
 	void						removeUser(Client *user);
 	int							getOneUserFd(std::string userName);

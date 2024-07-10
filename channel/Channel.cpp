@@ -76,19 +76,6 @@ size_t	Channel::getNumMaxOfMembers() {
 	return (_numMaxOfMembers);
 }
 
-/*void	Channel::sendMessageChannel(int fd, std::string message) {
-	const char	*buffer = message.c_str();
-	send(fd, buffer, std::strlen(buffer), MSG_DONTWAIT);
-}
-
-void Channel::joinBroadcastChannel(clientInfo *user, std::string message) {
-	for (size_t i = 0; i < _membersFd.size(); i++)
-	{
-		if (_membersFd[i] != user->socket_fd)
-			sendMessageChannel(_membersFd[i], message);
-	}
-}*/
-
 std::string	Channel::getMembersForList() {
 	std::string	allMembers;
 
@@ -122,7 +109,27 @@ std::string	Channel::getMembersForList() {
 	return (allMembers);
 }
 
-void Channel::removeUser(Client *user) {
+void	Channel::removeAdmin(Client *user) {
+	for (std::vector<std::string>::iterator	it = _listOfAdmins.begin(); it != _listOfAdmins.end(); it++)
+	{
+		if (it->c_str() == user->getNick())
+		{
+			_listOfAdmins.erase(it);
+			break ;
+		}
+	}
+}
+
+bool	Channel::isAdm(std::string userName) {
+	for (std::vector<std::string>::iterator	it = _listOfAdmins.begin(); it != _listOfAdmins.end(); it++)
+	{
+		if (it->c_str() == userName)
+			return (true);
+	}
+	return (false);
+}
+
+void	Channel::removeUser(Client *user) {
 	for (std::vector<std::string>::iterator	it = _listOfMembers.begin(); it != _listOfMembers.end(); it++)
 	{
 		if (*it == user->getNick())
@@ -193,7 +200,11 @@ void Channel::removeUserKick(std::string userName, int fdUser) {
 }
 
 void	Channel::setInviteOnly(bool flag) {
-	_inviteOnly = flag;
+
+	if (flag == false)
+		_inviteOnly = false;
+	else
+		_inviteOnly = true;
 }
 
 std::string	Channel::getChannelName() {
@@ -201,9 +212,13 @@ std::string	Channel::getChannelName() {
 }
 
 void	Channel::setTopicOn(bool flag) {
-	_topicOn = flag;
 	if (flag == false)
+	{
 		_topic = "/0";
+		_topicOn = false;
+	}
+	else
+		_topicOn = true;
 }
 
 void	Channel::setKeyPass(std::string key, bool keyOn) {
@@ -261,10 +276,10 @@ std::time_t	Channel::getCreationTime() {
 
 void	Channel::setCrationTimeString() {
 	_creationTime = time(0);
-	time(&this->_creationTime);
+	time(&_creationTime);
 
 	std::ostringstream oss;
-	oss << this->_creationTime;
+	oss << _creationTime;
 	_creationTimeString = oss.str();
 }
 

@@ -83,14 +83,42 @@ void	Server::tryToMode(std::string& channelName, Client *user, std::vector<std::
 	}
 	if (tokens.size() >= 3 && (tokens[2][0] == '+' || tokens[2][0] == '-'))
 		modeChannel(user, tokens, thisChannel);
-	else if (tokens.size() >= 3)
+	else if (tokens.size() >= 4)
 		modeUser(user, tokens, thisChannel);
 }
 
 void	Server::modeUser(Client *user, std::vector<std::string> tokens, Channel *thisChannel) {
-	(void)user;
-	(void)tokens;
-	(void)thisChannel;
+	size_t	k = 0;
+	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
+	{
+		if (thisChannel->getlistOfMembers()[k] == tokens[2])
+			break ;
+	}
+	if (k == thisChannel->getlistOfMembers().size())
+	{
+		std::string msgNoSuchNick = ":" + displayHostname() + " 401 " + user->getNick() + " " + thisChannel->getChannelName() + " " + tokens[2] + " :No such nick\r\n";
+		sendMessage(user->getSocketFD(), msgNoSuchNick);
+		return;
+	}
+	if (tokens[3] == "+o" && !thisChannel->isAdm(tokens[2]))
+	{
+		thisChannel->setListOfAdmins(_getUserClass(tokens[2]));
+		std::string msgModeGiveOperator = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " +o " + tokens[2] + "\r\n";
+		for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
+			sendMessage(thisChannel->getMembersFd()[i], msgModeGiveOperator);
+	}
+	else if (tokens[3] == "-o" && thisChannel->isAdm(tokens[2]))
+	{
+		thisChannel->removeAdmin(_getUserClass(tokens[2]));
+		std::string msgModeRemoveOperator = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " -o " + tokens[2] + "\r\n";
+		for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
+			sendMessage(thisChannel->getMembersFd()[i], msgModeRemoveOperator);
+	}
+	/*else
+	{
+		std::string msgModeUnknownFlag = ":" + displayHostname() + " 501 " + user->getNick() + " :Unknown MODE flag\r\n";
+		sendMessage(user->getSocketFD(), msgModeUnknownFlag);
+	}*/
 }
 
 void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel *thisChannel) {
