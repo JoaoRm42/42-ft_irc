@@ -230,8 +230,16 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 		if (user->getSocketFD() != *itt) {
 			sendMessage(*itt, PRIVMSG(user->getNick(), args[0], args[1]));
 		}
-		if (args[1] == "!Hello") {
-			sendMessage(*itt, PRIVMSG("BOT", args[0], "Hello there! Having a great day i assume."));
+		if (args[1] == "BOT Time") {
+			std::time_t now = std::time(NULL);
+			std::tm* localTime = std::localtime(&now);
+			char timeBuffer[6];
+			std::strftime(timeBuffer, sizeof(timeBuffer), "%H:%M", localTime);
+			std::string msgReplyBot = "The time right now is " + std::string(timeBuffer);
+			sendMessage(*itt, PRIVMSG("BOT", args[0], msgReplyBot));
+		}
+		else if (args[1] == "BOT Joke") {
+			sendMessage(*itt, PRIVMSG("BOT", args[0], BotJokes()));
 		}
 	}
 }
