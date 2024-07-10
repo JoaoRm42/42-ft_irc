@@ -37,6 +37,7 @@
 # include <limits>
 # include <cstdarg>
 # include <ctime>
+# include <csignal>
 
 //Server Libs
 # include "server/server.hpp"
