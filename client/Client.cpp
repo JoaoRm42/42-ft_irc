@@ -103,13 +103,19 @@ bool Client::checkClientParams(Server& Server, const std::string& buffer) {
 			}
 			else {
 				Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 432 " + nick + " " + tmp[1] + " :Erroneous nickname\r\n");
-				//Server.sendMessage(socket_fd, ":" + nick + " NICK " + tmp[1] + "\r\n");
 			}
 			return (true);
 		}
 		if(!Server.checkUniqueNick(tmp[1])) {
-			Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 433 " + nick + " " + tmp[1] + " :Nickname is already in use\r\n");
-			return (true);
+			if (nick.empty()) {
+				Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 433 " + tmp[1] + " " + tmp[1] + " :Nickname is already in use\r\n");
+				nick = tmp[1];
+				return (true);
+			}
+			else {
+				Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 433 " + nick + " " + tmp[1] + " :Nickname is already in use\r\n");
+				return (true);
+			}
 		}
 		Server.sendMessage(socket_fd, ":" + nick + " NICK " + tmp[1] + "\r\n");
 		nick = tmp[1];
