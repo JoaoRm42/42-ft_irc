@@ -12,6 +12,8 @@
 
 #include "server.hpp"
 
+volatile sig_atomic_t isRunning = 1;
+
 Server::Server() : _port("6667"), _password("password") {}
 
 Server::Server(char **av) : _port(av[1]), _password(av[2]) {}
@@ -28,6 +30,10 @@ Server::~Server() {
 	for (std::map<std::string, Channel *>::iterator it = _channelsList.begin(); it != _channelsList.end(); ++it) {
 		delete it->second;
 	}
+	for (std::map<int, Client*>::iterator it = this->_tmpClients.begin(); it != this->_tmpClients.end(); ++it) {
+		delete it->second;
+	}
+	this->_tmpClients.clear();
 }
 
 std::string Server::getPassword() { return ( this->_password ); }
@@ -127,6 +133,13 @@ void Server::handleClientData(int clientSocket) {
 	}
 }
 
+void signalHandler(int signal) {
+	if (signal == SIGINT) {
+		std::cout << "\nCtrl+C detected. Shutting Down Server..." << std::endl;
+		isRunning = 0;
+	}
+}
+
 int Server::epollFunction() {
 	int					sockfd;
 	int					opt;
@@ -147,6 +160,13 @@ int Server::epollFunction() {
 		return (1);
 	if (listenUser(sockfd))
 		return (1);
+
+	struct sigaction sa;
+	sa.sa_handler = signalHandler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGINT, &sa, NULL);
+
 
 	epoll_fd = epoll_create1(0);
 
@@ -170,7 +190,7 @@ int Server::epollFunction() {
 	createBot("127.0.0.1", 6667);
 	epoll_event events[MAX_EVENTS];
 	//sendMessage(sockfd, "CHANLIMIT=#&:25\r\n");
-	while (true) {
+	while (isRunning) {
 		numEvents = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
 		for (int i = 0; i < numEvents; ++i) {
 			if (events[i].data.fd == sockfd) {
@@ -181,6 +201,7 @@ int Server::epollFunction() {
 		}
 	}
 	close(sockfd);
+	close(epoll_fd);
 	return (0);
 }
 

@@ -60,6 +60,7 @@ public:
 	bool	checkUniqueNick(const std::string& toCheck);
 	Client *_getUserClass(const std::string&);
 
+
 	void		BotJoinChannel(const std::string& channel);
 	void		createBot(const std::string& server, int port);
 	void		BotSendAsciiArt(const std::string& userNick);
