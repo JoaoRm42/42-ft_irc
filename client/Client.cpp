@@ -145,18 +145,18 @@ void Client::checksNick(Server& Server, const std::vector<std::string> &tmp) {
 }
 
 void Client::checkUser(Server& Server, const std::vector<std::string> &tmp) {
-	if (!user.empty()) {
-		{
-			Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 462 " + ":You may not reregister\r\n");
-		}
-		return ;
-	}
-	else {
-		if (tmp.size() == 1) {
-			Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 461 " + "USER :Not enough parameters\r\n");
-			return ;
-		}
-		user = tmp[1];
+	if (tmp.size() < 4) {
+		Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 461 " + "USER :Not enough parameters\r\n");
 		return;
 	}
+	if (validatedUser) {
+		Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 462 " + ":You may not reregister\r\n");
+		return ;
+	}
+	if (tmp[2] == "0" && tmp[3] == "*") {
+		user = tmp[1];
+		validatedUser = true;
+		return ;
+	}
 }
+

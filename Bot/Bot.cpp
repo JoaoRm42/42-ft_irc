@@ -25,7 +25,6 @@ void Server::createBot(const std::string& server, int port) {
 	server_addr.sin_family = AF_INET;
 	memcpy((char *) &server_addr.sin_addr.s_addr, (char *) server_host->h_addr, server_host->h_length);
 	server_addr.sin_port = htons(port);
-
 	if (connect(this->_socketFdBot , (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0) {
 		std::cout << "Error connecting" << std::endl;
 		close(this->_socketFdBot );
