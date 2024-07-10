@@ -48,6 +48,8 @@ void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vecto
 	BotJoinChannel(channelName);
 
 	// Dar MOD ao bot aqui
+	// std::string msgModeRemoveOperator = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " -o " + tokens[2] + "\r\n";
+	// sendMessage(thisChannel->getMembersFd()[i], msgModeRemoveOperator);
 
 	std::string	msgJoin = ":" + user->getNick() + " JOIN " + channelName + "\r\n";
 	sendMessage(user->getSocketFD(), msgJoin);
