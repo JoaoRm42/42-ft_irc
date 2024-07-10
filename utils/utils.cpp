@@ -191,42 +191,45 @@ std::string returnQuantity(const std::string &character, unsigned int size) {
 }
 
 void printInput(std::pair<std::vector<std::string>, std::string> input, Client* client) {
-    std::vector<std::string>	saveResult;
-    unsigned int				size;
-    unsigned int				totalSize;
-    unsigned int				paddingSize;
-    unsigned int				halfPadding;
+	std::vector<std::string> saveResult;
+	unsigned int size;
+	unsigned int totalSize;
+	unsigned int paddingSize;
+	unsigned int halfPadding;
 
-    size = 0;
-    totalSize = 0;
-    paddingSize = 0;
-    halfPadding = 0;
-    for (size_t i = 0; i < input.first.size(); i++) {
-        saveResult.push_back("\"");
-        size += 1;
-        saveResult.push_back(input.first[i]);
-        size += input.first[i].size();
-        saveResult.push_back("\" ");
-        size += 2;
-    }
+	size = 0;
+	totalSize = 0;
+	paddingSize = 0;
+	halfPadding = 0;
+	for (size_t i = 0; i < input.first.size(); i++) {
+		saveResult.push_back("\"");
+		size += 1;
+		saveResult.push_back(input.first[i]);
+		size += input.first[i].size();
+		saveResult.push_back("\" ");
+		size += 2;
+	}
 
-    totalSize = size + 7 + input.second.size(); // Additional space for "Input", "TEXT", and quotes
-    paddingSize = 20; // Adjust this to ensure the minimum width for "TEXT" line
+	totalSize = size + 7 + input.second.size(); // Additional space for "Input", "TEXT", and quotes
+	paddingSize = 20; // Adjust this to ensure the minimum width for "TEXT" line
 
-    if (totalSize < paddingSize) {
-        totalSize = paddingSize;
-    }
+	if (totalSize < paddingSize) {
+		totalSize = paddingSize;
+	}
 
-    halfPadding = (totalSize - size - 5) / 2; // 5 for the length of "Input"
+	halfPadding = (totalSize - size - 5) / 2; // 5 for the length of "Input"
 
-    std::cout << "┌" << returnQuantity("─", halfPadding) << "Input" << returnQuantity("─", totalSize - halfPadding - 5) << "┐" << std::endl;
-    if (!client->getNick().empty())
-        std::cout << "│ User: " << client->getNick() << std::setw(totalSize - 4 - client->getNick().size()) << "│" << std::endl;
-    std::cout << "│ ARGS: ";
-    for (std::vector<std::string>::iterator it = saveResult.begin(); it != saveResult.end(); it++)
-        std::cout << *it;
-    std::cout << std::setw(totalSize - size - 4) << "│" << std::endl;
-    std::cout << "│ TEXT: \"" << input.second << "\"" << std::setw(totalSize - input.second.size() - 6) << "│" << std::endl;
-    std::cout << "└" << returnQuantity("─", totalSize) << "┘" << std::endl;
-    std::cout << std::endl;
+	std::cout << "┌" << returnQuantity("─", halfPadding) << "Input" << returnQuantity("─", totalSize - halfPadding - 5)
+			  << "┐" << std::endl;
+	if (!client->getNick().empty())
+		std::cout << "│ User: " << client->getNick() << std::setw(totalSize - 4 - client->getNick().size()) << "│"
+				  << std::endl;
+	std::cout << "│ ARGS: ";
+	for (std::vector<std::string>::iterator it = saveResult.begin(); it != saveResult.end(); it++)
+		std::cout << *it;
+	std::cout << std::setw(totalSize - size - 4) << "│" << std::endl;
+	std::cout << "│ TEXT: \"" << input.second << "\"" << std::setw(totalSize - input.second.size() - 6) << "│"
+			  << std::endl;
+	std::cout << "└" << returnQuantity("─", totalSize) << "┘" << std::endl;
+	std::cout << std::endl;
 }
