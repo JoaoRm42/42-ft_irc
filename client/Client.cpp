@@ -69,8 +69,11 @@ void Client::setValidData(const bool data) {
 
 bool Client::checkClientParams(Server& Server, const std::string& buffer) {
 	std::vector<std::string> tmp = split(buffer, ' ');
-	if (tmp[0] == "PASS" && !validatedPass)
+	if (tmp[0] == "PASS")
 	{
+		if(validatedPass) {
+
+		}
 		if (!pass.empty()) {
 			std::cout << "Password already set!" << std::endl;
 			return (true);
@@ -88,28 +91,7 @@ bool Client::checkClientParams(Server& Server, const std::string& buffer) {
 		return (true);
 	}
 	else if (tmp[0] == "NICK" && validatedPass) {
-		if (tmp.size() == 1 || (tmp.size() == 2 && tmp[1].empty())) {
-			std::string errMsg = ":" + Server.displayHostname() + " 431 " + nick + " :No nickname given\r\n";
-			Server.sendMessage(socket_fd, errMsg);
-			return (true);
-		}
-		std::string nickSet = ":" + nick + " NICK " + tmp[1] + "\r\n";
-		if (checkForbiddenChars(tmp[1])) {
-			std::string errMsg = ":" + Server.displayHostname() + " 432 " + nick + " " + tmp[1] + " :Erroneus nickname\r\n";
-			nick = tmp[1];
-			Server.sendMessage(socket_fd, errMsg);
-			Server.sendMessage(socket_fd, nickSet);
-			return (true);
-		}
-		if(!Server.checkUniqueNick(tmp[1])) {
-			std::string errMsg = ":" + Server.displayHostname() + " 433 " + nick + " " + tmp[1] + " :Nickname is already in use\r\n";
-			Server.sendMessage(socket_fd, errMsg);
-			return (true);
-		}
-		nick = tmp[1];
-		isValidNick = true;
-		Server.sendMessage(socket_fd, nickSet);
-		std::cout << "Nick Set!" << std::endl;
+		checksNick(Server, tmp);
 		return (true);
 	}
 	else if (tmp[0] == "USER" && validatedPass) {
@@ -141,4 +123,37 @@ bool Client::checkForbiddenChars(const std::string& toCheck) {
 	if (toCheck.find_first_of(" ,*?!@.") != toCheck.npos)
 		return (true);
 	return (false);
+}
+
+void Client::checksNick(Server& Server, const std::vector<std::string> &tmp) {
+	isValidNick = false;
+	if (tmp.size() == 1 || (tmp.size() == 2 && tmp[1].empty())) {
+		Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 431 " +  " :No nickname given\r\n");
+		return ;
+	}
+	if (checkForbiddenChars(tmp[1])) {
+		if (nick.empty()) {
+			Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 432 " + tmp[1] + " " + tmp[1] + " :Erroneous nickname\r\n");
+			nick = tmp[1];
+			return ;
+		}
+		else {
+			Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 432 " + nick + " " + tmp[1] + " :Erroneous nickname\r\n");
+			return ;
+		}
+	}
+	if(!Server.checkUniqueNick(tmp[1])) {
+		if (nick.empty()) {
+			Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 433 " + tmp[1] + " " + tmp[1] + " :Nickname is already in use\r\n");
+			nick = tmp[1];
+			return ;
+		}
+		else {
+			Server.sendMessage(socket_fd, ":" + Server.displayHostname() + " 433 " + nick + " " + tmp[1] + " :Nickname is already in use\r\n");
+			return ;
+		}
+	}
+	Server.sendMessage(socket_fd, ":" + nick + " NICK " + tmp[1] + "\r\n");
+	nick = tmp[1];
+	isValidNick = true;
 }

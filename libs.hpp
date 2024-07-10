@@ -35,6 +35,7 @@
 # include <errno.h>
 # include <fcntl.h>
 # include <limits>
+# include <cstdarg>
 # include <ctime>
 
 //Server Libs

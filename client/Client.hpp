@@ -41,6 +41,7 @@ class Client {
 	//Class Functions
 	bool checkClientParams(Server &Server, const std::string& buffer);
 	bool checkForbiddenChars(const std::string& toCheck);
+	void checksNick(Server &Server, const std::vector<std::string> &tmp);
 };
 
 
