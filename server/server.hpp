@@ -83,6 +83,8 @@ public:
 	void		limitUserMode(int, Channel *, Client *, std::string);
 	void		showMode(std::string&, Client *);
 	void		modeUser(Client *, std::vector<std::string>, Channel *);
+	void		quitCommand(std::vector<std::string> tokens, Client *user);
+
 	void		tryTopic(std::string&, Client *, std::vector<std::string>);
 	void		seeTopic(Channel *, Client *);
 	void		setTopic(Channel *, Client *, std::string);

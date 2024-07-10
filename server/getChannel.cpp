@@ -124,5 +124,9 @@ bool Server::checkForOperators(std::string line, Client *user, std::pair<std::ve
 	}
 	if (tokens[0] == "WHO")
 		return (true);
+	if (tokens[0] == "QUIT") {
+		quitCommand(tokens, user);
+		return (true);
+	}
 	return (false);
 }
