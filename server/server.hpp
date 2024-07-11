@@ -60,7 +60,7 @@ public:
 	bool	checkUniqueNick(const std::string& toCheck);
 	Client *_getUserClass(const std::string&);
 
-
+	//bot functions
 	void		BotJoinChannel(const std::string& channel);
 	void		createBot(const std::string& server, int port);
 	void		BotSendAsciiArt(const std::string& userNick);
@@ -84,12 +84,14 @@ public:
 	void		limitUserMode(int, Channel *, Client *, std::string);
 	void		showMode(std::string&, Client *);
 	void		modeUser(Client *, std::vector<std::string>, Channel *);
-	void		quitCommand(std::vector<std::string> tokens, Client *user);
-
 	void		tryTopic(std::string&, Client *, std::vector<std::string>);
 	void		seeTopic(Channel *, Client *);
 	void		setTopic(Channel *, Client *, std::string);
 	void		removeTopic(Channel *, Client *);
+	void		tryToInvite(std::string& , Client *, std::vector<std::string>);
+
+	//client funtions
+	void		quitCommand(std::vector<std::string> tokens, Client *user);
 };
 
 

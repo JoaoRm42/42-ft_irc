@@ -283,5 +283,5 @@ Client *Server::_getUserClass(const std::string& userNick) {
 		if(it->second->getNick() == userNick)
 			return (it->second);
 	}
-	return (it->second);
+	return (NULL);
 }

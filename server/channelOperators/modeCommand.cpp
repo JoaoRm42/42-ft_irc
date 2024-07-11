@@ -114,11 +114,11 @@ void	Server::modeUser(Client *user, std::vector<std::string> tokens, Channel *th
 		for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
 			sendMessage(thisChannel->getMembersFd()[i], msgModeRemoveOperator);
 	}
-	/*else
+	else if (tokens[3] != "-o" || tokens[3] != "-o")
 	{
 		std::string msgModeUnknownFlag = ":" + displayHostname() + " 501 " + user->getNick() + " :Unknown MODE flag\r\n";
 		sendMessage(user->getSocketFD(), msgModeUnknownFlag);
-	}*/
+	}
 }
 
 void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel *thisChannel) {

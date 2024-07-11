@@ -88,7 +88,7 @@ bool Server::checkForOperators(std::string line, Client *user, std::pair<std::ve
 			for (size_t k = 0; k < users.size(); k++)
 			{
 				tokens.clear();
-				tokens.push_back("PART");
+				tokens.push_back("KICK");
 				tokens.push_back(channelNameTemp);
 				tokens.push_back(users[k]);
 				if (k < reason.size())
@@ -100,11 +100,17 @@ bool Server::checkForOperators(std::string line, Client *user, std::pair<std::ve
 			tryToKick(tokens[1], user, tokens);
 		return (true);
 	}
-	/*if (tokens[0] == "INVITE" && tokens.size() > 1)
+	if (tokens[0] == "INVITE" && tokens.size() > 1)
 	{
-		std::cout << "invite command\n";
+		if (tokens.size() == 2)
+		{
+			std::string msgNeedMoreParams = ":" + displayHostname() + " 461 " + user->getNick() + " " + tokens[0] + " :Not enough parameters\r\n";
+			sendMessage(user->getSocketFD(), msgNeedMoreParams);
+		}
+		else
+			tryToInvite(tokens[2], user, tokens);
 		return (true);
-	}*/
+	}
 	if (tokens[0] == "TOPIC" && tokens.size() > 1)
 	{
 		tryTopic(tokens[1], user, tokens);
