@@ -150,3 +150,7 @@ void Client::checkUser(Server& Server, const std::vector<std::string> &tmp) {
 		return ;
 	}
 }
+
+std::vector<std::string>	Client::getChannels() const {
+	return (channels);
+}

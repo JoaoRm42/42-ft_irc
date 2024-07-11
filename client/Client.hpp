@@ -28,6 +28,7 @@ class Client {
 	std::string getUser() const;
 	bool getValidData() const;
 	size_t getNumOfChannels() const;
+	std::vector<std::string> getChannels(void) const;
 
 	//Setters of Variables
 	void setSocketFD(unsigned int data);
