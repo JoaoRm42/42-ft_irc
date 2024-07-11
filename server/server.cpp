@@ -110,10 +110,13 @@ void Server::handleClientData(int clientSocket) {
 	buffer[bytesRead] = '\0';
 	_messages[clientSocket] += buffer;
 
-	while (_messages[clientSocket].find("\n") != std::string::npos)
-	{
-		line = _messages[clientSocket].substr(0, _messages[clientSocket].find("\n"));
-		_messages[clientSocket] = _messages[clientSocket].substr(_messages[clientSocket].find("\n") + 1);
+    if (bytesRead == 0) {
+        std::cout << "Client Disconnected\n";
+    } else {
+	    while (_messages[clientSocket].find("\n") != std::string::npos)
+	    {
+    		line = _messages[clientSocket].substr(0, _messages[clientSocket].find("\n"));
+    		_messages[clientSocket] = _messages[clientSocket].substr(_messages[clientSocket].find("\n") + 1);
 
             if (line.find("\r") != std::string::npos)
                 line.erase(line.find("\r"));
@@ -123,7 +126,7 @@ void Server::handleClientData(int clientSocket) {
             if (!tokens.empty()) {
                 bool check = _tmpClients[clientSocket]->checkClientParams(*this, line);
                 if (_tmpClients[clientSocket]->getValidData() &&
-                    checkForOperators(line, _tmpClients[clientSocket], input)) {
+                checkForOperators(line, _tmpClients[clientSocket], input)) {
                     std::cout << "comando executado\n";
                 } else if (!check && tokens[0] != "CAP") {
                     std::cerr << "Invalid command" << std::endl;
@@ -131,9 +134,8 @@ void Server::handleClientData(int clientSocket) {
                 }
             }
         }
-	}
+    }
 }
-
 void signalHandler(int signal) {
 	if (signal == SIGINT) {
 		std::cout << "\nCtrl+C detected. Shutting Down Server..." << std::endl;
