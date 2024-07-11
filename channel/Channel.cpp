@@ -16,6 +16,7 @@ Channel::Channel(std::string name) : _channelName(name) {
 	_inviteOnly = false;
 	_numOfMembers = 0;
 	_passwordNeed = false;
+	_limitOfUsers = false;
 	_numMaxOfMembers = std::numeric_limits<int>::max();
 	setCrationTimeString();
 }
