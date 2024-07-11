@@ -11,11 +11,11 @@
 # **************************************************************************** #
 
 NAME = ircserv
-CXX = c++
+#CXX = c++
 CXXFLAGS = -std=c++98 -Wall -Wextra -Werror -g
 #-------------------FOR CLION-------------------
 #CXX = g++
-#CXXFLAGS = -std=c++98 -g
+CXXFLAGS = -std=c++98 -g
 
 SRCS = main.cpp \
 	server/server.cpp \

@@ -14,7 +14,7 @@
 #include "../../libs.hpp"
 
 void	Server::tryToKick(std::string& channelName, Client *user, std::vector<std::string> tokens){
-
+	//check if the channel exists
 	std::map<std::string, Channel *>::iterator it;
 	for (it = _channelsList.begin(); it != _channelsList.end(); it++)
 	{
@@ -40,7 +40,7 @@ void	Server::tryToKick(std::string& channelName, Client *user, std::vector<std::
 
 void	Server::kickChannel(std::string channelName, Channel *thisChannel, Client *user, std::string reason, int flag, std::string kickedUser) {
 	size_t k;
-	//check se o membro esta neste canal
+	//check the user is on that channel
 	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
 	{
 		if (thisChannel->getlistOfMembers()[k] == user->getNick())
@@ -52,7 +52,7 @@ void	Server::kickChannel(std::string channelName, Channel *thisChannel, Client *
 		sendMessage(user->getSocketFD(), msgNotOnChannel);
 		return;
 	}
-	//check se este membro é adm para poder dar kick
+	//check the user is an operator on that channel
 	for (k = 0; k < thisChannel->getlistOfAdmins().size(); k++)
 	{
 		if (thisChannel->getlistOfAdmins()[k] == user->getNick())
@@ -64,8 +64,7 @@ void	Server::kickChannel(std::string channelName, Channel *thisChannel, Client *
 		sendMessage(user->getSocketFD(), msgNotAnOp);
 		return;
 	}
-
-	//check se o membro que sera kickado esta no canal
+	//check if the kicked nick is in the channel
 	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
 	{
 		if (thisChannel->getlistOfMembers()[k] == kickedUser)
@@ -77,26 +76,28 @@ void	Server::kickChannel(std::string channelName, Channel *thisChannel, Client *
 		sendMessage(user->getSocketFD(), msgUserNotOnChannel);
 		return;
 	}
-
+	//put the reason on double quotes
 	reason = "\"" + reason + "\"";
+	//if you try to kick bot he sends you and priv message and don´t get kicked
 	std::string msgKick;
 	if (kickedUser == "BOT") {
 		BotSendAsciiArt(user->getNick());
 		return ;
 	}
+	//send the message to everyone saying that the kicked person has been kicked
 	if (flag == 0)
 		msgKick = ":" + user->getNick() + " KICK " + channelName + " " + kickedUser + "\r\n";
 	else
 		msgKick = ":" + user->getNick() + " KICK " + channelName + " " + kickedUser + " :" + reason + "\r\n";
 	for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
-	{
 		sendMessage(thisChannel->getMembersFd()[i], msgKick);
-	}
-
-	thisChannel->removeUserKick(kickedUser, thisChannel->getOneUserFd(kickedUser));
-	if (thisChannel->getNumOfMembers() == 0)
+	//remove the kicked user and check if the channel is empty, if it is remove the channel
+	thisChannel->removeUser(user);
+	if (thisChannel->getNumOfMembers() == 1 && thisChannel->getlistOfMembers()[0] == "BOT")
 	{
+		thisChannel->removeBotFromChannel();
 		removeChannel(channelName);
+//		close(getSocketFdBot());
 		return;
 	}
 }

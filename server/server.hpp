@@ -25,7 +25,6 @@ class Server {
 	private:
 		std::string	_port;
 		std::string							_password;
-		std::vector<Client>					_clientInfo;
 		std::map<int, Client*>				_tmpClients;
 		std::map<std::string, Channel *>	_channelsList;
 		std::map<int, std::string>			_messages;
@@ -92,6 +91,7 @@ public:
 
 	//client funtions
 	void		quitCommand(std::vector<std::string> tokens, Client *user);
+	void		removeUsersChannels(Client *user);
 };
 
 

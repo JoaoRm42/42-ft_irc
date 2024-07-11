@@ -15,6 +15,7 @@
 
 void	Server::tryToPartChannel(std::string& channelName, Client *user, std::vector<std::string> tokens) {
 	std::map<std::string, Channel *>::iterator it;
+	//check if the channel exists
 	for (it = _channelsList.begin(); it != _channelsList.end(); it++)
 	{
 		if (it->first == channelName)
@@ -39,7 +40,7 @@ void	Server::tryToPartChannel(std::string& channelName, Client *user, std::vecto
 
 void	Server::partChannel(std::string channelName, Channel *thisChannel, Client *user, std::string reason, int flag) {
 	size_t k;
-	std::vector<std::string> checker;
+	//check the user is on that channel
 	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
 	{
 		if (thisChannel->getlistOfMembers()[k] == user->getNick())
@@ -51,25 +52,21 @@ void	Server::partChannel(std::string channelName, Channel *thisChannel, Client *
 		sendMessage(user->getSocketFD(), msgNotOnChannel);
 		return;
 	}
-
+	//put the reason on double quotes
 	reason = "\"" + reason + "\"";
 	std::string msgPart;
 	if (flag == 0)
 		msgPart = ":" + user->getNick() + " PART " + channelName + "\r\n";
 	else
 		msgPart = ":" + user->getNick() + " PART " + channelName + " :" + reason + "\r\n";
+	//send the message to everyone saying that the user has left the channel
 	for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
 	{
 		sendMessage(thisChannel->getMembersFd()[i], msgPart);
 	}
+	//remove the user and check if the channel is empty, if it is remove the channel
 	thisChannel->removeUser(user);
-	if (thisChannel->getNumOfMembers() == 0)
-	{
-		removeChannel(channelName);
-		return;
-	}
-	checker = thisChannel->getlistOfMembers();
-	if (checker.size() == 1 && checker.at(0) == "BOT")
+	if (thisChannel->getNumOfMembers() == 1 && thisChannel->getlistOfMembers()[0] == "BOT")
 	{
 		thisChannel->removeBotFromChannel();
 		removeChannel(channelName);

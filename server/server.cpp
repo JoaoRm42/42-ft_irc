@@ -110,24 +110,31 @@ void Server::handleClientData(int clientSocket) {
 	buffer[bytesRead] = '\0';
 	_messages[clientSocket] += buffer;
 
-	while (_messages[clientSocket].find("\n") != std::string::npos)
-	{
-		line = _messages[clientSocket].substr(0, _messages[clientSocket].find("\n"));
-		_messages[clientSocket] = _messages[clientSocket].substr(_messages[clientSocket].find("\n") + 1);
+	if (bytesRead == 0) {
+		std::cout << "Client Disconnected\n";
+	} else {
+		while (_messages[clientSocket].find("\n") != std::string::npos)
+		{
+			line = _messages[clientSocket].substr(0, _messages[clientSocket].find("\n"));
+			_messages[clientSocket] = _messages[clientSocket].substr(_messages[clientSocket].find("\n") + 1);
 
-		if (line.find("\r") != std::string::npos)
-			line.erase(line.find("\r"));
-		initInput(&input, line);
-		printInput(input, _tmpClients[clientSocket]);
-		tokens = split(line, ' ');
-		if (!tokens.empty()) {
-			bool check = _tmpClients[clientSocket]->checkClientParams(*this, line);
-			if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket], input)) {
-				std::cout << "comando executado\n";
-			}
-			else if (!check && tokens[0] != "CAP") {
-				std::cerr << "Invalid command" << std::endl;
-				sendMessage(clientSocket, "ERROR :Invalid command\n");
+			if (line.find("\r") != std::string::npos)
+				line.erase(line.find("\r"));
+			initInput(&input, line);
+			//printInput(input, _tmpClients[clientSocket]);
+			tokens = split(line, ' ');
+			if (!tokens.empty()) {
+				if (_tmpClients[clientSocket] == NULL)
+					return ;
+				bool check = _tmpClients[clientSocket]->checkClientParams(*this, line);
+				if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket], input)) {
+					std::cout << "comando executado\n";
+					break ; // if something goes wrong DELETE
+				}
+				else if (!check && tokens[0] != "CAP") {
+					std::cerr << "Invalid command" << std::endl;
+					sendMessage(clientSocket, "ERROR :Invalid command\n");
+				}
 			}
 		}
 	}

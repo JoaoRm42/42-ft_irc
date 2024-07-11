@@ -17,6 +17,7 @@ void	Server::tryToInvite(std::string& channelName, Client *user, std::vector<std
 
 	std::map<std::string, Channel *>::iterator it;
 	Channel *thisChannel;
+	//check if the channel exists
 	for (it = _channelsList.begin(); it != _channelsList.end(); it++)
 	{
 		if (it->first == channelName)
@@ -32,7 +33,7 @@ void	Server::tryToInvite(std::string& channelName, Client *user, std::vector<std
 		return;
 	}
 	size_t k;
-	//check se o membro esta neste canal
+	//check the user is on that channel
 	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
 	{
 		if (thisChannel->getlistOfMembers()[k] == user->getNick())
@@ -44,7 +45,7 @@ void	Server::tryToInvite(std::string& channelName, Client *user, std::vector<std
 		sendMessage(user->getSocketFD(), msgNotOnChannel);
 		return;
 	}
-	//check se este membro é adm para poder dar invite
+	//check the user is an operator on that channel
 	for (k = 0; k < thisChannel->getlistOfAdmins().size(); k++)
 	{
 		if (thisChannel->getlistOfAdmins()[k] == user->getNick())
@@ -56,7 +57,7 @@ void	Server::tryToInvite(std::string& channelName, Client *user, std::vector<std
 		sendMessage(user->getSocketFD(), msgNotAnOp);
 		return;
 	}
-	//client does not exist in the server
+	//check if the invited nick is in the server
 	Client	*invitedClient = _getUserClass(tokens[1]);
 	if (invitedClient == NULL)
 	{
@@ -64,7 +65,7 @@ void	Server::tryToInvite(std::string& channelName, Client *user, std::vector<std
 		sendMessage(user->getSocketFD(), msgNoSuchNick);
 		return;
 	}
-	//check se o nick invitado ja esta neste canal
+	//check if the invited nick is already in the channel
 	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
 	{
 		if (thisChannel->getlistOfMembers()[k] == invitedClient->getNick())
@@ -74,17 +75,14 @@ void	Server::tryToInvite(std::string& channelName, Client *user, std::vector<std
 			return;
 		}
 	}
-	//RPL_INVITING (341)
-	//"<client> <nick> <channel>"
+	//send the success invite message to the user who made the invitation
 	std::string msgInviting = ":" + displayHostname() + " 341 " + user->getNick() + " " + invitedClient->getNick() + " " + channelName + "\r\n";
 	sendMessage(user->getSocketFD(), msgInviting);
-	//:dan-!d@localhost INVITE Wiz #test
+	//send the invite message to the invited user
 	std::string	msgInvite = ":" + user->getNick() + " INVITE " + invitedClient->getNick() + " " + channelName + "\r\n";
 	sendMessage(invitedClient->getSocketFD(), msgInvite);
 	thisChannel->setListOfMembers(invitedClient);
+	//send a JOIN message for the invited person enter the channel
 	std::string	msgJoin = ":" + invitedClient->getNick() + " JOIN " + channelName + "\r\n";
 	sendMessage(invitedClient->getSocketFD(), msgJoin);
-	//debug
-	std::string allMembers = thisChannel->getMembersForList();
-	std::cout << allMembers << std::endl;
 }
