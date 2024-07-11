@@ -47,10 +47,6 @@ void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vecto
 	// Add Bot ///////////////////
 	BotJoinChannel(channelName);
 
-	// Dar MOD ao bot aqui
-	// std::string msgModeRemoveOperator = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " -o " + tokens[2] + "\r\n";
-	// sendMessage(thisChannel->getMembersFd()[i], msgModeRemoveOperator);
-
 	std::string	msgJoin = ":" + user->getNick() + " JOIN " + channelName + "\r\n";
 	sendMessage(user->getSocketFD(), msgJoin);
 
@@ -65,6 +61,7 @@ void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vecto
 	sendMessage(user->getSocketFD(), msgEndOfList);
 
 	//Mandar Mensagem com os comandos do BOT
+    sendHelpTableBot(user);
 }
 
 void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, Client *user, std::string channelPass, int flag) {
@@ -109,11 +106,12 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 	std::string msgEndOfList = ":" + displayHostname() + " 366 " + user->getNick() + " " + channelName + " :End of /NAMES list.\r\n";
 	sendMessage(user->getSocketFD(), msgEndOfList);
 
+    sendHelpTableBot(user);
+
 	std::string msgJoinBroadcast = ":" + user->getNick() + " JOIN :" + channelName + "\r\n";
 	for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
 	{
 		if (thisChannel->getMembersFd()[i] != user->getSocketFD())
 			sendMessage(thisChannel->getMembersFd()[i], msgJoinBroadcast);
 	}
-	//Mandar Mensagem com os comandos do BOT
 }

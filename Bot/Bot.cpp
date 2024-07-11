@@ -1,5 +1,11 @@
 # include "../libs.hpp"
 
+void Server::sendHelpTableBot(Client *user) {
+    std::string helpCommands = "COMMANDS: BOT Time & BOT Joke";
+    std::string msgHelpMessage = "PRIVMSG " + user->getNick() + " :" + helpCommands + "\r\n";
+    sendMessage(this->_socketFdBot, msgHelpMessage);
+}
+
 std::string Server::BotJokes() {
 	std::vector<std::string> jokes;
 	jokes.push_back("When the window fell into the incinerator, it was a pane in the ash to retrieve.");
