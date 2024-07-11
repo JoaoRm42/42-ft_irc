@@ -118,9 +118,11 @@ void Server::handleClientData(int clientSocket) {
 		if (line.find("\r") != std::string::npos)
 			line.erase(line.find("\r"));
 		initInput(&input, line);
-		printInput(input, _tmpClients[clientSocket]);
+		//printInput(input, _tmpClients[clientSocket]);
 		tokens = split(line, ' ');
 		if (!tokens.empty()) {
+			if (!_tmpClients[clientSocket])
+				return ;
 			bool check = _tmpClients[clientSocket]->checkClientParams(*this, line);
 			if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket], input)) {
 				std::cout << "comando executado\n";
