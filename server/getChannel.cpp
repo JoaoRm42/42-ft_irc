@@ -75,7 +75,7 @@ bool Server::checkForOperators(std::string line, Client *user, std::pair<std::ve
 			tryToPartChannel(tokens[1], user, tokens);
 		return (true);
 	}
-	if (tokens[0] == "KICK" && tokens.size() > 1) {
+	if (tokens[0] == "KICK" && tokens.size() > 2) {
 		if (tokens[2].find(',') != std::string::npos)
 		{
 			std::vector<std::string> users = split(tokens[2], ',');

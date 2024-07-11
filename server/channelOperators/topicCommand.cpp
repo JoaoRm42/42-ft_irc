@@ -14,9 +14,9 @@
 #include "../../libs.hpp"
 
 void	Server::tryTopic(std::string &channelName, Client *user, std::vector<std::string> tokens) {
-
 	std::map<std::string, Channel *>::iterator it;
 	Channel *thisChannel;
+	//check if the channel exists
 	for (it = _channelsList.begin(); it != _channelsList.end(); it++)
 	{
 		if (it->first == channelName)
@@ -32,7 +32,7 @@ void	Server::tryTopic(std::string &channelName, Client *user, std::vector<std::s
 		return;
 	}
 	size_t k;
-	//check se o membro esta neste canal
+	//check the user is on that channel
 	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
 	{
 		if (thisChannel->getlistOfMembers()[k] == user->getNick())
@@ -44,7 +44,7 @@ void	Server::tryTopic(std::string &channelName, Client *user, std::vector<std::s
 		sendMessage(user->getSocketFD(), msgNotOnChannel);
 		return;
 	}
-	//check se este membro é adm para poder dar kick
+	//check the user is an operator on that channel
 	for (k = 0; k < thisChannel->getlistOfAdmins().size(); k++)
 	{
 		if (thisChannel->getlistOfAdmins()[k] == user->getNick())
@@ -56,12 +56,14 @@ void	Server::tryTopic(std::string &channelName, Client *user, std::vector<std::s
 		sendMessage(user->getSocketFD(), msgNotAnOp);
 		return;
 	}
+	//chekc if the topic mode is seted, if it's not give the error
 	if (thisChannel->getTopicOn() == false)
 	{
 		std::string msgNoTopic = ":" + displayHostname() + " 331 " + user->getNick() + " " + thisChannel->getChannelName() + " :No topic is set\r\n";
 		sendMessage(user->getSocketFD(), msgNoTopic);
 		return;
 	}
+	//divide the topic in the types: see, remove or set
 	if (tokens.size() == 2)
 		seeTopic(thisChannel, user);
 	else if (tokens.size() >= 3)
