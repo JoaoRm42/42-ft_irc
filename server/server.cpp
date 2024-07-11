@@ -138,6 +138,10 @@ void signalHandler(int signal) {
 		std::cout << "\nCtrl+C detected. Shutting Down Server..." << std::endl;
 		isRunning = 0;
 	}
+	if (signal == SIGPIPE) {
+		std::cout << "Forced Shutdown.\n" << std::endl;
+		isRunning = 1;
+	}
 }
 
 int Server::epollFunction() {
@@ -166,6 +170,7 @@ int Server::epollFunction() {
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGPIPE, &sa, NULL);
 
 
 	epoll_fd = epoll_create1(0);
@@ -207,7 +212,6 @@ int Server::epollFunction() {
 
 void	Server::sendMessage(int fd, std::string message) {
 	const char	*buffer = message.c_str();
-//	std::cout << "SENT TO CLIENT ->" << message << std::endl;
 	send(fd, buffer, std::strlen(buffer), MSG_DONTWAIT);
 }
 
