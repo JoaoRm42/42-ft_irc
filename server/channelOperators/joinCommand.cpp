@@ -14,7 +14,6 @@
 #include "../../libs.hpp"
 void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vector<std::string> tokens) {
 	// Check if the channel exists, create if it does not
-
 	if (user->getNumOfChannels() >= LIMITOFCHANNELS)
 	{
 		std::string msgTooManyChannels = ":" + displayHostname() + " 405 " + user->getNick() + " " + channelName + " :You have joined too many channels\r\n";
@@ -38,13 +37,11 @@ void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vecto
 
 	Channel* newChannel = new Channel(channelName);
 	_channelsList[channelName] = newChannel;
-	//tirar debug depois
-	if (user->addBackChannel(channelName) == -1)
-		std::cout << "DEBUG: Client is at max channels" << std::endl;
+	user->addBackChannel(channelName);
 	newChannel->setListOfMembers(user);
 	newChannel->setListOfAdmins(user);
 
-	// Add Bot ///////////////////
+	// Add the Bot
 	BotJoinChannel(channelName);
 
 	std::string	msgJoin = ":" + user->getNick() + " JOIN " + channelName + "\r\n";
@@ -60,22 +57,25 @@ void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vecto
 	std::string msgEndOfList = ":" + displayHostname() + " 366 " + user->getNick() + " " + channelName + " :End of /NAMES list.\r\n";
 	sendMessage(user->getSocketFD(), msgEndOfList);
 
-	//Mandar Mensagem com os comandos do BOT
+	//Send the user a priv message from BOT to explain the command that bot do
     sendHelpTableBot(user);
 }
 
 void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, Client *user, std::string channelPass, int flag) {
+	//if the user is already on the channel nothing is done, and return
 	for (size_t k = 0; k != thisChannel->getlistOfMembers().size(); k++)
 	{
 		if (thisChannel->getlistOfMembers()[k] == user->getNick())
 			return;
 	}
+	//check if the channel is invite only, and don´t let the user enter if it is invite only
 	if (thisChannel->getInviteOnly())
 	{
 		std::string msgInviteOnly = ":" + displayHostname() + " 473 " + user->getNick() + " " + channelName + " :Cannot join channel (+i)\r\n";
 		sendMessage(user->getSocketFD(), msgInviteOnly);
 		return;
 	}
+	//check if the channel needs a password to enter and also check if the password giving is right
 	if (thisChannel->getPasswordNeed())
 	{
 		if (flag == 0 || thisChannel->getPassword() != channelPass)
@@ -85,15 +85,15 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 			return;
 		}
 	}
+	//check if the channel is already full, with the num max of users
 	if (thisChannel->getNumOfMembers() >= thisChannel->getNumMaxOfMembers())
 	{
 		std::string msgChannelFull = ":" + displayHostname() + " 471 " + user->getNick() + " " + channelName + " :Cannot join channel (+l)\r\n";
 		sendMessage(user->getSocketFD(), msgChannelFull);
 		return;
 	}
-	//tirar debug depois
-	if (user->addBackChannel(channelName) == -1)
-		std::cout << "Debug: The user is alredy in the MAX channels" << std::endl;
+	//put the user on that channel
+	user->addBackChannel(channelName);
 	thisChannel->setListOfMembers(user);
 	std::string allMembers = thisChannel->getMembersForList();
 
@@ -106,8 +106,10 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 	std::string msgEndOfList = ":" + displayHostname() + " 366 " + user->getNick() + " " + channelName + " :End of /NAMES list.\r\n";
 	sendMessage(user->getSocketFD(), msgEndOfList);
 
+	//Send the user a priv message from BOT to explain the command that bot do
     sendHelpTableBot(user);
 
+	//send a messagem to all the members of the channel saying that someone joined the channel
 	std::string msgJoinBroadcast = ":" + user->getNick() + " JOIN :" + channelName + "\r\n";
 	for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
 	{

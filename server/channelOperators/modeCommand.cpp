@@ -16,6 +16,7 @@
 void	Server::showMode(std::string& channelName, Client *user) {
 	std::map<std::string, Channel *>::iterator it;
 	Channel *thisChannel;
+	//check if the channel exists
 	for (it = _channelsList.begin(); it != _channelsList.end(); it++)
 	{
 		if (it->first == channelName)
@@ -30,6 +31,7 @@ void	Server::showMode(std::string& channelName, Client *user) {
 		sendMessage(user->getSocketFD(), msgNotOnChannel);
 		return;
 	}
+	//send the /mode message with the set modes and the args (the limit and the key/password)
 	std::string allModes = thisChannel->getAllModes();
 	std::string	msgWhatMode = ":" + displayHostname() + " 324 " + user->getNick() + " " + channelName + " " + allModes + "\r\n";
 	sendMessage(user->getSocketFD(), msgWhatMode);
@@ -39,9 +41,9 @@ void	Server::showMode(std::string& channelName, Client *user) {
 }
 
 void	Server::tryToMode(std::string& channelName, Client *user, std::vector<std::string> tokens){
-
 	std::map<std::string, Channel *>::iterator it;
 	Channel *thisChannel;
+	//check if the channel exists
 	for (it = _channelsList.begin(); it != _channelsList.end(); it++)
 	{
 		if (it->first == channelName)
@@ -57,7 +59,7 @@ void	Server::tryToMode(std::string& channelName, Client *user, std::vector<std::
 		return;
 	}
 	size_t k;
-	//check se o membro esta neste canal
+	//check the user is on that channel
 	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
 	{
 		if (thisChannel->getlistOfMembers()[k] == user->getNick())
@@ -69,7 +71,7 @@ void	Server::tryToMode(std::string& channelName, Client *user, std::vector<std::
 		sendMessage(user->getSocketFD(), msgNotOnChannel);
 		return;
 	}
-	//check se este membro é adm para poder dar kick
+	//check the user is an operator on that channel
 	for (k = 0; k < thisChannel->getlistOfAdmins().size(); k++)
 	{
 		if (thisChannel->getlistOfAdmins()[k] == user->getNick())
@@ -81,6 +83,7 @@ void	Server::tryToMode(std::string& channelName, Client *user, std::vector<std::
 		sendMessage(user->getSocketFD(), msgNotAnOp);
 		return;
 	}
+	//divide the two types of modes, user modes or channel modes
 	if (tokens.size() >= 3 && (tokens[2][0] == '+' || tokens[2][0] == '-'))
 		modeChannel(user, tokens, thisChannel);
 	else if (tokens.size() >= 4)
@@ -89,6 +92,7 @@ void	Server::tryToMode(std::string& channelName, Client *user, std::vector<std::
 
 void	Server::modeUser(Client *user, std::vector<std::string> tokens, Channel *thisChannel) {
 	size_t	k = 0;
+	//check if the nick is in the server to give operator
 	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
 	{
 		if (thisChannel->getlistOfMembers()[k] == tokens[2])
@@ -100,6 +104,7 @@ void	Server::modeUser(Client *user, std::vector<std::string> tokens, Channel *th
 		sendMessage(user->getSocketFD(), msgNoSuchNick);
 		return;
 	}
+	//give the operator privilege if the user is not an operator already
 	if (tokens[3] == "+o" && !thisChannel->isAdm(tokens[2]))
 	{
 		thisChannel->setListOfAdmins(_getUserClass(tokens[2]));
@@ -107,6 +112,7 @@ void	Server::modeUser(Client *user, std::vector<std::string> tokens, Channel *th
 		for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
 			sendMessage(thisChannel->getMembersFd()[i], msgModeGiveOperator);
 	}
+	//take the operator privilege if the user is an operator
 	else if (tokens[3] == "-o" && thisChannel->isAdm(tokens[2]))
 	{
 		thisChannel->removeAdmin(_getUserClass(tokens[2]));
@@ -114,11 +120,12 @@ void	Server::modeUser(Client *user, std::vector<std::string> tokens, Channel *th
 		for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
 			sendMessage(thisChannel->getMembersFd()[i], msgModeRemoveOperator);
 	}
-	/*else
+	//check if there is other flag, and don´t do it
+	else if (tokens[3] != "-o" || tokens[3] != "-o")
 	{
 		std::string msgModeUnknownFlag = ":" + displayHostname() + " 501 " + user->getNick() + " :Unknown MODE flag\r\n";
 		sendMessage(user->getSocketFD(), msgModeUnknownFlag);
-	}*/
+	}
 }
 
 void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel *thisChannel) {
@@ -127,6 +134,7 @@ void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel 
 		flag = 1;
 	else if (tokens[2][0] == '-')
 		flag = -1;
+	//see all the string because you can send plus than one mode
 	for (size_t i = 1; i < tokens[2].size(); i++)
 	{
 		size_t j = 0;
