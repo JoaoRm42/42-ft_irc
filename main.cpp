@@ -26,6 +26,7 @@ void Server::printCoolntro() {
     std::string ip = getIP();
     std::string port = getPort();
     std::string pass = getPassword();
+
     std::cout << "┌──────────────────────────────────────────────────────────────────────────────────────────────┐\n";
     std::cout << "│  __________  __________  __________  __________  __________  __________  _________________   │\n";
     std::cout << "│ ||F        |||T        |||_        |||I        |||R        |||C        |||                |  │\n";
@@ -44,7 +45,6 @@ int main(int ac, char **av) {
     if (ac == 3)
     {
         Server teste(av);
-        std::vector<clientInfo> client;
         teste.printCoolntro();
         teste.epollFunction();
     }
