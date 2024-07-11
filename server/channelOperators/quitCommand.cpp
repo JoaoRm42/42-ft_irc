@@ -21,7 +21,7 @@ void	Server::removeUsersChannels(Client *user) {
 			if (it->first == user->getChannels()[k])
 			{
 				it->second->removeUser(user);
-				if (it->second->getNumOfMembers() == 0) {
+				if (it->second->getNumOfMembers() == 1 && it->second->getlistOfMembers()[0] == "BOT") {
 					it->second->removeBotFromChannel();
 					removeChannel(it->first);
 				}

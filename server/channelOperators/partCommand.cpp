@@ -40,7 +40,6 @@ void	Server::tryToPartChannel(std::string& channelName, Client *user, std::vecto
 
 void	Server::partChannel(std::string channelName, Channel *thisChannel, Client *user, std::string reason, int flag) {
 	size_t k;
-	std::vector<std::string> checker;
 	//check the user is on that channel
 	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
 	{
@@ -67,14 +66,7 @@ void	Server::partChannel(std::string channelName, Channel *thisChannel, Client *
 	}
 	//remove the user and check if the channel is empty, if it is remove the channel
 	thisChannel->removeUser(user);
-	if (thisChannel->getNumOfMembers() == 0)
-	{
-		removeChannel(channelName);
-		return;
-	}
-	//get this shit right
-	checker = thisChannel->getlistOfMembers();
-	if (checker.size() == 1 && checker.at(0) == "BOT")
+	if (thisChannel->getNumOfMembers() == 1 && thisChannel->getlistOfMembers()[0] == "BOT")
 	{
 		thisChannel->removeBotFromChannel();
 		removeChannel(channelName);

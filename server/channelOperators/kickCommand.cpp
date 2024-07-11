@@ -92,10 +92,12 @@ void	Server::kickChannel(std::string channelName, Channel *thisChannel, Client *
 	for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
 		sendMessage(thisChannel->getMembersFd()[i], msgKick);
 	//remove the kicked user and check if the channel is empty, if it is remove the channel
-	thisChannel->removeUserKick(kickedUser, thisChannel->getOneUserFd(kickedUser));
-	if (thisChannel->getNumOfMembers() == 0)
+	thisChannel->removeUser(user);
+	if (thisChannel->getNumOfMembers() == 1 && thisChannel->getlistOfMembers()[0] == "BOT")
 	{
+		thisChannel->removeBotFromChannel();
 		removeChannel(channelName);
+//		close(getSocketFdBot());
 		return;
 	}
 }
