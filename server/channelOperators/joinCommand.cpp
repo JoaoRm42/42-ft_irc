@@ -92,6 +92,15 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 		sendMessage(user->getSocketFD(), msgChannelFull);
 		return;
 	}
+	//add the bot if it isn't on the channel
+	size_t k;
+	for (k = 0; k != thisChannel->getlistOfMembers().size(); k++)
+	{
+		if (thisChannel->getlistOfMembers()[k] == "BOT")
+			break;
+	}
+	if (k == thisChannel->getlistOfMembers().size())
+		BotJoinChannel(channelName);
 	//put the user on that channel
 	user->addBackChannel(channelName);
 	thisChannel->setListOfMembers(user);
@@ -107,7 +116,8 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 	sendMessage(user->getSocketFD(), msgEndOfList);
 
 	//Send the user a priv message from BOT to explain the command that bot do
-    sendHelpTableBot(user);
+	if (user->getNick() != "BOT")
+  	  sendHelpTableBot(user);
 
 	//send a messagem to all the members of the channel saying that someone joined the channel
 	std::string msgJoinBroadcast = ":" + user->getNick() + " JOIN :" + channelName + "\r\n";
