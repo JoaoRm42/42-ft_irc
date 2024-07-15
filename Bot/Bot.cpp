@@ -175,7 +175,7 @@ void Server::createBot(const std::string& server, int port) {
 		return;
 	}
 
-    std::string msgPass = "PASS pass\r\n";
+    std::string msgPass = "PASS " + getPassword() + "\r\n";
 	std::string msgNick = "NICK BOT\r\n";
 	std::string msgUser = "USER BOT 0 * :realname\r\n";
 
