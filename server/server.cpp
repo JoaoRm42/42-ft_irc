@@ -213,6 +213,7 @@ int Server::epollFunction() {
 		}
 	}
 	close(sockfd);
+	close(_socketFdBot);
 	close(epoll_fd);
 	return (0);
 }
