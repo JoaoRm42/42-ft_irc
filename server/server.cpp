@@ -122,7 +122,7 @@ void Server::handleClientData(int clientSocket) {
 		if (line.find("\r") != std::string::npos)
 			line.erase(line.find("\r"));
 		initInput(&input, line);
-		//printInput(input, _tmpClients[clientSocket]);
+		printInput(input, _tmpClients[clientSocket]);
 		tokens = split(line, ' ');
 		if (!tokens.empty()) {
 			if (_tmpClients[clientSocket] == NULL)
@@ -263,7 +263,7 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 		if (user->getSocketFD() != *itt) {
 			sendMessage(*itt, PRIVMSG(user->getNick(), args[0], args[1]));
 		}
-		if (args[1] == "BOT Time") {
+		if (args[1] == "BOT time") {
 			std::time_t now = std::time(NULL);
 			std::tm* localTime = std::localtime(&now);
 			char timeBuffer[6];
@@ -271,7 +271,7 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 			std::string msgReplyBot = "The time right now is " + std::string(timeBuffer);
 			sendMessage(*itt, PRIVMSG("BOT", args[0], msgReplyBot));
 		}
-		else if (args[1] == "BOT Joke") {
+		else if (args[1] == "BOT joke") {
 			sendMessage(*itt, PRIVMSG("BOT", args[0], BotJokes()));
 		}
 	}
