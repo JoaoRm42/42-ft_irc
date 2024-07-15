@@ -46,6 +46,9 @@
 # include "client/Client.hpp"
 
 #define LIMITOFCHANNELS	50
+# define RED "\033[1;31m"
+# define NRM "\033[0m"
+# define GRN "\033[1;32m"
 
 #define PRIVMSG(nick, channel, message) \
 	":" + std::string(nick) + " PRIVMSG " + std::string(channel) + " :" + std::string(message) + "\r\n"
