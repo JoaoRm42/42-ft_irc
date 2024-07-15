@@ -87,7 +87,7 @@ void Server::handleNewConnection(int epoll_fd, int sockfd) {
 	_tmpClients[clientSocket] = new Client();
 	_tmpClients[clientSocket]->setSocketFD(clientSocket);
 
-	std::cout << "New connection from " << inet_ntoa(clientAddr.sin_addr) << ":" << ntohs(clientAddr.sin_port) << std::endl;
+	std::cout << GRN << "New connection from " << inet_ntoa(clientAddr.sin_addr) << ":" << ntohs(clientAddr.sin_port) << "" << NRM <<  std::endl;
 
 	event.events = EPOLLIN | EPOLLET;
 	event.data.fd = clientSocket;
@@ -122,14 +122,14 @@ void Server::handleClientData(int clientSocket) {
 		if (line.find("\r") != std::string::npos)
 			line.erase(line.find("\r"));
 		initInput(&input, line);
-		printInput(input, _tmpClients[clientSocket]);
+		//printInput(input, _tmpClients[clientSocket]);
 		tokens = split(line, ' ');
 		if (!tokens.empty()) {
 			if (_tmpClients[clientSocket] == NULL)
 				return ;
 			bool check = _tmpClients[clientSocket]->checkClientParams(*this, line);
 			if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket], input)) {
-				std::cout << "comando executado\n";
+				std::cout << "Valid command " << tokens[0] << std::endl;
 				break ; // if something goes wrong DELETE
 			}
 			else if (!check && tokens[0] != "CAP") {
@@ -146,7 +146,6 @@ void signalHandler(int signal) {
 		isRunning = 0;
 	}
 	if (signal == SIGPIPE) {
-		std::cout << "Forced Shutdown.\n" << std::endl;
 		isRunning = 1;
 	}
 }
