@@ -59,6 +59,8 @@ void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vecto
 
 	//Send the user a priv message from BOT to explain the command that bot do
     sendHelpTableBot(user);
+	/*std::string msgPrivate = ":" + user->getNick() + " PRIVMSG " + channelName + " :hhdbd Joeodjvvd " + "\r\n";
+	sendMessage(user->getSocketFD(), msgPrivate);*/
 }
 
 void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, Client *user, std::string channelPass, int flag) {
