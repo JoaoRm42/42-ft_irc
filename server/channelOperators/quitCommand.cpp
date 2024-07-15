@@ -11,12 +11,12 @@ void Server::quitCommand(std::vector<std::string> tokens, Client *user) {
 	removeUsersChannels(user, msgQuit);
 
 	std::map<int, Client *>::iterator it = _tmpClients.find(user->getSocketFD());
-	if (it != _tmpClients.end())
-	{
+	if (it != _tmpClients.end()) {
 		delete it->second;
 		_tmpClients.erase(it);
 	}
 	close(user->getSocketFD());
+	std::cout << "Client Disconnected" << std::endl;
 }
 
 std::string	Server::getFirstUser() {
