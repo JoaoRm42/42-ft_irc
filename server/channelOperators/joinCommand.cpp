@@ -57,8 +57,9 @@ void Server::tryToJoinChannel(std::string& channelName, Client *user, std::vecto
 	std::string msgEndOfList = ":" + displayHostname() + " 366 " + user->getNick() + " " + channelName + " :End of /NAMES list.\r\n";
 	sendMessage(user->getSocketFD(), msgEndOfList);
 
-	//Send the user a priv message from BOT to explain the command that bot do
-    sendHelpTableBot(user);
+	std::string helpCommands = "COMMANDS: BOT time & BOT joke";
+	std::string msgHelpCommands = ":BOT PRIVMSG " + channelName + " :" + helpCommands + "\r\n";
+	sendMessage(user->getSocketFD(), msgHelpCommands);
 }
 
 void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, Client *user, std::string channelPass, int flag) {
@@ -92,6 +93,15 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 		sendMessage(user->getSocketFD(), msgChannelFull);
 		return;
 	}
+	//add the bot if it isn't on the channel
+	size_t k;
+	for (k = 0; k != thisChannel->getlistOfMembers().size(); k++)
+	{
+		if (thisChannel->getlistOfMembers()[k] == "BOT")
+			break;
+	}
+	if (k == thisChannel->getlistOfMembers().size())
+		BotJoinChannel(channelName);
 	//put the user on that channel
 	user->addBackChannel(channelName);
 	thisChannel->setListOfMembers(user);
@@ -106,9 +116,6 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 	std::string msgEndOfList = ":" + displayHostname() + " 366 " + user->getNick() + " " + channelName + " :End of /NAMES list.\r\n";
 	sendMessage(user->getSocketFD(), msgEndOfList);
 
-	//Send the user a priv message from BOT to explain the command that bot do
-    sendHelpTableBot(user);
-
 	//send a messagem to all the members of the channel saying that someone joined the channel
 	std::string msgJoinBroadcast = ":" + user->getNick() + " JOIN :" + channelName + "\r\n";
 	for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
@@ -116,4 +123,8 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 		if (thisChannel->getMembersFd()[i] != user->getSocketFD())
 			sendMessage(thisChannel->getMembersFd()[i], msgJoinBroadcast);
 	}
+
+	std::string helpCommands = "COMMANDS: BOT time & BOT joke";
+	std::string msgHelpCommands = ":BOT PRIVMSG " + channelName + " :" + helpCommands + "\r\n";
+	sendMessage(user->getSocketFD(), msgHelpCommands);
 }
