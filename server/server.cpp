@@ -51,7 +51,7 @@ uint16_t Server::getPortAsUint16() {
 	return (static_cast<uint16_t>(port_ul));
 }
 
-int Server::createUser() {
+int Server::createServerSocket() {
 	return (socket(AF_INET, SOCK_STREAM, 0));
 }
 
@@ -163,7 +163,7 @@ int Server::epollFunction() {
 	server_addr.sin_port = htons(getPortAsUint16());
 	server_addr.sin_addr.s_addr = INADDR_ANY;
 	opt = 1;
-	sockfd = createUser();
+	sockfd = createServerSocket();
 	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) != 0)
 		return (1);
 	if (bindUser(sockfd, server_addr))

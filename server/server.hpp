@@ -46,7 +46,7 @@ public:
 	std::string	getIP();
 	uint16_t	getPortAsUint16();
 	void		printCoolntro();
-	int			createUser();
+	int			createServerSocket();
 	int			bindUser(int, const struct sockaddr_in&);
 	int			listenUser(int);
 	void		handleNewConnection(int, int);
