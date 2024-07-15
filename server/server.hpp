@@ -62,7 +62,6 @@ public:
 	//bot functions
 	void		BotJoinChannel(const std::string& channel);
 	void		createBot(const std::string& server, int port);
-	void		BotSendAsciiArt(const std::string& userNick);
 	std::string	BotJokes();
 
 	//channels functions

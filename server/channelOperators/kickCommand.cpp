@@ -81,7 +81,9 @@ void	Server::kickChannel(std::string channelName, Channel *thisChannel, Client *
 	//if you try to kick bot he sends you and priv message and don´t get kicked
 	std::string msgKick;
 	if (kickedUser == "BOT") {
-		BotSendAsciiArt(user->getNick());
+        std::string botKickMessage = "You cannot kick god!";
+        std::string msgbotKickMessage = ":BOT PRIVMSG " + channelName + " :" + botKickMessage + "\r\n";
+        sendMessage(user->getSocketFD(), msgbotKickMessage);
 		return ;
 	}
 	//send the message to everyone saying that the kicked person has been kicked
