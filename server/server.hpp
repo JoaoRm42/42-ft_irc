@@ -64,7 +64,6 @@ public:
 	void		createBot(const std::string& server, int port);
 	void		BotSendAsciiArt(const std::string& userNick);
 	std::string	BotJokes();
-    void        sendHelpTableBot(Client *user);
 
 	//channels functions
 	bool		checkForOperators(std::string line, Client *user, std::pair<std::vector<std::string>, std::string > input);
@@ -91,7 +90,8 @@ public:
 
 	//client funtions
 	void		quitCommand(std::vector<std::string> tokens, Client *user);
-//	void		removeUsersChannels(Client *user);
+	void		removeUsersChannels(Client *user, std::string);
+	std::string	getFirstUser();
 };
 
 

@@ -135,17 +135,20 @@ void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel 
 	else if (tokens[2][0] == '-')
 		flag = -1;
 	//see all the string because you can send plus than one mode
+	size_t j = 0;
 	for (size_t i = 1; i < tokens[2].size(); i++)
 	{
-		size_t j = 0;
 		if (tokens[2][i] == 'i')
 			inviteMode(flag, thisChannel, user);
 		else if (tokens[2][i] == 't')
 			topicMode(flag, thisChannel, user);
 		else if (tokens[2][i] == 'k')
 		{
-			if (tokens.size() >= (3 + j))
-				keyMode(flag, thisChannel, user, tokens[3 + j++]);
+			if (tokens.size() >= 3)
+			{
+				keyMode(flag, thisChannel, user, tokens[3 + j]);
+				j++;
+			}
 			else
 			{
 				std::string msgModeSpecifyKey = ":" + displayHostname() + " 324 " + user->getNick() + " " + thisChannel->getChannelName() + " :You must specify a parameter for the key mode\r\n";
@@ -154,8 +157,11 @@ void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel 
 		}
 		else if (tokens[2][i] == 'l')
 		{
-			if (flag == 1 && tokens.size() >= (3 + j))
-				limitUserMode(flag, thisChannel, user, tokens[3 + j++]);
+			if (flag == 1 && tokens.size() >= 3)
+			{
+				limitUserMode(flag, thisChannel, user, tokens[3 + j]);
+				j++;
+			}
 			else if (flag == -1)
 				limitUserMode(flag, thisChannel, user, "unset the limit");
 			else

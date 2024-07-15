@@ -87,7 +87,7 @@ void Server::handleNewConnection(int epoll_fd, int sockfd) {
 	_tmpClients[clientSocket] = new Client();
 	_tmpClients[clientSocket]->setSocketFD(clientSocket);
 
-	std::cout << "New connection from " << inet_ntoa(clientAddr.sin_addr) << ":" << ntohs(clientAddr.sin_port) << std::endl;
+	std::cout << GRN << "New connection from " << inet_ntoa(clientAddr.sin_addr) << ":" << ntohs(clientAddr.sin_port) << "" << NRM <<  std::endl;
 
 	event.events = EPOLLIN | EPOLLET;
 	event.data.fd = clientSocket;
@@ -110,31 +110,31 @@ void Server::handleClientData(int clientSocket) {
 	buffer[bytesRead] = '\0';
 	_messages[clientSocket] += buffer;
 
-	if (bytesRead == 0) {
-		std::cout << "Client Disconnected\n";
-	} else {
-		while (_messages[clientSocket].find("\n") != std::string::npos)
-		{
-			line = _messages[clientSocket].substr(0, _messages[clientSocket].find("\n"));
-			_messages[clientSocket] = _messages[clientSocket].substr(_messages[clientSocket].find("\n") + 1);
+	while (_messages[clientSocket].find("\n") != std::string::npos)
+	{
+		line = _messages[clientSocket].substr(0, _messages[clientSocket].find("\n"));
+//		if (!line.size()) {
+//			std::cout << "Client Disconnected\n";  //in case something goes wrong recheck this again
+//			break ;
+//		}
+		_messages[clientSocket] = _messages[clientSocket].substr(_messages[clientSocket].find("\n") + 1);
 
-			if (line.find("\r") != std::string::npos)
-				line.erase(line.find("\r"));
-			initInput(&input, line);
-			//printInput(input, _tmpClients[clientSocket]);
-			tokens = split(line, ' ');
-			if (!tokens.empty()) {
-				if (_tmpClients[clientSocket] == NULL)
-					return ;
-				bool check = _tmpClients[clientSocket]->checkClientParams(*this, line);
-				if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket], input)) {
-					std::cout << "comando executado\n";
-					break ; // if something goes wrong DELETE
-				}
-				else if (!check && tokens[0] != "CAP") {
-					std::cerr << "Invalid command" << std::endl;
-					sendMessage(clientSocket, "ERROR :Invalid command\n");
-				}
+		if (line.find("\r") != std::string::npos)
+			line.erase(line.find("\r"));
+		initInput(&input, line);
+		//printInput(input, _tmpClients[clientSocket]);
+		tokens = split(line, ' ');
+		if (!tokens.empty()) {
+			if (_tmpClients[clientSocket] == NULL)
+				return ;
+			bool check = _tmpClients[clientSocket]->checkClientParams(*this, line);
+			if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket], input)) {
+				std::cout << "Valid command " << tokens[0] << std::endl;
+				break ; // if something goes wrong DELETE
+			}
+			else if (!check && tokens[0] != "CAP") {
+				std::cerr << "Invalid command" << std::endl;
+				sendMessage(clientSocket, "ERROR :Invalid command\n");
 			}
 		}
 	}
@@ -146,7 +146,6 @@ void signalHandler(int signal) {
 		isRunning = 0;
 	}
 	if (signal == SIGPIPE) {
-		std::cout << "Forced Shutdown.\n" << std::endl;
 		isRunning = 1;
 	}
 }
@@ -213,6 +212,7 @@ int Server::epollFunction() {
 		}
 	}
 	close(sockfd);
+	close(_socketFdBot);
 	close(epoll_fd);
 	return (0);
 }
@@ -262,7 +262,7 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 		if (user->getSocketFD() != *itt) {
 			sendMessage(*itt, PRIVMSG(user->getNick(), args[0], args[1]));
 		}
-		if (args[1] == "BOT Time") {
+		if (args[1] == "BOT time") {
 			std::time_t now = std::time(NULL);
 			std::tm* localTime = std::localtime(&now);
 			char timeBuffer[6];
@@ -270,7 +270,7 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 			std::string msgReplyBot = "The time right now is " + std::string(timeBuffer);
 			sendMessage(*itt, PRIVMSG("BOT", args[0], msgReplyBot));
 		}
-		else if (args[1] == "BOT Joke") {
+		else if (args[1] == "BOT joke") {
 			sendMessage(*itt, PRIVMSG("BOT", args[0], BotJokes()));
 		}
 	}

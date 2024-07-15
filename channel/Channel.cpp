@@ -16,6 +16,7 @@ Channel::Channel(std::string name) : _channelName(name) {
 	_inviteOnly = false;
 	_numOfMembers = 0;
 	_passwordNeed = false;
+	_limitOfUsers = false;
 	_numMaxOfMembers = std::numeric_limits<int>::max();
 	setCrationTimeString();
 }
@@ -27,9 +28,18 @@ void	Channel::removeBotFromChannel() {
 }
 
 void	Channel::setListOfMembers(Client *user) {
-	_listOfMembers.push_back(user->getNick());
-	_membersFd.push_back(user->getSocketFD());
-	_numOfMembers++;
+	if (user->getNick() == "BOT")
+	{
+		_listOfMembers.insert(_listOfMembers.begin(), user->getNick());
+		_membersFd.push_back(user->getSocketFD());
+		_numOfMembers++;
+	}
+	else
+	{
+		_listOfMembers.push_back(user->getNick());
+		_membersFd.push_back(user->getSocketFD());
+		_numOfMembers++;
+	}
 }
 
 void	Channel::setListOfAdmins(Client *user) {
@@ -95,7 +105,7 @@ std::string	Channel::getMembersForList() {
 		{
 			if (tmp > 0)
 				allMembers += " ";
-			allMembers += "@" + _listOfAdmins[i];
+			allMembers += "@" + _listOfMembers[i];
 			tmp++;
 		}
 		else
