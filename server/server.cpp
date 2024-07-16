@@ -138,12 +138,19 @@ void Server::handleClientData(int clientSocket) {
 		if (!tokens.empty()) {
 			if (_tmpClients[clientSocket] == NULL)
 				return ;
-			bool check = _tmpClients[clientSocket]->checkClientParams(*this, line);
-			if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket], input)) {
+			else if (!tokens[0].empty()) {
+				_tmpClients[clientSocket]->checkClientParams(*this, line);
+				if (_tmpClients[clientSocket]->getValidData() && !_tmpClients[clientSocket]->getAlreadyWelcomed())
+					sendMessage(_tmpClients[clientSocket]->getSocketFD(),
+							":" + displayHostname() + " 001" + " : Welcome to the " +
+							displayHostname() + " Network, " + _tmpClients[clientSocket]->getNick() + "!" +
+							_tmpClients[clientSocket]->getUser() + "@" + getIP() + "\r\n");
+			} //if something goes wrong recheck this
+			else if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket], input)) {
 				std::cout << "Valid command " << tokens[0] << std::endl;
-				break ; // if something goes wrong DELETE
+				break ;
 			}
-			else if (!check && tokens[0] != "CAP") {
+			else {
 				std::cerr << "Invalid command" << std::endl;
 				sendMessage(clientSocket, "ERROR :Invalid command\n");
 			}
