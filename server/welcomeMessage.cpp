@@ -3,7 +3,7 @@
 void Server::welcomeMessage(Client& client)
 {
 	sendMessage(client.getSocketFD(),
-				":" + displayHostname() + " 001" + " : Welcome to the " +
+				":" + displayHostname() + " 001 " + client.getNick() + " :Welcome to the " +
 				displayHostname() + " Network, " + client.getNick() + "!" +
 				client.getUser() + "@" + getIP() + "\r\n");
 	sendMessage(client.getSocketFD(),
@@ -13,8 +13,9 @@ void Server::welcomeMessage(Client& client)
 	sendMessage(client.getSocketFD(),
 				":" + displayHostname() + " 004 " + ": " + displayHostname() + " 1.302 " + "itkol " + "kol\r\n");
 	sendMessage(client.getSocketFD(),
-			   ":" + displayHostname() + " 005 " + " : MAXCHANNELS=50 :are supported by this server" + "\r\n");
+			   ":" + displayHostname() + " 005 " + ": MAXCHANNELS=50 :are supported by this server" + "\r\n");
 	sendWelcomeMessage(client);
+	client.setAlreadyWelcomed(true);
 }
 
 void	Server::sendWelcomeMessage(Client &client) {
@@ -46,5 +47,4 @@ void	Server::sendWelcomeMessage(Client &client) {
 	//"<client> :End of /MOTD command."
 	sendMessage(client.getSocketFD(),
 				":" + displayHostname() + " 376 " + client.getNick() + " : End of /MOTD command.\r\n");
-	client.setAlreadyWelcomed(true);
 }

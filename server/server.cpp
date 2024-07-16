@@ -126,10 +126,6 @@ void Server::handleClientData(int clientSocket) {
 	while (_messages[clientSocket].find("\n") != std::string::npos)
 	{
 		line = _messages[clientSocket].substr(0, _messages[clientSocket].find("\n"));
-//		if (!line.size()) {
-//			std::cout << "Client Disconnected\n";  //in case something goes wrong recheck this again
-//			break ;
-//		}
 		_messages[clientSocket] = _messages[clientSocket].substr(_messages[clientSocket].find("\n") + 1);
 
 		if (line.find("\r") != std::string::npos)
@@ -140,16 +136,14 @@ void Server::handleClientData(int clientSocket) {
 		if (!tokens.empty()) {
 			if (_tmpClients[clientSocket] == NULL)
 				return ;
-			else if (!tokens[0].empty()) {
-				_tmpClients[clientSocket]->checkClientParams(*this, line);
-				if (_tmpClients[clientSocket]->getValidData() && !_tmpClients[clientSocket]->getAlreadyWelcomed())
-					welcomeMessage(*_tmpClients[clientSocket]);
-			} //if something goes wrong recheck this
-			else if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket], input)) {
+			_tmpClients[clientSocket]->checkClientParams(*this, line);
+			if (_tmpClients[clientSocket]->getValidData() && !_tmpClients[clientSocket]->getAlreadyWelcomed() && _tmpClients[clientSocket]->getNick() != "BOT")
+				welcomeMessage(*_tmpClients[clientSocket]);
+			if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket], input)) {
 				std::cout << "Valid command " << tokens[0] << std::endl;
 				break ;
 			}
-			else {
+			if (!(tokens[0] == "NICK" || tokens[0] == "USER" || tokens[0] == "PASS" || tokens[0] == "CAP")) {
 				std::cerr << "Invalid command" << std::endl;
 				sendMessage(clientSocket, "ERROR :Invalid command\n");
 			}
