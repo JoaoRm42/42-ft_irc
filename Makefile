@@ -31,7 +31,8 @@ SRCS = main.cpp \
 	server/channelOperators/topicCommand.cpp \
 	server/channelOperators/inviteCommand.cpp \
 	Bot/Bot.cpp \
-	server/channelOperators/quitCommand.cpp
+	server/channelOperators/quitCommand.cpp \
+	server/welcomeMessage.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(NAME)

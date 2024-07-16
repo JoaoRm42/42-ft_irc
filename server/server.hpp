@@ -94,6 +94,7 @@ public:
 	void		quitCommand(std::vector<std::string> tokens, Client *user);
 	void		removeUsersChannels(Client *user, std::string);
 	void		welcomeMessage(Client& client);
+	void		sendWelcomeMessage(Client& client);
 	std::string	getFirstUser();
 };
 

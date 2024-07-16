@@ -134,5 +134,9 @@ bool Server::checkForOperators(std::string line, Client *user, std::pair<std::ve
 		quitCommand(tokens, user);
 		return (true);
 	}
+	if (tokens[0] == "MOTD") {
+		sendWelcomeMessage(*user);
+		return (true);
+	}
 	return (false);
 }
