@@ -142,7 +142,7 @@ void Server::handleClientData(int clientSocket) {
 				_tmpClients[clientSocket]->checkClientParams(*this, line);
 				if (_tmpClients[clientSocket]->getValidData() && !_tmpClients[clientSocket]->getAlreadyWelcomed())
 					sendMessage(_tmpClients[clientSocket]->getSocketFD(),
-							":" + _tmpClients[clientSocket]->getNick() + " 001 " + " :Welcome to the " +
+							":" + displayHostname() + " 001" + " : Welcome to the " +
 							displayHostname() + " Network, " + _tmpClients[clientSocket]->getNick() + "!" +
 							_tmpClients[clientSocket]->getUser() + "@" + getIP() + "\r\n");
 			} //if something goes wrong recheck this
