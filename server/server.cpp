@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <iomanip>
 #include "server.hpp"
 
 volatile sig_atomic_t isRunning = 1;
@@ -17,11 +18,12 @@ volatile sig_atomic_t isRunning = 1;
 Server::Server() : _port("6667"), _password("password") {}
 
 Server::Server(char **av) : _port(av[1]), _password(av[2]) {
-	_creationServerTime = time(0);
-	time(&_creationServerTime);
-
+	_creationServerTime = time(NULL);
+	std::tm* localTime = std::localtime(&_creationServerTime);
+	char buffer[80];
+	std::strftime(buffer, sizeof(buffer), "%d-%m-%Y %H:%M:%S", localTime);
 	std::ostringstream oss;
-	oss << _creationServerTime;
+	oss << buffer;
 	_creationServerTimeString = oss.str();
 }
 
@@ -141,10 +143,7 @@ void Server::handleClientData(int clientSocket) {
 			else if (!tokens[0].empty()) {
 				_tmpClients[clientSocket]->checkClientParams(*this, line);
 				if (_tmpClients[clientSocket]->getValidData() && !_tmpClients[clientSocket]->getAlreadyWelcomed())
-					sendMessage(_tmpClients[clientSocket]->getSocketFD(),
-							":" + displayHostname() + " 001" + " : Welcome to the " +
-							displayHostname() + " Network, " + _tmpClients[clientSocket]->getNick() + "!" +
-							_tmpClients[clientSocket]->getUser() + "@" + getIP() + "\r\n");
+					welcomeMessage(*_tmpClients[clientSocket]);
 			} //if something goes wrong recheck this
 			else if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket], input)) {
 				std::cout << "Valid command " << tokens[0] << std::endl;
