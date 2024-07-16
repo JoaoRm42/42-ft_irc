@@ -46,4 +46,5 @@ void	Server::sendWelcomeMessage(Client &client) {
 	//"<client> :End of /MOTD command."
 	sendMessage(client.getSocketFD(),
 				":" + displayHostname() + " 376 " + client.getNick() + " : End of /MOTD command.\r\n");
+	client.setAlreadyWelcomed(true);
 }

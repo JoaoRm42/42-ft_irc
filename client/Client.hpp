@@ -14,16 +14,14 @@ class Client {
 	std::vector<std::string> channels;
 	size_t	numOfChannels;
 	bool isValidData;
-  public:
-	bool isValidData1() const;
-
-  private:
 	bool isValidNick;
 	bool validatedPass;
 	bool validatedUser;
 	bool alreadyWelcomed;
-  	public:
+  public:
+	void setAlreadyWelcomed(bool alreadyWelcomed);
 
+  public:
 	Client();
 	~Client();
 	//Getters of Variables

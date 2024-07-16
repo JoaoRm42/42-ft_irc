@@ -155,3 +155,7 @@ void Client::checkUser(Server& Server, const std::vector<std::string> &tmp) {
 std::vector<std::string>	Client::getChannels() const {
 	return (channels);
 }
+
+void Client::setAlreadyWelcomed(bool bollean) {
+	Client::alreadyWelcomed = bollean;
+}
