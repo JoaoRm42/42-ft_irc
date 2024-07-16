@@ -126,6 +126,10 @@ void Server::handleClientData(int clientSocket) {
 	while (_messages[clientSocket].find("\n") != std::string::npos)
 	{
 		line = _messages[clientSocket].substr(0, _messages[clientSocket].find("\n"));
+//		if (!line.size()) {
+//			std::cout << "Client Disconnected\n";  //in case something goes wrong recheck this again
+//			break ;
+//		}
 		_messages[clientSocket] = _messages[clientSocket].substr(_messages[clientSocket].find("\n") + 1);
 
 		if (line.find("\r") != std::string::npos)
