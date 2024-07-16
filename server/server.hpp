@@ -29,6 +29,8 @@ class Server {
 		std::map<std::string, Channel *>	_channelsList;
 		std::map<int, std::string>			_messages;
 		int									_socketFdBot;
+		std::time_t							_creationServerTime;
+		std::string							_creationServerTimeString;
 
 public:
 	Server();
@@ -54,6 +56,7 @@ public:
 	int			epollFunction();
 	int			checkMessage(Client*, std::string);
 	void 		sendChannelMessage(std::pair<std::vector<std::string>, std::string>, Client*);
+	std::string	getCreationServerTimeString(void);
 
 	void	sendMessage(int, std::string);
 	bool	checkUniqueNick(const std::string& toCheck);

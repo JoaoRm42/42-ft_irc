@@ -16,7 +16,14 @@ volatile sig_atomic_t isRunning = 1;
 
 Server::Server() : _port("6667"), _password("password") {}
 
-Server::Server(char **av) : _port(av[1]), _password(av[2]) {}
+Server::Server(char **av) : _port(av[1]), _password(av[2]) {
+	_creationServerTime = time(0);
+	time(&_creationServerTime);
+
+	std::ostringstream oss;
+	oss << _creationServerTime;
+	_creationServerTimeString = oss.str();
+}
 
 Server::Server(Server const &obj) { *this = obj; }
 
@@ -34,6 +41,10 @@ Server::~Server() {
 		delete it->second;
 	}
 	this->_tmpClients.clear();
+}
+
+std::string Server::getCreationServerTimeString() {
+	return (_creationServerTimeString);
 }
 
 std::string Server::getPassword() { return ( this->_password ); }
