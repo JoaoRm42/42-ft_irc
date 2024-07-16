@@ -93,15 +93,7 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 		sendMessage(user->getSocketFD(), msgChannelFull);
 		return;
 	}
-	//add the bot if it isn't on the channel
-	size_t k;
-	for (k = 0; k != thisChannel->getlistOfMembers().size(); k++)
-	{
-		if (thisChannel->getlistOfMembers()[k] == "BOT")
-			break;
-	}
-	if (k == thisChannel->getlistOfMembers().size())
-		BotJoinChannel(channelName);
+
 	//put the user on that channel
 	user->addBackChannel(channelName);
 	thisChannel->setListOfMembers(user);
