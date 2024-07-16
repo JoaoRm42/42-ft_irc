@@ -17,6 +17,7 @@ class Client {
 	bool isValidNick;
 	bool validatedPass;
 	bool validatedUser;
+    bool isHexchat;
 	bool alreadyWelcomed;
   public:
 	void setAlreadyWelcomed(bool alreadyWelcomed);
@@ -32,6 +33,7 @@ class Client {
 	bool getValidData() const;
 	size_t getNumOfChannels() const;
 	std::vector<std::string> getChannels(void) const;
+    bool getIsHexchat();
 	bool getAlreadyWelcomed() const;
 
 	//Setters of Variables

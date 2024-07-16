@@ -8,6 +8,7 @@ Client::Client() {
 	isValidNick = false;
 	validatedPass = false;
 	validatedUser = false;
+    isHexchat = false;
 	alreadyWelcomed = false;
 }
 
@@ -35,6 +36,10 @@ bool Client::getValidData() const {
 
 bool Client::getAlreadyWelcomed() const {
 	return alreadyWelcomed;
+}
+
+bool Client::getIsHexchat() {
+    return (isHexchat);
 }
 
 void Client::setSocketFD(unsigned int data) {
@@ -90,6 +95,9 @@ void Client::checkClientParams(Server& Server, const std::string& buffer) {
 	else if (tmp[0] == "USER" && validatedPass) {
 		checkUser(Server, tmp);
 		}
+    else if (tmp[0] == "CAP") {
+        isHexchat = true;
+    }
 	if (!nick.empty() && !user.empty() && isValidNick && validatedPass) {
 		isValidData = true;
 	}

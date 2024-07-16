@@ -128,13 +128,15 @@ void Server::handleClientData(int clientSocket) {
 	buffer[bytesRead] = '\0';
 	_messages[clientSocket] += buffer;
 
+    if (bytesRead == 0 && !_tmpClients[clientSocket]->getIsHexchat()) {
+        std::vector<std::string> tmpTokens;
+
+        tmpTokens.push_back("QUIT");
+        quitCommand(tmpTokens, _tmpClients[clientSocket]);
+    }
 	while (_messages[clientSocket].find("\n") != std::string::npos)
 	{
 		line = _messages[clientSocket].substr(0, _messages[clientSocket].find("\n"));
-//		if (!line.size()) {
-//			std::cout << "Client Disconnected\n";  //in case something goes wrong recheck this again
-//			break ;
-//		}
 		_messages[clientSocket] = _messages[clientSocket].substr(_messages[clientSocket].find("\n") + 1);
 
 		if (line.find("\r") != std::string::npos)
@@ -222,7 +224,6 @@ int Server::epollFunction() {
 
 	createBot("127.0.0.1", 6667);
 	epoll_event events[MAX_EVENTS];
-	//sendMessage(sockfd, "CHANLIMIT=#&:25\r\n");
 	while (isRunning) {
 		numEvents = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
 		for (int i = 0; i < numEvents; ++i) {
