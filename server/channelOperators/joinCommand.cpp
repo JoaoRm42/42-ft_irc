@@ -69,8 +69,8 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 		if (thisChannel->getlistOfMembers()[k] == user->getNick())
 			return;
 	}
-	//check if the channel is invite only, and don´t let the user enter if it is invite only
-	if (thisChannel->getInviteOnly())
+	//check if the channel is invite only and if the user is on the invited list, if it's not don´t let the user enter if it is invite only
+	if (thisChannel->getInviteOnly() && thisChannel->checkListOfInvitedUsers(user->getNick()) == false)
 	{
 		std::string msgInviteOnly = ":" + displayHostname() + " 473 " + user->getNick() + " " + channelName + " :Cannot join channel (+i)\r\n";
 		sendMessage(user->getSocketFD(), msgInviteOnly);
@@ -127,4 +127,6 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 	std::string helpCommands = "COMMANDS: BOT time & BOT joke";
 	std::string msgHelpCommands = ":BOT PRIVMSG " + channelName + " :" + helpCommands + "\r\n";
 	sendMessage(user->getSocketFD(), msgHelpCommands);
+	if (thisChannel->getInviteOnly() && thisChannel->checkListOfInvitedUsers(user->getNick()) == true)
+		thisChannel->removeInvitedUser(user->getNick());
 }

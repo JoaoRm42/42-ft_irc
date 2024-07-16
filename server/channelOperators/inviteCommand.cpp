@@ -81,24 +81,6 @@ void	Server::tryToInvite(std::string& channelName, Client *user, std::vector<std
 	//send the invite message to the invited user
 	std::string	msgInvite = ":" + user->getNick() + " INVITE " + invitedClient->getNick() + " " + channelName + "\r\n";
 	sendMessage(invitedClient->getSocketFD(), msgInvite);
-	thisChannel->setListOfMembers(invitedClient);
-
-    std::string allMembers = thisChannel->getMembersForList();
-	//send a JOIN message for the invited person enter the channel
-	std::string	msgJoin = ":" + invitedClient->getNick() + " JOIN " + channelName + "\r\n";
-	sendMessage(invitedClient->getSocketFD(), msgJoin);
-
-    std::string msgNamReply = ":" + displayHostname() + " 353 " + invitedClient->getNick() + " = " + channelName + " :" + allMembers + "\r\n";
-    sendMessage(invitedClient->getSocketFD(), msgNamReply);
-
-    std::string msgEndOfList = ":" + displayHostname() + " 366 " + invitedClient->getNick() + " " + channelName + " :End of /NAMES list.\r\n";
-    sendMessage(invitedClient->getSocketFD(), msgEndOfList);
-
-    //send a messagem to all the members of the channel saying that someone joined the channel
-    std::string msgJoinBroadcast = ":" + invitedClient->getNick() + " JOIN :" + channelName + "\r\n";
-    for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
-    {
-        if (thisChannel->getMembersFd()[i] != invitedClient->getSocketFD())
-            sendMessage(thisChannel->getMembersFd()[i], msgJoinBroadcast);
-    }
+	//add the user to the list of invited members, if the user invited wants he uses the join command
+	thisChannel->addInvitedUser(invitedClient->getNick());
 }

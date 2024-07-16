@@ -37,6 +37,7 @@ private:
 	std::string _topicTimeString;
 	std::time_t	_topicTime;
 	std::string _topicNick;
+	std::vector<std::string>	_invitedUsersToChannel;
 public:
 	Channel(std::string name);
 	~Channel();
@@ -73,6 +74,9 @@ public:
 	void						setTopic(std::string newTopic, std::string user);
 	std::string					getTopicNick(void);
 	std::string					getTopicTime(void);
+	void						addInvitedUser(std::string userInvited);
+	bool						checkListOfInvitedUsers(std::string userInvited);
+	void						removeInvitedUser(std::string userInvited);
 };
 
 #endif

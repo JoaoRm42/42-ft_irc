@@ -319,3 +319,27 @@ void	Channel::setCrationTimeString() {
 std::string	Channel::getCreationTimeString() {
 	return (_creationTimeString);
 }
+
+void	Channel::addInvitedUser(std::string userInvited) {
+	_invitedUsersToChannel.push_back(userInvited);
+}
+
+bool	Channel::checkListOfInvitedUsers(std::string userInvited) {
+	for (std::vector<std::string>::iterator	it = _invitedUsersToChannel.begin(); it != _invitedUsersToChannel.end(); it++)
+	{
+		if (*it == userInvited)
+			return (true);
+	}
+	return (false);
+}
+
+void	Channel::removeInvitedUser(std::string userInvited) {
+	for (std::vector<std::string>::iterator	it = _invitedUsersToChannel.begin(); it != _invitedUsersToChannel.end(); it++)
+	{
+		if (*it == userInvited)
+		{
+			_invitedUsersToChannel.erase(it);
+			break ;
+		}
+	}
+}
