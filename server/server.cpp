@@ -256,6 +256,19 @@ void Server::sendChannelMessage(std::pair<std::vector<std::string>, std::string>
 		return;
 	}
 
+	size_t k;
+	//check the user is on that channel
+	for (k = 0; k < it->second->getlistOfMembers().size(); k++)
+	{
+		if (it->second->getlistOfMembers()[k] == user->getNick())
+			break ;
+	}
+	if (k == it->second->getlistOfMembers().size())
+	{
+		std::string msgNotOnChannel = ":" + displayHostname() + " 442 " + user->getNick() + " " + it->second->getChannelName() + " :You're not on that channel\r\n";
+		sendMessage(user->getSocketFD(), msgNotOnChannel);
+		return;
+	}
 
 	std::vector<int> membersFd = it->second->getMembersFd();
 	for (std::vector<int>::iterator itt = membersFd.begin(); itt != membersFd.end(); ++itt) {
