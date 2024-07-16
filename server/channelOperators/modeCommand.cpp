@@ -83,62 +83,54 @@ void	Server::tryToMode(std::string& channelName, Client *user, std::vector<std::
 		sendMessage(user->getSocketFD(), msgNotAnOp);
 		return;
 	}
-	//divide the two types of modes, user modes or channel modes
+	//do channel modes if it has enough parameters
 	if (tokens.size() >= 3 && (tokens[2][0] == '+' || tokens[2][0] == '-'))
 		modeChannel(user, tokens, thisChannel);
-	else if (tokens.size() >= 4)
-		modeUser(user, tokens, thisChannel);
 }
 
-void	Server::modeUser(Client *user, std::vector<std::string> tokens, Channel *thisChannel) {
+void	Server::modeUserOperator(Client *user, std::string userToGetOp, Channel *thisChannel, int flag) {
 	size_t	k = 0;
 	//check if the nick is in the server to give operator
 	for (k = 0; k < thisChannel->getlistOfMembers().size(); k++)
 	{
-		if (thisChannel->getlistOfMembers()[k] == tokens[2])
+		if (thisChannel->getlistOfMembers()[k] == userToGetOp)
 			break ;
 	}
 	if (k == thisChannel->getlistOfMembers().size())
 	{
-		std::string msgNoSuchNick = ":" + displayHostname() + " 401 " + user->getNick() + " " + thisChannel->getChannelName() + " " + tokens[2] + " :No such nick\r\n";
+		std::string msgNoSuchNick = ":" + displayHostname() + " 401 " + user->getNick() + " " + thisChannel->getChannelName() + " " + userToGetOp + " :No such nick\r\n";
 		sendMessage(user->getSocketFD(), msgNoSuchNick);
 		return;
 	}
 	//give the operator privilege if the user is not an operator already
-	if (tokens[3] == "+o" && !thisChannel->isAdm(tokens[2]))
+	if (flag == 1 && !thisChannel->isAdm(userToGetOp))
 	{
-		thisChannel->setListOfAdmins(_getUserClass(tokens[2]));
-		std::string msgModeGiveOperator = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " +o " + tokens[2] + "\r\n";
+		thisChannel->setListOfAdmins(_getUserClass(userToGetOp));
+		std::string msgModeGiveOperator = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " +o " + userToGetOp + "\r\n";
 		for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
 			sendMessage(thisChannel->getMembersFd()[i], msgModeGiveOperator);
 	}
 	//take the operator privilege if the user is an operator
-	else if (tokens[3] == "-o" && thisChannel->isAdm(tokens[2]))
+	else if (flag == -1 && thisChannel->isAdm(userToGetOp))
 	{
-		thisChannel->removeAdmin(_getUserClass(tokens[2]));
-		std::string msgModeRemoveOperator = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " -o " + tokens[2] + "\r\n";
+		thisChannel->removeAdmin(_getUserClass(userToGetOp));
+		std::string msgModeRemoveOperator = ":" + user->getNick() + " MODE " + thisChannel->getChannelName() + " -o " + userToGetOp + "\r\n";
 		for (size_t i = 0; i < thisChannel->getMembersFd().size(); i++)
 			sendMessage(thisChannel->getMembersFd()[i], msgModeRemoveOperator);
-	}
-	//check if there is other flag, and don´t do it
-	else if (tokens[3] != "-o" || tokens[3] != "-o")
-	{
-		std::string msgModeUnknownFlag = ":" + displayHostname() + " 501 " + user->getNick() + " :Unknown MODE flag\r\n";
-		sendMessage(user->getSocketFD(), msgModeUnknownFlag);
 	}
 }
 
 void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel *thisChannel) {
 	int	flag = 0; //if =-1 (minus mode) else if =+1 (plus mode)
-	if (tokens[2][0] == '+')
-		flag = 1;
-	else if (tokens[2][0] == '-')
-		flag = -1;
 	//see all the string because you can send plus than one mode
 	size_t j = 0;
-	for (size_t i = 1; i < tokens[2].size(); i++)
+	for (size_t i = 0; i < tokens[2].size(); i++)
 	{
-		if (tokens[2][i] == 'i')
+		if (tokens[2][i] == '+')
+			flag = 1;
+		else if (tokens[2][i] == '-')
+			flag = -1;
+		else if (tokens[2][i] == 'i')
 			inviteMode(flag, thisChannel, user);
 		else if (tokens[2][i] == 't')
 			topicMode(flag, thisChannel, user);
@@ -170,7 +162,22 @@ void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel 
 				sendMessage(user->getSocketFD(), msgModeSpecifyLimit);
 			}
 		}
-		else if (tokens[2][i] != 'o')
+		else if (tokens[2][i] == 'o')
+		{
+			if (flag == 1 && tokens.size() >= 4)
+			{
+				modeUserOperator(user, tokens[3 + j], thisChannel, flag);
+				j++;
+			}
+			else if (flag == -1 && tokens.size() >= 4)
+				modeUserOperator(user, tokens[3 + j], thisChannel, flag);
+			else
+			{
+				std::string msgModeSpecifyLimit = ":" + displayHostname() + " 324 " + user->getNick() + " " + thisChannel->getChannelName() + " :You must specify a parameter for the operator mode\r\n";
+				sendMessage(user->getSocketFD(), msgModeSpecifyLimit);
+			}
+		}
+		else
 		{
 			std::string msgModeUnknownFlag = ":" + displayHostname() + " 501 " + user->getNick() + " :Unknown MODE flag\r\n";
 			sendMessage(user->getSocketFD(), msgModeUnknownFlag);

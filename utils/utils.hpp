@@ -19,6 +19,5 @@ void						printInput(std::pair<std::vector<std::string>, std::string> input, Cli
 void						initInput(std::pair<std::vector<std::string>, std::string>* input, const std::string &line);
 void						printVector(std::vector<std::string> vector);
 std::vector<std::string>	returnVector(std::vector<std::string> vector);
-Client*                     findClientByNick(const std::map<int, Client*>& clients, const std::string& nick);
 
 #endif

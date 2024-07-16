@@ -4,16 +4,6 @@
 
 #include "utils.hpp"
 
-Client* findClientByNick(const std::map<int, Client*>& clients, const std::string& nick) {
-    std::map<int, Client*>::const_iterator it;
-    for (it = clients.begin(); it != clients.end(); ++it) {
-        Client* client = it->second;
-        if (client->getNick() == nick) {
-            return client;
-        }
-    }
-    return NULL;
-}
 std::string toUpperCase(const std::string& input) {
 	std::string result = input;
 
