@@ -123,9 +123,6 @@ void Server::createBot(const std::string& server, int port) {
 		return;
 	}
 
-	flags = fcntl(this->_socketFdBot, F_GETFL, 0);
-	fcntl(this->_socketFdBot, F_SETFL, flags | O_NONBLOCK);
-
 	memset((char *) &server_addr, 0, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	memcpy((char *) &server_addr.sin_addr.s_addr, (char *) server_host->h_addr, server_host->h_length);
@@ -136,6 +133,8 @@ void Server::createBot(const std::string& server, int port) {
 		return;
 	}
 
+	flags = fcntl(this->_socketFdBot, F_GETFL, 0);
+	fcntl(this->_socketFdBot, F_SETFL, flags | O_NONBLOCK);
     std::string msgPass = "PASS " + getPassword() + "\r\n";
 	std::string msgNick = "NICK BOT\r\n";
 	std::string msgUser = "USER BOT 0 * :realname\r\n";
