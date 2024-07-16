@@ -343,3 +343,7 @@ void	Channel::removeInvitedUser(std::string userInvited) {
 		}
 	}
 }
+
+std::vector<std::string>	Channel::getlistOfInvitedUsers() {
+	return (_invitedUsersToChannel);
+}

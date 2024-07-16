@@ -82,5 +82,6 @@ void	Server::tryToInvite(std::string& channelName, Client *user, std::vector<std
 	std::string	msgInvite = ":" + user->getNick() + " INVITE " + invitedClient->getNick() + " " + channelName + "\r\n";
 	sendMessage(invitedClient->getSocketFD(), msgInvite);
 	//add the user to the list of invited members, if the user invited wants he uses the join command
-	thisChannel->addInvitedUser(invitedClient->getNick());
+	if (thisChannel->getInviteOnly())
+		thisChannel->addInvitedUser(invitedClient->getNick());
 }

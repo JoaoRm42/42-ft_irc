@@ -77,6 +77,7 @@ public:
 	void						addInvitedUser(std::string userInvited);
 	bool						checkListOfInvitedUsers(std::string userInvited);
 	void						removeInvitedUser(std::string userInvited);
+	std::vector<std::string>	getlistOfInvitedUsers(void);
 };
 
 #endif
