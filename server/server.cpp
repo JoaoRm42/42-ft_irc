@@ -89,9 +89,14 @@ void Server::handleNewConnection(int epoll_fd, int sockfd) {
 	struct epoll_event	event;
 	socklen_t			clientAddrLen;
 	int					clientSocket;
+	int					flags;
 
 	clientAddrLen = sizeof(clientAddr);
 	clientSocket = accept(sockfd, (struct sockaddr*)&clientAddr, &clientAddrLen);
+
+
+	flags = fcntl(sockfd, F_GETFL, 0);
+	fcntl(clientSocket, F_SETFL, flags | O_NONBLOCK);
 
 	if (clientSocket == -1) {
 		std::cerr << "Failed to accept client connection: " << strerror(errno) << std::endl;

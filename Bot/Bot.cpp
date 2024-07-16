@@ -110,6 +110,7 @@ void Server::createBot(const std::string& server, int port) {
     this->_socketFdBot  = socket(AF_INET, SOCK_STREAM, 0);
 	struct sockaddr_in server_addr;
 	struct hostent *server_host;
+	int 			flags;
 
 	server_host = gethostbyname(server.c_str());
 	if (server_host == NULL) {
@@ -121,6 +122,9 @@ void Server::createBot(const std::string& server, int port) {
 		std::cout << "Error opening socket" << std::endl;
 		return;
 	}
+
+	flags = fcntl(this->_socketFdBot, F_GETFL, 0);
+	fcntl(this->_socketFdBot, F_SETFL, flags | O_NONBLOCK);
 
 	memset((char *) &server_addr, 0, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
