@@ -41,7 +41,7 @@ void	Server::sendWelcomeMessage(Client &client) {
 	sendMessage(client.getSocketFD(),
 				":" + displayHostname() + " 372 " + client.getNick() + " : " + "                 \"\"\" \"\"\"         \"\"\" \"\"\"       \"\"  \"\"  \"\" \"\"\r\n");
 	sendMessage(client.getSocketFD(),
-				":" + displayHostname() + " 372 " + client.getNick() + " : " + "                 macastan            joaoped2          ccosta-c\r\n");
+				":" + displayHostname() + " 372 " + client.getNick() + " : " + "                 macastan        joaoped2          ccosta-c\r\n");
 	//RPL_ENDOFMOTD (376)
 	//"<client> :End of /MOTD command."
 	sendMessage(client.getSocketFD(),
