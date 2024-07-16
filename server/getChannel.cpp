@@ -138,5 +138,10 @@ bool Server::checkForOperators(std::string line, Client *user, std::pair<std::ve
 		sendWelcomeMessage(*user);
 		return (true);
 	}
+	if (tokens[0] == "PING") {
+		std::string msgPong = ":" + displayHostname() + " PONG " + displayHostname() + " :" + tokens[1] + "\r\n";
+		sendMessage(user->getSocketFD(), msgPong);
+		return (true);
+	}
 	return (false);
 }

@@ -144,6 +144,8 @@ void Server::handleClientData(int clientSocket) {
 			if (_tmpClients[clientSocket]->getValidData() && !_tmpClients[clientSocket]->getAlreadyWelcomed() && _tmpClients[clientSocket]->getNick() != "BOT")
 				welcomeMessage(*_tmpClients[clientSocket]);
 			if (_tmpClients[clientSocket]->getValidData() && checkForOperators(line, _tmpClients[clientSocket], input)) {
+				if (tokens[0] == "PING")
+					break ;
 				std::cout << "Valid command " << tokens[0] << std::endl;
 				break ;
 			}
