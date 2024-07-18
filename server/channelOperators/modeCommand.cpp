@@ -161,7 +161,7 @@ void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel 
 		}
 		else if (tokens[2][i] == 'l')
 		{
-			if (flag == 1 && tokens.size() >= 3)
+			if (flag == 1 && tokens.size() > 3)
 			{
 				limitUserMode(flag, thisChannel, user, tokens[3 + j]);
 				j++;
