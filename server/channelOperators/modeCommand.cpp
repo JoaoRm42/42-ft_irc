@@ -148,7 +148,7 @@ void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel 
 			topicMode(flag, thisChannel, user);
 		else if (tokens[2][i] == 'k')
 		{
-			if (tokens.size() >= 3)
+			if (tokens.size() > 3)
 			{
 				keyMode(flag, thisChannel, user, tokens[3 + j]);
 				j++;
