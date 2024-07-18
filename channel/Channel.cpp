@@ -246,6 +246,10 @@ void	Channel::setTopic(std::string newTopic, std::string user) {
 	_topicTimeString = out.str();
 }
 
+std::time_t&	Channel::getTopicTimeCreation() {
+	return (_topicTime);
+}
+
 std::string Channel::getTopicNick() {
 	return (_topicNick);
 }
@@ -303,7 +307,7 @@ std::string	Channel::getAllModes() {
 	return (allModes + allArgs);
 }
 
-std::time_t	Channel::getCreationTime() {
+std::time_t&	Channel::getCreationTime() {
 	return (_creationTime);
 }
 

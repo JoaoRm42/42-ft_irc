@@ -67,7 +67,7 @@ public:
 	bool						getLimitOfUsers(void);
 	void						setLimitOfUsers(size_t limit, bool limitOn);
 	std::string					getAllModes(void);
-	std::time_t					getCreationTime(void);
+	std::time_t&					getCreationTime(void);
 	void						setCrationTimeString(void);
 	std::string					getCreationTimeString(void);
 	std::string					getTopic(void);
@@ -78,6 +78,7 @@ public:
 	bool						checkListOfInvitedUsers(std::string userInvited);
 	void						removeInvitedUser(std::string userInvited);
 	std::vector<std::string>	getlistOfInvitedUsers(void);
+	std::time_t&					getTopicTimeCreation(void);
 };
 
 #endif

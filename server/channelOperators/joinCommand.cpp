@@ -79,7 +79,9 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 	//check if the channel needs a password to enter and also check if the password giving is right
 	if (thisChannel->getPasswordNeed())
 	{
-		if (flag == 0 || thisChannel->getPassword() != channelPass)
+		if (thisChannel->checkListOfInvitedUsers(user->getNick()) == true)
+			;
+		else if (flag == 0 || thisChannel->getPassword() != channelPass)
 		{
 			std::string msgWrongPassword = ":" + displayHostname() + " 475 " + user->getNick() + " " + channelName + " :Cannot join channel (+k)\r\n";
 			sendMessage(user->getSocketFD(), msgWrongPassword);
@@ -119,6 +121,5 @@ void	Server::joinExistingChannel(std::string channelName, Channel *thisChannel, 
 	std::string helpCommands = "COMMANDS: BOT time & BOT joke";
 	std::string msgHelpCommands = ":BOT PRIVMSG " + channelName + " :" + helpCommands + "\r\n";
 	sendMessage(user->getSocketFD(), msgHelpCommands);
-	if (thisChannel->getInviteOnly() && thisChannel->checkListOfInvitedUsers(user->getNick()) == true)
-		thisChannel->removeInvitedUser(user->getNick());
+	thisChannel->removeInvitedUser(user->getNick());
 }

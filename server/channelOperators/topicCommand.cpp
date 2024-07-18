@@ -100,7 +100,19 @@ void	Server::seeTopic(Channel *thisChannel, Client *user) {
 	{
 		std::string msgTopic = ":" + displayHostname() + " 332 " + user->getNick() + " " + thisChannel->getChannelName() + " " + thisChannel->getTopic() + "\r\n";
 		sendMessage(user->getSocketFD(), msgTopic);
-		std::string msgTopicWhoTime = ":" + displayHostname() + " 333 " + user->getNick() + " " + thisChannel->getChannelName() + " " + thisChannel->getTopicNick() + " " + thisChannel->getTopicTime() + "\r\n";
-		sendMessage(user->getSocketFD(), msgTopicWhoTime);
+		if (user->getIsHexchat() == false)
+		{
+			char* dt = std::ctime(&thisChannel->getTopicTimeCreation());
+			std::string dateString(dt);
+			size_t pos = dateString.find('\n');
+			if (pos != std::string::npos)
+				dateString.erase(pos);
+			std::string msgTopicWhoTime = ":" + displayHostname() + " 333 " + user->getNick() + " " + thisChannel->getChannelName() + " " + thisChannel->getTopicNick() + " " + dateString + "\r\n";
+			sendMessage(user->getSocketFD(), msgTopicWhoTime);
+		}
+		else {
+			std::string msgTopicWhoTime = ":" + displayHostname() + " 333 " + user->getNick() + " " + thisChannel->getChannelName() + " " + thisChannel->getTopicNick() + " " + thisChannel->getTopicTime() + "\r\n";
+			sendMessage(user->getSocketFD(), msgTopicWhoTime);
+		}
 	}
 }

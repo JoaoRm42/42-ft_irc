@@ -26,23 +26,23 @@ void	Server::sendWelcomeMessage(Client &client) {
 	//RPL_MOTD (372)
 	//"<client> :<line of the motd>"
 	sendMessage(client.getSocketFD(),
-				":" + displayHostname() + " 372 " + client.getNick() + " : " + "                                                         __\r\n");
+				":" + displayHostname() + " 372 " + client.getNick() + " : " + "                                                __\r\n");
 	sendMessage(client.getSocketFD(),
-				":" + displayHostname() + " 372 " + client.getNick() + " : " + "                                                         `\\\\\r\n");
+				":" + displayHostname() + " 372 " + client.getNick() + " : " + "                                                `\\\\\r\n");
 	sendMessage(client.getSocketFD(),
-				":" + displayHostname() + " 372 " + client.getNick() + " : " + "                  /\\-/\\          /\\-/\\          /\\=/\\-\"\"-.//\r\n");
+				":" + displayHostname() + " 372 " + client.getNick() + " : " + "         /\\-/\\          /\\-/\\          /\\=/\\-\"\"-.//\r\n");
 	sendMessage(client.getSocketFD(),
-				":" + displayHostname() + " 372 " + client.getNick() + " : " + "              /) = ^I^ =        = 'Y' = (\\     = 'Y' =  ,  \\\r\n");
+				":" + displayHostname() + " 372 " + client.getNick() + " : " + "     /) = ^I^ =        = 'Y' = (\\     = 'Y' =  ,  \\\r\n");
 	sendMessage(client.getSocketFD(),
-				":" + displayHostname() + " 372 " + client.getNick() + " : " + "             ((_ /'-^-'\\ _     _/'-^-'\\_))      '-u-'  /(  /\r\n");
+				":" + displayHostname() + " 372 " + client.getNick() + " : " + "    ((_ /'-^-'\\ _     _/'-^-'\\_))      '-u-'  /(  /\r\n");
 	sendMessage(client.getSocketFD(),
-				":" + displayHostname() + " 372 " + client.getNick() + " : " + "              `\\`\\ \\ / /`/     \\\\ \\ / //`       /;_,) |\\\\ \\\r\n");
+				":" + displayHostname() + " 372 " + client.getNick() + " : " + "     `\\`\\ \\ / /`/     \\\\ \\ / //`       /;_,) |\\\\ \\\r\n");
 	sendMessage(client.getSocketFD(),
-				":" + displayHostname() + " 372 " + client.getNick() + " : " + "                (_\\_|_/_)       (_(_|_)_)      (_/ (_/ (_(_/\r\n");
+				":" + displayHostname() + " 372 " + client.getNick() + " : " + "       (_\\_|_/_)       (_(_|_)_)      (_/ (_/ (_(_/\r\n");
 	sendMessage(client.getSocketFD(),
-				":" + displayHostname() + " 372 " + client.getNick() + " : " + "                 \"\"\" \"\"\"         \"\"\" \"\"\"       \"\"  \"\"  \"\" \"\"\r\n");
+				":" + displayHostname() + " 372 " + client.getNick() + " : " + "        \"\"\" \"\"\"         \"\"\" \"\"\"       \"\"  \"\"  \"\" \"\"\r\n");
 	sendMessage(client.getSocketFD(),
-				":" + displayHostname() + " 372 " + client.getNick() + " : " + "                 macastan        joaoped2          ccosta-c\r\n");
+				":" + displayHostname() + " 372 " + client.getNick() + " : " + "        macastan        joaoped2          ccosta-c\r\n");
 	//RPL_ENDOFMOTD (376)
 	//"<client> :End of /MOTD command."
 	sendMessage(client.getSocketFD(),

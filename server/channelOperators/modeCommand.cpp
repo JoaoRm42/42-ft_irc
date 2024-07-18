@@ -35,9 +35,21 @@ void	Server::showMode(std::string& channelName, Client *user) {
 	std::string allModes = thisChannel->getAllModes();
 	std::string	msgWhatMode = ":" + displayHostname() + " 324 " + user->getNick() + " " + channelName + " " + allModes + "\r\n";
 	sendMessage(user->getSocketFD(), msgWhatMode);
-
-	std::string	msgCreationTime = ":" + displayHostname() + " 329 " + user->getNick() + " " + channelName + " " + thisChannel->getCreationTimeString() + "\r\n";
-	sendMessage(user->getSocketFD(), msgCreationTime);
+	if (user->getIsHexchat() == false)
+	{
+		char* dt = std::ctime(&thisChannel->getCreationTime());
+		std::string dateString(dt);
+		size_t pos = dateString.find('\n');
+		if (pos != std::string::npos)
+			dateString.erase(pos);
+		std::string	msgCreationTime = ":" + displayHostname() + " 329 " + user->getNick() + " " + channelName + " " + dateString + "\r\n";
+		sendMessage(user->getSocketFD(), msgCreationTime);
+	}
+	else
+	{
+		std::string	msgCreationTime = ":" + displayHostname() + " 329 " + user->getNick() + " " + channelName + " " + thisChannel->getCreationTimeString() + "\r\n";
+		sendMessage(user->getSocketFD(), msgCreationTime);
+	}
 }
 
 void	Server::tryToMode(std::string& channelName, Client *user, std::vector<std::string> tokens){
