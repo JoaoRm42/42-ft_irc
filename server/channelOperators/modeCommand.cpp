@@ -136,16 +136,6 @@ void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel 
 	int	flag = 0; //if =-1 (minus mode) else if =+1 (plus mode)
 	//see all the string because you can send plus than one mode
 	size_t j = 0;
-	size_t	tokensSize = 3;
-	for (size_t k = 0; k < tokens[2].size(); k++)
-	{
-		if (tokens[2][k] == 'o')
-			tokensSize++;
-		else if (tokens[2][k] == 'k')
-			tokensSize++;
-		else if (tokens[2][k] == 'l')
-			tokensSize++;
-	}
 	for (size_t i = 0; i < tokens[2].size(); i++)
 	{
 		if (tokens[2][i] == '+')
@@ -158,7 +148,7 @@ void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel 
 			topicMode(flag, thisChannel, user);
 		else if (tokens[2][i] == 'k')
 		{
-			if ((3 + j) < tokensSize)
+			if ((3 + j) < tokens.size())
 			{
 				keyMode(flag, thisChannel, user, tokens[3 + j]);
 				j++;
@@ -171,7 +161,7 @@ void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel 
 		}
 		else if (tokens[2][i] == 'l')
 		{
-			if (flag == 1 && (3 + j) < tokensSize)
+			if (flag == 1 && (3 + j) < tokens.size())
 			{
 				limitUserMode(flag, thisChannel, user, tokens[3 + j]);
 				j++;
@@ -186,12 +176,12 @@ void	Server::modeChannel(Client *user, std::vector<std::string> tokens, Channel 
 		}
 		else if (tokens[2][i] == 'o')
 		{
-			if (flag == 1 && (3 + j) < tokensSize)
+			if (flag == 1 && (3 + j) < tokens.size())
 			{
 				modeUserOperator(user, tokens[3 + j], thisChannel, flag);
 				j++;
 			}
-			else if (flag == -1 && (3 + j) < tokensSize)
+			else if (flag == -1 && (3 + j) < tokens.size())
 				modeUserOperator(user, tokens[3 + j], thisChannel, flag);
 			else
 			{
